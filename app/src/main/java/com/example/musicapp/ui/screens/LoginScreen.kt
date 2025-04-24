@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.musicapp.ui.MusicAppRoute
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -73,32 +75,27 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier
-                    .fillMaxWidth()
+                label = { Text("Email") }
             )
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
-                modifier = Modifier
-                    .fillMaxWidth()
+                label = { Text("Password") }
             )
 
             Button(
-                contentPadding = ButtonDefaults.TextButtonContentPadding,
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .fillMaxWidth()
+                onClick = { /*TODO*/ }
             ) {
                 Text("Log in")
             }
 
-            Button(
-                contentPadding = ButtonDefaults.TextButtonContentPadding,
+            TextButton(
                 onClick = { /*TODO*/ },
             ) {
                 Text("Forgot your password?")
+            }
+            TextButton (onClick = { navController.navigate(MusicAppRoute.Register) }) {
+                Text("Don't have an account? Sign up")
             }
             Spacer(modifier = Modifier.weight(0.5f))
         }
