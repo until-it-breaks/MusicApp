@@ -14,10 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.example.musicapp.R
-import com.example.musicapp.ui.MusicAppRoute
 
 @Composable
-fun WelcomeScreen(navController: NavController) {
+fun RegisterScreen(navController: NavController) {
     Scaffold { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -25,26 +24,7 @@ fun WelcomeScreen(navController: NavController) {
                 .padding(contentPadding)
                 .fillMaxSize()
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = "App Logo"
-            )
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                contentDescription = "App Logo"
-            )
-            Button(
-                onClick = { navController.navigate(MusicAppRoute.Login) },
-                contentPadding = ButtonDefaults.TextButtonContentPadding
-            ) {
-                Text("Sign Up For Free")
-            }
-            Button(
-                onClick = { navController.navigate(MusicAppRoute.Register) },
-                contentPadding = ButtonDefaults.TextButtonContentPadding
-            ) {
-                Text("Login")
-            }
+            Text("Register")
         }
     }
 }
