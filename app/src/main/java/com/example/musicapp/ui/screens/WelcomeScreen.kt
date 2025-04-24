@@ -34,16 +34,16 @@ fun WelcomeScreen(navController: NavController) {
                 contentDescription = "App Logo"
             )
             Button(
-                onClick = { navController.navigate(MusicAppRoute.Login) },
-                contentPadding = ButtonDefaults.TextButtonContentPadding
-            ) {
-                Text("Sign Up For Free")
-            }
-            Button(
                 onClick = { navController.navigate(MusicAppRoute.Register) },
                 contentPadding = ButtonDefaults.TextButtonContentPadding
             ) {
-                Text("Login")
+                Text("Sign up for free")
+            }
+            Button(
+                onClick = { navController.navigate(MusicAppRoute.Login) },
+                contentPadding = ButtonDefaults.TextButtonContentPadding
+            ) {
+                Text("Log in")
             }
         }
     }
