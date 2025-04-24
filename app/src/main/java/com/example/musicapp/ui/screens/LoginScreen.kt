@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -15,7 +16,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -43,7 +43,6 @@ fun LoginScreen(navController: NavController) {
             modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize()
-                .padding(16.dp)
         ) {
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -82,18 +81,17 @@ fun LoginScreen(navController: NavController) {
                 onValueChange = { password = it },
                 label = { Text("Password") }
             )
-
-            Button(
-                onClick = { /*TODO*/ }
-            ) {
-                Text("Log in")
-            }
-
             TextButton(
                 onClick = { /*TODO*/ },
             ) {
                 Text("Forgot your password?")
             }
+            Button(
+                onClick = { /*TODO*/ }
+            ) {
+                Text("Log in")
+            }
+            Spacer(modifier = Modifier.height(36.dp))
             TextButton (onClick = { navController.navigate(MusicAppRoute.Register) }) {
                 Text("Don't have an account? Sign up")
             }

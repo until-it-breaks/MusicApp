@@ -6,17 +6,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -26,12 +26,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
@@ -45,35 +46,44 @@ fun RegisterScreen(navController: NavController) {
                 .padding(contentPadding)
                 .fillMaxSize()
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-            Row (
-                modifier = Modifier.height(50.dp),
-
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text(
-                        "Sign Up",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold)
-                    Text(
-                        "Discover new music",
-                        style = MaterialTheme.typography.bodySmall)
-                }
-                Spacer(modifier = Modifier.width(16.dp))
                 Image(
                     Icons.Outlined.MusicNote,
                     "App Logo",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .fillMaxHeight()
+                        .size(96.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .padding(12.dp)
                 )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    "MusicApp",
+                    style = MaterialTheme.typography.headlineLarge
+                )
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Sign Up",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Discover new music",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
 
             var email by rememberSaveable { mutableStateOf("") }
             var password by rememberSaveable { mutableStateOf("") }
@@ -82,25 +92,29 @@ fun RegisterScreen(navController: NavController) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label ={ Text("Email") }
-            )
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label ={ Text("Password") }
+                label = { Text("Email") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
-                label ={ Text("Username") }
+                label = { Text("Username") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             Button(
-                contentPadding = ButtonDefaults.TextButtonContentPadding,
-                onClick = { },
+                onClick = { /* TODO */ },
             ) {
-                Text("Create an account")
+                Text("Create account")
             }
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.5f))
         }
     }
 }
