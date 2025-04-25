@@ -3,14 +3,16 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.serialization)
+
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.musicapp"
+    namespace = "com.musicapp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.musicapp"
+        applicationId = "com.musicapp"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -60,4 +62,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.androidx.material.icons.extended)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.com.google.firebase.firebase.analytics)
+    implementation(libs.firebase.auth)
 }

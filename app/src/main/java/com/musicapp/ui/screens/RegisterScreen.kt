@@ -1,4 +1,4 @@
-package com.example.musicapp.ui.screens
+package com.musicapp.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,15 +13,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,12 +33,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.MusicAppRoute
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun RegisterScreen(navController: NavController) {
+    val signUpViewModel: SignUpViewModel = viewModel()
+    val signUpState by signUpViewModel.signUpState.collectAsState()
+
     Scaffold { innerPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -49,7 +59,7 @@ fun LoginScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(2f)
+                    .weight(1f)
             ) {
                 Image(
                     Icons.Outlined.MusicNote,
@@ -67,35 +77,70 @@ fun LoginScreen(navController: NavController) {
                     style = MaterialTheme.typography.headlineLarge
                 )
             }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Sign Up",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Discover new music",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             var email by rememberSaveable { mutableStateOf("") }
             var password by rememberSaveable { mutableStateOf("") }
+            var username by rememberSaveable { mutableStateOf("") }
 
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") }
+                label = { Text("Email") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            )
+            OutlinedTextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("Username") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") }
+                label = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
-            TextButton(
-                onClick = { /*TODO*/ },
-            ) {
-                Text("Forgot your password?")
-            }
+            Spacer(modifier = Modifier.height(8.dp))
             Button(
-                onClick = { navController.navigate(MusicAppRoute.Main) }
+                onClick = { signUpViewModel.signUp(email, password, username) },
             ) {
-                Text("Log in")
-            }
-            Spacer(modifier = Modifier.height(36.dp))
-            TextButton (onClick = { navController.navigate(MusicAppRoute.Register) }) {
-                Text("Don't have an account? Sign up")
+                Text("Create account")
             }
             Spacer(modifier = Modifier.weight(0.5f))
+
+            when (signUpState) {
+                is SignUpViewModel.SignUpState.Loading -> {
+                    CircularProgressIndicator()
+                }
+                is SignUpViewModel.SignUpState.Success -> {
+                    LaunchedEffect(Unit) {
+                        navController.navigate(MusicAppRoute.Login)
+                    }
+                }
+                is SignUpViewModel.SignUpState.Error -> {
+                    val errorMessage = (signUpState as SignUpViewModel.SignUpState.Error).errorMessage
+                    Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
+                }
+                is SignUpViewModel.SignUpState.Idle -> {
+
+                }
+            }
         }
     }
 }

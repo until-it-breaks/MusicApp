@@ -1,4 +1,4 @@
-package com.example.musicapp.ui.screens
+package com.musicapp.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -10,8 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.example.musicapp.ui.composables.AppBar
-import com.example.musicapp.ui.composables.NavBar
+import com.musicapp.ui.composables.AppBar
+import com.musicapp.ui.composables.NavBar
 
 @Composable
 fun MainScreen(navController: NavController) {
@@ -21,7 +21,11 @@ fun MainScreen(navController: NavController) {
 
     Scaffold(
         topBar = { AppBar(navController, title = currentTitle) },
-        bottomBar = { NavBar(selectedItem = selectedItem, onItemSelected = {index -> selectedItem = index}) }
+        bottomBar = {
+            NavBar(
+                selectedItem = selectedItem,
+                onItemSelected = { index -> selectedItem = index })
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
