@@ -36,12 +36,12 @@ import com.example.musicapp.ui.MusicAppRoute
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    Scaffold { contentPadding ->
+    Scaffold { innerPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-                .padding(contentPadding)
+                .padding(innerPadding)
                 .fillMaxSize()
         ) {
             Row(
@@ -87,7 +87,7 @@ fun LoginScreen(navController: NavController) {
                 Text("Forgot your password?")
             }
             Button(
-                onClick = { /*TODO*/ }
+                onClick = { navController.navigate(MusicAppRoute.Main) }
             ) {
                 Text("Log in")
             }

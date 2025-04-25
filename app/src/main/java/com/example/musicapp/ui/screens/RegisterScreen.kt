@@ -38,12 +38,12 @@ import androidx.navigation.NavController
 
 @Composable
 fun RegisterScreen(navController: NavController) {
-    Scaffold { contentPadding ->
+    Scaffold { innerPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-                .padding(contentPadding)
+                .padding(innerPadding)
                 .fillMaxSize()
         ) {
             Row(
