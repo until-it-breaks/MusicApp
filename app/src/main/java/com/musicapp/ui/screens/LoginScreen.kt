@@ -99,7 +99,7 @@ fun LoginScreen(navController: NavController) {
                 Text("Log in")
             }
             Spacer(modifier = Modifier.height(36.dp))
-            TextButton (onClick = { navController.navigate(MusicAppRoute.Register) }) {
+            TextButton (onClick = { navController.navigate(MusicAppRoute.SignUp) }) {
                 Text("Don't have an account? Sign up")
             }
             Spacer(modifier = Modifier.weight(0.5f))

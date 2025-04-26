@@ -42,7 +42,7 @@ import androidx.navigation.NavController
 import com.musicapp.ui.MusicAppRoute
 
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun SignUpScreen(navController: NavController) {
     val signUpViewModel: SignUpViewModel = viewModel()
     val signUpState by signUpViewModel.signUpState.collectAsState()
 

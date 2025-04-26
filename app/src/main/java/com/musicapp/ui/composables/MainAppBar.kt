@@ -9,18 +9,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
+import com.musicapp.ui.MusicAppRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppBar(navController: NavController, title: String) {
+fun MainAppBar(navController: NavController, title: String) {
     TopAppBar(
         title = {
             Text(title)
         },
         actions = {
-            IconButton(onClick = { /*TODO*/}) {
-                Icon(Icons.Outlined.Person, contentDescription = "Profile")
-            }
+                IconButton(onClick = { navController.navigate(MusicAppRoute.Profile)}) {
+                    Icon(Icons.Outlined.Person, contentDescription = "Profile")
+                }
         }
     )
 }
