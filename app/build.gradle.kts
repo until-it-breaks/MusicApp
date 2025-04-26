@@ -64,5 +64,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(platform(libs.firebase.bom))
     implementation(libs.com.google.firebase.firebase.analytics)
+    implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 }

@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens
+package com.musicapp.ui.screens.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

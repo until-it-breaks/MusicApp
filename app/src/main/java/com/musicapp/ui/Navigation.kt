@@ -4,26 +4,26 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.musicapp.ui.screens.LoginScreen
+import com.musicapp.ui.screens.login.LoginScreen
 import com.musicapp.ui.screens.MainScreen
 import com.musicapp.ui.screens.ProfileScreen
 import com.musicapp.ui.screens.SettingsScreen
-import com.musicapp.ui.screens.SignUpScreen
+import com.musicapp.ui.screens.signup.SignUpScreen
 import kotlinx.serialization.Serializable
 
 sealed interface MusicAppRoute {
-    @Serializable object Login: MusicAppRoute
-    @Serializable object SignUp: MusicAppRoute
-    @Serializable object Main: MusicAppRoute
-    @Serializable object Settings: MusicAppRoute
-    @Serializable object Profile: MusicAppRoute
+    @Serializable data object Login: MusicAppRoute
+    @Serializable data object SignUp: MusicAppRoute
+    @Serializable data object Main: MusicAppRoute
+    @Serializable data object Settings: MusicAppRoute
+    @Serializable data object Profile: MusicAppRoute
 }
 
 @Composable
-fun MusicAppNavGraph(navController: NavHostController) {
+fun MusicAppNavGraph(navController: NavHostController, musicAppRoute: MusicAppRoute) {
     NavHost(
         navController = navController,
-        startDestination = MusicAppRoute.Login
+        startDestination = musicAppRoute
     ) {
         composable<MusicAppRoute.Login> {
             LoginScreen(navController)
