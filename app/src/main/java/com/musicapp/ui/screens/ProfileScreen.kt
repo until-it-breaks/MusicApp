@@ -1,6 +1,7 @@
 package com.musicapp.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,8 +11,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,13 +23,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.compose.material3.TopAppBar
+import com.musicapp.ui.composables.BackTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text("Profile") }) }
+        topBar = { BackTopBar("Profile", navController) }
     ) { contentPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -42,9 +43,9 @@ fun ProfileScreen(navController: NavController) {
                 "Profile picture",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .padding(vertical = 16.dp)
                     .size(128.dp)
                     .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(36.dp)
             )
             OutlinedTextField(
