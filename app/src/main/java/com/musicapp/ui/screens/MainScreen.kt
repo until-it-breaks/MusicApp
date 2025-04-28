@@ -1,6 +1,5 @@
 package com.musicapp.ui.screens
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -31,16 +30,13 @@ fun MainScreen(navController: NavController) {
                 onItemSelected = { index -> selectedItem = index })
         }
     ) { contentPadding ->
-        Column(
-            modifier = Modifier
-                .padding(contentPadding)
-                .fillMaxSize()
-        ) {
-            when (categories[selectedItem]) {
-                "Home" -> HomeContent()
-                "Search" -> SearchContent()
-                "Library" -> LibraryContent()
-            }
+        val modifier = Modifier
+            .padding(contentPadding)
+            .fillMaxSize()
+        when (categories[selectedItem]) {
+            "Home" -> HomeContent(modifier)
+            "Search" -> SearchContent(modifier)
+            "Library" -> LibraryContent(modifier)
         }
     }
 }
