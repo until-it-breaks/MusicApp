@@ -1,0 +1,6 @@
+log in (jiekai)
+home (jiekai)
+search, song, player (franco)
+library (jiekai)
+setting
+profilo (franco)
