@@ -91,11 +91,9 @@ fun SettingsScreen(navController: NavController) {
                         Column {
                             Text(
                                 text = "Allow explicit songs",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.titleMedium)
                             Text(
                                 text = "Songs containing explicit content won't be shown",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyMedium)
                         }
                         Switch(
@@ -117,11 +115,9 @@ fun SettingsScreen(navController: NavController) {
                         Column {
                             Text(
                                 text = "Allow explicit songs",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.titleMedium)
                             Text(
                                 text = "Songs containing explicit content won't be shown",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyMedium)
                         }
                         Switch(
@@ -143,11 +139,9 @@ fun SettingsScreen(navController: NavController) {
                         Column {
                             Text(
                                 text = "Allow explicit songs",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.titleMedium)
                             Text(
                                 text = "Songs containing explicit content won't be shown",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyMedium)
                         }
                         Switch(

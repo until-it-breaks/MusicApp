@@ -58,17 +58,13 @@ fun ProfileScreen(navController: NavController) {
                     .padding(36.dp)
             )
             TextButton(onClick = { /*TODO*/ }) {
-                Text(
-                    text = "Edit photo",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                Text("Edit photo")
             }
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
                     text = "Username",
-                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(12.dp, 0.dp, 0.dp, 0.dp)
                 )
@@ -83,7 +79,6 @@ fun ProfileScreen(navController: NavController) {
                     ) {
                         Text(
                             text = "Placeholder Name",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(Modifier.weight(1f))
