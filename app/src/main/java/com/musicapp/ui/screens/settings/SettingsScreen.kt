@@ -7,15 +7,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -43,36 +43,31 @@ fun SettingsScreen(navController: NavController) {
         topBar = { BackTopBar("Account & Settings", navController) }
     ) { contentPadding ->
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(12.dp)
         ) {
             Card(
-                onClick = { navController.navigate(MusicAppRoute.Profile) },
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
+                onClick = { navController.navigate(MusicAppRoute.Profile) }
             ) {
                 Row(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
-                        Icons.Filled.Image,
-                        "Profile picture",
+                        imageVector = Icons.Filled.Image,
+                        contentDescription = "Profile picture",
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.size(72.dp)
                     )
                     Column {
                         Text(
                             text = "Profile Name",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.headlineSmall)
                         Text(
                             text = "View Profile",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodyMedium)
                     }
                     Spacer(modifier = Modifier.weight(1f))
@@ -83,78 +78,83 @@ fun SettingsScreen(navController: NavController) {
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
+            Column {
+                Card(
+                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 0.dp, bottomEnd = 0.dp)
                 ) {
-                    Column {
-                        Text(
-                            text = "Allow explicit songs",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.titleLarge)
-                        Text(
-                            text = "Songs containing explicit content won't be shown",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyMedium)
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        Column {
+                            Text(
+                                text = "Allow explicit songs",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                text = "Songs containing explicit content won't be shown",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium)
+                        }
+                        Switch(
+                            checked = setting1,
+                            onCheckedChange = { setting1 = it }
+                        )
                     }
-                    Switch(
-                        checked = setting1,
-                        onCheckedChange = { setting1 = it }
-                    )
                 }
-            }
-            Card {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
+                HorizontalDivider()
+                Card(
+                    shape = RoundedCornerShape(0)
                 ) {
-                    Column {
-                        Text(
-                            text = "Allow explicit songs",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.titleLarge)
-                        Text(
-                            text = "Songs containing explicit content won't be shown",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyMedium)
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        Column {
+                            Text(
+                                text = "Allow explicit songs",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                text = "Songs containing explicit content won't be shown",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium)
+                        }
+                        Switch(
+                            checked = setting1,
+                            onCheckedChange = { setting1 = it }
+                        )
                     }
-                    Switch(
-                        checked = setting1,
-                        onCheckedChange = { setting1 = it }
-                    )
                 }
-            }
-            Card {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
+                HorizontalDivider()
+                Card(
+                    shape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
                 ) {
-                    Column {
-                        Text(
-                            text = "Allow explicit songs",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.titleLarge)
-                        Text(
-                            text = "Songs containing explicit content won't be shown",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyMedium)
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        Column {
+                            Text(
+                                text = "Allow explicit songs",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                text = "Songs containing explicit content won't be shown",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium)
+                        }
+                        Switch(
+                            checked = setting1,
+                            onCheckedChange = { setting1 = it }
+                        )
                     }
-                    Switch(
-                        checked = setting1,
-                        onCheckedChange = { setting1 = it }
-                    )
                 }
             }
         }
