@@ -2,7 +2,6 @@ package com.musicapp.ui.screens.search
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,19 +29,19 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SearchContent(modifier: Modifier) {
-    val genres = (1..8).map { "Genre #$it" } // TODO remove
+    val genres = (1..8).map { "Genre #$it" } // TODO replace with actual content
     var searchText by remember { mutableStateOf("") }
+
     Column(
-        modifier = modifier
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier.padding(12.dp)
     ) {
         // TODO consider swapping for a pre-made search composable
         OutlinedTextField(
             value = searchText,
             onValueChange = { searchText = it },
             placeholder = { Text("What do you want to play?") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+            modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(Icons.Outlined.Search, "Search")
@@ -51,27 +50,25 @@ fun SearchContent(modifier: Modifier) {
         )
         Text(
             text = "Discover something new",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 12.dp)
+            style = MaterialTheme.typography.titleLarge
         )
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(8.dp)
         ) {
             items(genres) { genre ->
                 GenreItem(
                     genre,
-                    onClick = { /*TODO*/ })
+                    onClick = { /*TODO*/ }
+                )
             }
         }
     }
 }
 
 @Composable
-fun GenreItem(item: String, onClick: () -> Unit) {
+fun GenreItem(title: String, onClick: () -> Unit) {
     Card(
         onClick = onClick
     ) {
@@ -80,13 +77,12 @@ fun GenreItem(item: String, onClick: () -> Unit) {
         ) {
             Icon(
                 imageVector =  Icons.Outlined.Image,
-                contentDescription = "Item Picture",
+                contentDescription = "Genre picture",
                 modifier = Modifier.size(72.dp)
             )
             Text(
-                text = item,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge
+                text = title,
+                style = MaterialTheme.typography.titleMedium
             )
         }
     }

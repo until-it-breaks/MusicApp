@@ -2,7 +2,6 @@ package com.musicapp.ui.screens.library
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,17 +25,15 @@ import androidx.compose.ui.unit.dp
 fun LibraryContent(modifier: Modifier) {
     val playlists = (1..8).map { "Playlist #$it" } // TODO remove
     Column(
-        modifier = modifier
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier.padding(12.dp)
     ) {
         Text(
-            "Your playlists",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 12.dp)
+            text = "Your playlists",
+            style = MaterialTheme.typography.titleLarge,
         )
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(playlists) { playlist ->
                 PlaylistItem(
@@ -49,7 +46,7 @@ fun LibraryContent(modifier: Modifier) {
 }
 
 @Composable
-fun PlaylistItem(item: String, onClick: () -> Unit) {
+fun PlaylistItem(title: String, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth()
@@ -60,13 +57,12 @@ fun PlaylistItem(item: String, onClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Outlined.Image,
                 contentDescription = "Playlist Picture",
-                modifier = Modifier
-                    .size(72.dp)
+                modifier = Modifier.size(72.dp)
             )
             Text(
-                text = item,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge)
+                text = title,
+                style = MaterialTheme.typography.titleMedium
+            )
             Spacer(modifier = Modifier.weight(1f))
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,

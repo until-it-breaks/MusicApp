@@ -2,8 +2,8 @@ package com.musicapp.ui.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -24,28 +24,29 @@ import androidx.compose.ui.unit.dp
 fun HomeContent(modifier: Modifier) {
     val homeViewModel = remember { HomeViewModel() }
 
-    val randomMixes = (1..8).map { "Random mix #$it" } // TODO remove
+    val randomMixes = (1..8).map { "Random mix #$it" } // TODO replace with actual content
 
     Column(
-        modifier = modifier
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.padding(12.dp)
     ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(randomMixes) { playlist ->
                 MixItem(
                     playlist,
-                    onClick = { /*TODO*/ })
+                    onClick = { /*TODO*/ }
+                )
             }
         }
     }
 }
 
 @Composable
-fun MixItem(item: String, onClick: () -> Unit) {
+fun MixItem(title: String, onClick: () -> Unit) {
     Card(
         onClick = onClick
     ) {
@@ -54,13 +55,12 @@ fun MixItem(item: String, onClick: () -> Unit) {
         ) {
             Icon(
                 imageVector = Icons.Outlined.Image,
-                contentDescription = "Item Picture",
+                contentDescription = "Mix picture",
                 modifier = Modifier.size(72.dp)
             )
             Text(
-                text = item,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge
+                text = title,
+                style = MaterialTheme.typography.titleMedium
             )
         }
     }
