@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens
+package com.musicapp.ui.screens.settings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -49,7 +50,10 @@ fun SettingsScreen(navController: NavController) {
                 .padding(8.dp)
         ) {
             Card(
-                onClick = { navController.navigate(MusicAppRoute.Profile) }
+                onClick = { navController.navigate(MusicAppRoute.Profile) },
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             ) {
                 Row(
                     horizontalArrangement = Arrangement.Start,
@@ -80,7 +84,11 @@ fun SettingsScreen(navController: NavController) {
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Card {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier

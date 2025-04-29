@@ -6,8 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.musicapp.ui.screens.login.LoginScreen
 import com.musicapp.ui.screens.MainScreen
-import com.musicapp.ui.screens.ProfileScreen
-import com.musicapp.ui.screens.SettingsScreen
+import com.musicapp.ui.screens.profile.ProfileScreen
+import com.musicapp.ui.screens.settings.SettingsScreen
 import com.musicapp.ui.screens.signup.SignUpScreen
 import kotlinx.serialization.Serializable
 
