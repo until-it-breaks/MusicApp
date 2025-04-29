@@ -59,11 +59,11 @@ fun SignUpScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(3f)
             ) {
                 Image(
-                    Icons.Outlined.MusicNote,
-                    "App Logo",
+                    imageVector = Icons.Outlined.MusicNote,
+                    contentDescription = "App Logo",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(96.dp)
@@ -73,7 +73,7 @@ fun SignUpScreen(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    "MusicApp",
+                    text = "MusicApp",
                     style = MaterialTheme.typography.headlineLarge
                 )
             }
@@ -81,12 +81,12 @@ fun SignUpScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "Sign Up",
+                    text = "Sign Up",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "Discover new music",
+                    text = "Discover new music",
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -98,16 +98,16 @@ fun SignUpScreen(navController: NavController) {
             var username by rememberSaveable { mutableStateOf("") }
 
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-            )
-            OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
                 label = { Text("Username") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
             OutlinedTextField(
                 value = password,
@@ -122,7 +122,7 @@ fun SignUpScreen(navController: NavController) {
             ) {
                 Text("Create account")
             }
-            Spacer(modifier = Modifier.weight(0.5f))
+            Spacer(modifier = Modifier.weight(2f))
 
             when (signUpState) {
                 is SignUpViewModel.SignUpState.Loading -> {

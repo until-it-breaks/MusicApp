@@ -8,14 +8,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -33,6 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -43,12 +46,12 @@ fun LoginScreen(navController: NavController) {
     val loginViewModel: LoginViewModel = viewModel()
     val loginUiState by loginViewModel.loginState.collectAsState()
 
-    Scaffold { innerPadding ->
+    Scaffold { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(contentPadding)
                 .fillMaxSize()
         ) {
             Row(
@@ -56,11 +59,11 @@ fun LoginScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(2f)
+                    .weight(3f)
             ) {
                 Image(
-                    Icons.Outlined.MusicNote,
-                    "App Logo",
+                    imageVector = Icons.Outlined.MusicNote,
+                    contentDescription = "App Logo",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(96.dp)
@@ -70,7 +73,7 @@ fun LoginScreen(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    "MusicApp",
+                    text = "MusicApp",
                     style = MaterialTheme.typography.headlineLarge
                 )
             }
@@ -86,7 +89,9 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") }
+                label = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
             TextButton(
                 onClick = { /*TODO*/ },
@@ -94,15 +99,19 @@ fun LoginScreen(navController: NavController) {
                 Text("Forgot your password?")
             }
             Button(
-                onClick = { loginViewModel.login(email, password) }
+                onClick = { loginViewModel.login(email, password) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
                 Text("Log in")
             }
-            Spacer(modifier = Modifier.height(36.dp))
-            TextButton (onClick = { navController.navigate(MusicAppRoute.SignUp) }) {
-                Text("Don't have an account? Sign up")
-            }
             Spacer(modifier = Modifier.weight(0.5f))
+            TextButton (onClick = { navController.navigate(MusicAppRoute.SignUp) }) {
+                Text("Don't have an account? Sign up now!")
+            }
+            Spacer(modifier = Modifier.weight(2f))
 
             when (loginUiState) {
                 is LoginViewModel.LoginState.Loading -> {
