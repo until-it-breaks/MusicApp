@@ -37,13 +37,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.musicapp.ui.MusicAppRoute
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    val loginViewModel: LoginViewModel = viewModel()
+    val loginViewModel = koinViewModel<LoginViewModel>()
     val loginUiState by loginViewModel.loginState.collectAsState()
 
     Scaffold { contentPadding ->

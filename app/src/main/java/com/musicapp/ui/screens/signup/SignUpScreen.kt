@@ -43,7 +43,7 @@ import com.musicapp.ui.MusicAppRoute
 
 @Composable
 fun SignUpScreen(navController: NavController) {
-    val signUpViewModel: SignUpViewModel = viewModel()
+    val signUpViewModel = viewModel<SignUpViewModel>()
     val signUpState by signUpViewModel.signUpState.collectAsState()
 
     Scaffold { innerPadding ->
