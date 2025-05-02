@@ -13,7 +13,7 @@ import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BackTopBar(title: String, navController: NavController) {
+fun TopBarWithBackButton(title: String, navController: NavController) {
     CenterAlignedTopAppBar(
         title = { Text(
             text = title,

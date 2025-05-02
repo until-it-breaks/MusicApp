@@ -32,7 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.musicapp.ui.MusicAppRoute
-import com.musicapp.ui.composables.BackTopBar
+import com.musicapp.ui.composables.TopBarWithBackButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +40,7 @@ fun SettingsScreen(navController: NavController) {
     var setting1 by remember { mutableStateOf(true) }
 
     Scaffold(
-        topBar = { BackTopBar("Account & Settings", navController) }
+        topBar = { TopBarWithBackButton("Account & Settings", navController) }
     ) { contentPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),

@@ -31,13 +31,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.musicapp.ui.composables.BackTopBar
+import com.musicapp.ui.composables.TopBarWithBackButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
     Scaffold(
-        topBar = { BackTopBar("Profile", navController) }
+        topBar = { TopBarWithBackButton("Profile", navController) }
     ) { contentPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
