@@ -9,13 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import kotlin.getValue
 
-class SignUpViewModel: ViewModel(), KoinComponent {
-    private val firebaseAuth: FirebaseAuth by inject<FirebaseAuth>()
-    private val firestore: FirebaseFirestore by inject<FirebaseFirestore>()
+class SignUpViewModel(private val auth: FirebaseAuth, private val store: FirebaseFirestore): ViewModel() {
 
     private val _signUpState = MutableStateFlow<SignUpState>(SignUpState.Idle)
     val signUpState: StateFlow<SignUpState> = _signUpState
@@ -24,7 +19,7 @@ class SignUpViewModel: ViewModel(), KoinComponent {
         _signUpState.update { SignUpState.Loading }
         viewModelScope.launch {
             try {
-                val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+                val authResult = auth.createUserWithEmailAndPassword(email, password).await()
                 authResult.user?.uid?.let { userId ->
                     saveUserData(userId, username)
                     _signUpState.update { SignUpState.Success }
@@ -39,10 +34,10 @@ class SignUpViewModel: ViewModel(), KoinComponent {
 
     private suspend fun saveUserData(userId: String, username: String) {
         try {
-            val userDocument = firestore.collection("users").document(userId)
+            val userDocument = store.collection("users").document(userId)
             val userData = hashMapOf(
                 "username" to username,
-                "email" to firebaseAuth.currentUser?.email
+                "email" to auth.currentUser?.email
             )
             userDocument.set(userData).await()
         } catch (e: Exception) {

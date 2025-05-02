@@ -37,13 +37,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.musicapp.ui.MusicAppRoute
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SignUpScreen(navController: NavController) {
-    val signUpViewModel = viewModel<SignUpViewModel>()
+    val signUpViewModel: SignUpViewModel = koinViewModel()
     val signUpState by signUpViewModel.signUpState.collectAsState()
 
     Scaffold { innerPadding ->

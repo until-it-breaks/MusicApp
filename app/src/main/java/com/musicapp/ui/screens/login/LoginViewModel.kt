@@ -3,41 +3,30 @@ package com.musicapp.ui.screens.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.musicapp.data.util.OperationState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import kotlin.getValue
 
-class LoginViewModel: ViewModel(), KoinComponent {
-    private val auth by inject<FirebaseAuth>()
-
-    private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
-    val loginState: StateFlow<LoginState> = _loginState
+class LoginViewModel(private val auth: FirebaseAuth): ViewModel() {
+    private val _loginState = MutableStateFlow<OperationState>(OperationState.Idle)
+    val loginState: StateFlow<OperationState> = _loginState
 
     fun login(email: String, password: String) {
-        _loginState.value = LoginState.Loading
+        _loginState.value = OperationState.Ongoing
         viewModelScope.launch {
             try {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            _loginState.value = LoginState.Success
+                            _loginState.value = OperationState.Success
                         } else {
-                            _loginState.value = LoginState.Error(task.exception?.message ?: "Login failed")
+                            _loginState.value = OperationState.Error(task.exception?.message ?: "Login failed")
                         }
                     }
             } catch (e: Exception) {
-                _loginState.value = LoginState.Error(e.localizedMessage ?: "An unexpected error occurred")
+                _loginState.value = OperationState.Error(e.localizedMessage ?: "An unexpected error occurred")
             }
         }
-    }
-
-    sealed class LoginState {
-        object Idle: LoginState()
-        object Loading: LoginState()
-        object Success:  LoginState()
-        data class Error(val errorMessage: String) : LoginState()
     }
 }

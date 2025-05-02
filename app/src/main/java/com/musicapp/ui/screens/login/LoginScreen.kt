@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.musicapp.data.util.OperationState
 import com.musicapp.ui.MusicAppRoute
 import org.koin.androidx.compose.koinViewModel
 
@@ -94,7 +95,7 @@ fun LoginScreen(navController: NavController) {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
             TextButton(
-                onClick = { /*TODO*/ },
+                onClick = { navController.navigate(MusicAppRoute.PasswordRecovery) },
             ) {
                 Text("Forgot your password?")
             }
@@ -114,19 +115,19 @@ fun LoginScreen(navController: NavController) {
             Spacer(modifier = Modifier.weight(2f))
 
             when (loginUiState) {
-                is LoginViewModel.LoginState.Loading -> {
+                is OperationState.Ongoing -> {
                     CircularProgressIndicator()
                 }
-                is LoginViewModel.LoginState.Success -> {
+                is OperationState.Success -> {
                     LaunchedEffect(Unit) {
                         navController.navigate(MusicAppRoute.Main)
                     }
                 }
-                is LoginViewModel.LoginState.Error -> {
-                    val errorMessage = (loginUiState as LoginViewModel.LoginState.Error).errorMessage
+                is OperationState.Error -> {
+                    val errorMessage = (loginUiState as OperationState.Error).message
                     Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
                 }
-                is LoginViewModel.LoginState.Idle -> {
+                is OperationState.Idle -> {
 
                 }
             }
