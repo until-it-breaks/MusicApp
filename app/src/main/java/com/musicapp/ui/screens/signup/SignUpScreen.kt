@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -38,20 +39,22 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.musicapp.data.util.OperationState
 import com.musicapp.ui.MusicAppRoute
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavController) {
     val signUpViewModel: SignUpViewModel = koinViewModel()
     val signUpState by signUpViewModel.signUpState.collectAsState()
 
-    Scaffold { innerPadding ->
+    Scaffold { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(contentPadding)
                 .fillMaxSize()
         ) {
             Row(
@@ -122,25 +125,25 @@ fun SignUpScreen(navController: NavController) {
             ) {
                 Text("Create account")
             }
-            Spacer(modifier = Modifier.weight(2f))
 
             when (signUpState) {
-                is SignUpViewModel.SignUpState.Loading -> {
+                is OperationState.Ongoing -> {
                     CircularProgressIndicator()
                 }
-                is SignUpViewModel.SignUpState.Success -> {
+                is OperationState.Success -> {
                     LaunchedEffect(Unit) {
                         navController.navigate(MusicAppRoute.Login)
                     }
                 }
-                is SignUpViewModel.SignUpState.Error -> {
-                    val errorMessage = (signUpState as SignUpViewModel.SignUpState.Error).errorMessage
+                is OperationState.Error -> {
+                    val errorMessage = (signUpState as OperationState.Error).message
                     Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
                 }
-                is SignUpViewModel.SignUpState.Idle -> {
+                is OperationState.Idle -> {
 
                 }
             }
+            Spacer(modifier = Modifier.weight(2f))
         }
     }
 }

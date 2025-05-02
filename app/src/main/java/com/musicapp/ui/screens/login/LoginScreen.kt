@@ -2,25 +2,35 @@ package com.musicapp.ui.screens.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -28,14 +38,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.musicapp.data.util.OperationState
@@ -45,15 +60,31 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun LoginScreen(navController: NavController) {
     val loginViewModel = koinViewModel<LoginViewModel>()
-    val loginUiState by loginViewModel.loginState.collectAsState()
+    val loginState by loginViewModel.loginState.collectAsState()
 
-    Scaffold { contentPadding ->
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    var passwordVisible by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val focusManager = LocalFocusManager.current
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize()
+                .imePadding()
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        focusManager.clearFocus()
+                    }
+                }
         ) {
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -78,21 +109,34 @@ fun LoginScreen(navController: NavController) {
                     style = MaterialTheme.typography.headlineLarge
                 )
             }
-
-            var email by rememberSaveable { mutableStateOf("") }
-            var password by rememberSaveable { mutableStateOf("") }
-
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") }
+                label = { Text("Email") },
+                modifier = Modifier.width(300.dp),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
             )
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                modifier = Modifier.width(300.dp),
+                singleLine = true,
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Go),
+                keyboardActions = KeyboardActions(onGo = {
+                    focusManager.clearFocus()
+                    loginViewModel.login(email, password)
+                }),
+                trailingIcon = {
+                    val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    val description = if (passwordVisible) "Hide password" else "Show password"
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(imageVector = image, contentDescription = description)
+                    }
+                }
             )
             TextButton(
                 onClick = { navController.navigate(MusicAppRoute.PasswordRecovery) },
@@ -100,23 +144,24 @@ fun LoginScreen(navController: NavController) {
                 Text("Forgot your password?")
             }
             Button(
-                onClick = { loginViewModel.login(email, password) },
+                onClick = {
+                    focusManager.clearFocus()
+                    loginViewModel.login(email, password)
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                ),
+                enabled = email.isNotBlank() && password.isNotBlank()
             ) {
                 Text("Log in")
             }
-            Spacer(modifier = Modifier.weight(0.5f))
-            TextButton (onClick = { navController.navigate(MusicAppRoute.SignUp) }) {
-                Text("Don't have an account? Sign up now!")
-            }
-            Spacer(modifier = Modifier.weight(2f))
 
-            when (loginUiState) {
+            when (loginState) {
                 is OperationState.Ongoing -> {
+                    Spacer(modifier = Modifier.weight(0.25f))
                     CircularProgressIndicator()
+                    Spacer(modifier = Modifier.weight(0.25f))
                 }
                 is OperationState.Success -> {
                     LaunchedEffect(Unit) {
@@ -124,13 +169,23 @@ fun LoginScreen(navController: NavController) {
                     }
                 }
                 is OperationState.Error -> {
-                    val errorMessage = (loginUiState as OperationState.Error).message
-                    Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
+                    val errorMessage = (loginState as OperationState.Error).message
+                    LaunchedEffect(errorMessage) {
+                        snackbarHostState.showSnackbar(
+                            message = errorMessage,
+                            duration = SnackbarDuration.Long
+                        )
+                    }
                 }
                 is OperationState.Idle -> {
-
+                    Spacer(modifier = Modifier.weight(0.5f))
                 }
             }
+
+            TextButton (onClick = { navController.navigate(MusicAppRoute.SignUp) }) {
+                Text("Don't have an account? Sign up now!")
+            }
+            Spacer(modifier = Modifier.weight(2f))
         }
     }
 }
