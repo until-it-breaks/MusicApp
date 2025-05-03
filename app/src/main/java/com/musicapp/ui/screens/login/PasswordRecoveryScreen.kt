@@ -98,7 +98,8 @@ fun PasswordRecoveryScreen(navController: NavController) {
                         email = ""
                         val result = snackbarHostState.showSnackbar(
                             message = context.getString(R.string.password_reset_email_sent),
-                            duration = SnackbarDuration.Long
+                            duration = SnackbarDuration.Long,
+                            withDismissAction = true
                         )
                         if (result == SnackbarResult.Dismissed) {
                             passwordRecoveryViewModel.resetState()
@@ -111,7 +112,8 @@ fun PasswordRecoveryScreen(navController: NavController) {
                         val errorMessage = errorState.stringKey?.let { context.getString(it) } ?: errorState.message
                         val result = snackbarHostState.showSnackbar(
                             message = errorMessage,
-                            duration = SnackbarDuration.Long
+                            duration = SnackbarDuration.Long,
+                            withDismissAction = true
                         )
                         if (result == SnackbarResult.Dismissed) {
                             passwordRecoveryViewModel.resetState()
