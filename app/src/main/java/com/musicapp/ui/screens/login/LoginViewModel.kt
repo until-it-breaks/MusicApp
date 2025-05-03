@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 data class LoginState(
     val email: String = "",
@@ -21,7 +22,7 @@ data class LoginState(
     val isLoading: Boolean = false,
     val navigateToMain: Boolean = false
 ) {
-    val canSubmit = email.isNotBlank() && password.isNotBlank() // Can be improved
+    val canSubmit = email.isNotBlank() && password.isNotBlank()
 }
 
 class LoginViewModel(private val auth: FirebaseAuth): ViewModel() {
@@ -46,24 +47,20 @@ class LoginViewModel(private val auth: FirebaseAuth): ViewModel() {
         _state.update { it.copy(isLoading = true, errorMessageId = null) }
 
         viewModelScope.launch {
-            auth.signInWithEmailAndPassword(state.value.email, state.value.password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        _state.update { it.copy(isLoading = false, navigateToMain = true) }
-                    } else {
-                        val errorKey = when (task.exception) {
-                            is FirebaseAuthInvalidUserException -> R.string.account_not_found_or_disabled
-                            is FirebaseAuthInvalidCredentialsException -> R.string.invalid_credentials
-                            is FirebaseNetworkException -> R.string.network_error
-                            else -> R.string.unexpected_error
-                        }
-                        _state.update { it.copy(isLoading = false, errorMessageId = errorKey) }
-                    }
+            try {
+                auth.signInWithEmailAndPassword(state.value.email, state.value.password).await()
+                _state.update { it.copy(navigateToMain = true) }
+            } catch (e: FirebaseAuthInvalidUserException) {
+                _state.update { it.copy(errorMessageId = R.string.account_not_found_or_disabled) }
+            } catch (e: FirebaseAuthInvalidCredentialsException) {
+                _state.update { it.copy(errorMessageId = R.string.invalid_credentials) }
+            } catch (e: FirebaseNetworkException) {
+                _state.update { it.copy(errorMessageId = R.string.network_error) }
+            } catch (e: Exception) {
+                _state.update { it.copy(errorMessageId = R.string.unexpected_error) }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
         }
-    }
-
-    fun resetNavigation() {
-        _state.update { it.copy(navigateToMain = false) }
     }
 }

@@ -35,7 +35,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -52,6 +51,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
@@ -60,7 +60,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun LoginScreen(navController: NavController) {
     val loginViewModel = koinViewModel<LoginViewModel>()
-    val state by loginViewModel.state.collectAsState()
+    val state by loginViewModel.state.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
@@ -122,19 +122,16 @@ fun LoginScreen(navController: NavController) {
                 visualTransformation = if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
+                    imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 trailingIcon = {
-                    val image =
-                        if (state.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (state.isPasswordVisible) {
-                        stringResource(R.string.hide_password)
-                    } else {
-                        stringResource(R.string.show_password)
-                    }
+                    val image = if (state.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    val description = if (state.isPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
                     IconButton(onClick = loginViewModel::togglePasswordVisibility) {
-                        Icon(imageVector = image, contentDescription = description)
+                        Icon(
+                            imageVector = image,
+                            contentDescription = description
+                        )
                     }
                 }
             )
@@ -172,8 +169,6 @@ fun LoginScreen(navController: NavController) {
                         withDismissAction = true
                     )
                 }
-            } else {
-                Spacer(modifier = Modifier.weight(0.5f))
             }
 
             if (state.navigateToMain) {
@@ -181,7 +176,6 @@ fun LoginScreen(navController: NavController) {
                     navController.navigate(MusicAppRoute.Main) {
                         popUpTo(navController.graph.id) { inclusive = true }
                     }
-                    loginViewModel.resetNavigation()
                 }
             }
 
