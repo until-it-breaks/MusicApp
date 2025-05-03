@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -46,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -71,6 +73,7 @@ fun LoginScreen(navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
 
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -166,24 +169,30 @@ fun LoginScreen(navController: NavController) {
             when (loginState) {
                 is OperationState.Ongoing -> {
                     Spacer(modifier = Modifier.weight(0.25f))
-
+                    CircularProgressIndicator()
                     Spacer(modifier = Modifier.weight(0.25f))
                 }
                 is OperationState.Success -> {
-                    LaunchedEffect(Unit) {
+                    LaunchedEffect(loginState) {
                         navController.navigate(MusicAppRoute.Main)
                     }
                 }
                 is OperationState.Error -> {
-                    val errorMessage = (loginState as OperationState.Error).message
-                    LaunchedEffect(errorMessage) {
-                        snackbarHostState.showSnackbar(
+                    LaunchedEffect(loginState) {
+                        val errorState = loginState as OperationState.Error
+                        val errorMessage = errorState.stringKey?.let { context.getString(it) } ?: errorState.message
+                        val result = snackbarHostState.showSnackbar(
                             message = errorMessage,
-                            duration = SnackbarDuration.Long
+                            duration = SnackbarDuration.Long,
+                            withDismissAction = true
                         )
+                        if (result == SnackbarResult.Dismissed) {
+                            loginViewModel.resetState()
+                        }
                     }
                 }
                 is OperationState.Idle -> {
+                    /* CircularProgressIndicator() */
                     Spacer(modifier = Modifier.weight(0.5f))
                 }
             }

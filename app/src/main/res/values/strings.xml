@@ -38,4 +38,6 @@
     <string name="network_error">A network error occurred</string>
     <string name="no_user_found">No user corresponding to the given mail was found</string>
     <string name="invalid_email">Invalid email</string>
+    <string name="invalid_credentials">Invalid credentials</string>
+    <string name="account_not_found_or_disabled">Account not found or disabled</string>
 </resources>

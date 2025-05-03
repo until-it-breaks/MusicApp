@@ -2,7 +2,11 @@ package com.musicapp.ui.screens.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.musicapp.R
 import com.musicapp.data.util.OperationState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,10 +27,19 @@ class LoginViewModel(private val auth: FirebaseAuth): ViewModel() {
                 if (task.isSuccessful) {
                     _loginState.value = OperationState.Success
                 } else {
-                    val errorMessage = task.exception?.localizedMessage ?: "An unexpected error occurred"
-                    _loginState.value = OperationState.Error(errorMessage)
+                    val errorKey = when (task.exception) {
+                        is FirebaseAuthInvalidUserException -> R.string.account_not_found_or_disabled
+                        is FirebaseAuthInvalidCredentialsException -> R.string.invalid_credentials
+                        is FirebaseNetworkException -> R.string.network_error
+                        else -> R.string.unexpected_error
+                    }
+                    _loginState.value = OperationState.Error(stringKey = errorKey)
                 }
             }
         }
+    }
+
+    fun resetState() {
+        _loginState.value = OperationState.Idle
     }
 }

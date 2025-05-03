@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens.login
+package com.musicapp.ui.screens.passwordrecovery
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

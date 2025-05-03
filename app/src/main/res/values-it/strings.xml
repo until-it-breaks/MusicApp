@@ -39,4 +39,6 @@
     <string name="network_error">Errore di rete</string>
     <string name="no_user_found">Non è stata trovato un utente corrispondente alla email</string>
     <string name="invalid_email">Email invalida</string>
+    <string name="invalid_credentials">Credenziali invalide</string>
+    <string name="account_not_found_or_disabled">Account inesistente o disabilitato</string>
 </resources>

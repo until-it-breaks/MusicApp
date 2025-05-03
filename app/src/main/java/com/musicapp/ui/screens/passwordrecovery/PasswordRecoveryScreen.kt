@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens.login
+package com.musicapp.ui.screens.passwordrecovery
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -44,7 +44,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun PasswordRecoveryScreen(navController: NavController) {
     val passwordRecoveryViewModel = koinViewModel<PasswordRecoveryViewModel>()
-    val recoveryProcessState by passwordRecoveryViewModel.recoveryState.collectAsState()
+    val recoveryState by passwordRecoveryViewModel.recoveryState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -91,10 +91,10 @@ fun PasswordRecoveryScreen(navController: NavController) {
             ) {
                 Text(stringResource(R.string.send_password_reset_email))
             }
-            when(recoveryProcessState) {
+            when(recoveryState) {
                 is OperationState.Ongoing -> CircularProgressIndicator()
                 is OperationState.Success -> {
-                    LaunchedEffect(recoveryProcessState) {
+                    LaunchedEffect(recoveryState) {
                         email = ""
                         val result = snackbarHostState.showSnackbar(
                             message = context.getString(R.string.password_reset_email_sent),
@@ -107,8 +107,8 @@ fun PasswordRecoveryScreen(navController: NavController) {
                     }
                 }
                 is OperationState.Error -> {
-                    LaunchedEffect(recoveryProcessState) {
-                        val errorState = recoveryProcessState as OperationState.Error
+                    LaunchedEffect(recoveryState) {
+                        val errorState = recoveryState as OperationState.Error
                         val errorMessage = errorState.stringKey?.let { context.getString(it) } ?: errorState.message
                         val result = snackbarHostState.showSnackbar(
                             message = errorMessage,
