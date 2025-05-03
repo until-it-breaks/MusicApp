@@ -21,4 +21,6 @@ val appModule = module {
     viewModel { PasswordRecoveryViewModel(get()) }
 
     viewModel { ProfileScreenViewModel(get()) }
+
+    viewModel { MainViewModel(get()) }
 }
