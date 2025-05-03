@@ -33,11 +33,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.musicapp.R
+import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.TopBarWithBackButton
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
+    val profileScreenViewModel: ProfileScreenViewModel = koinViewModel()
+
     Scaffold(
         topBar = { TopBarWithBackButton(stringResource(R.string.profile_screen_name), navController) }
     ) { contentPadding ->
@@ -116,6 +120,22 @@ fun ProfileScreen(navController: NavController) {
                     )
                 ) {
                     Text(stringResource(R.string.delete_profile))
+                }
+                Spacer(modifier = Modifier.width(24.dp))
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        profileScreenViewModel.logout()
+                        navController.navigate(MusicAppRoute.Login) {
+                            popUpTo(navController.graph.id) { inclusive = true} // Prevents going back to this screen
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    )
+                ) {
+                    Text("Logout")
                 }
             }
         }
