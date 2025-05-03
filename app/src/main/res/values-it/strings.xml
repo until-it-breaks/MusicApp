@@ -35,4 +35,8 @@
     <string name="discover_new_music">Scopri nuovi brani</string>
     <string name="username_label">Username</string>
     <string name="create_account">Crea account</string>
+    <string name="unexpected_error">Errore imprevisto</string>
+    <string name="network_error">Errore di rete</string>
+    <string name="no_user_found">Non è stata trovato un utente corrispondente alla email</string>
+    <string name="invalid_email">Email invalida</string>
 </resources>

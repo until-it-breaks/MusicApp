@@ -166,7 +166,7 @@ fun LoginScreen(navController: NavController) {
             when (loginState) {
                 is OperationState.Ongoing -> {
                     Spacer(modifier = Modifier.weight(0.25f))
-                    CircularProgressIndicator()
+
                     Spacer(modifier = Modifier.weight(0.25f))
                 }
                 is OperationState.Success -> {

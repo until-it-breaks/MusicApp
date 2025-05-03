@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +44,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun PasswordRecoveryScreen(navController: NavController) {
     val passwordRecoveryViewModel = koinViewModel<PasswordRecoveryViewModel>()
-    val recoveryProcessState by passwordRecoveryViewModel.recoveryProcessState.collectAsState()
+    val recoveryProcessState by passwordRecoveryViewModel.recoveryState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -93,23 +94,31 @@ fun PasswordRecoveryScreen(navController: NavController) {
             when(recoveryProcessState) {
                 is OperationState.Ongoing -> CircularProgressIndicator()
                 is OperationState.Success -> {
-                    LaunchedEffect(Unit) {
-                        snackbarHostState.showSnackbar(
+                    LaunchedEffect(recoveryProcessState) {
+                        email = ""
+                        val result = snackbarHostState.showSnackbar(
                             message = context.getString(R.string.password_reset_email_sent),
                             duration = SnackbarDuration.Long
                         )
+                        if (result == SnackbarResult.Dismissed) {
+                            passwordRecoveryViewModel.resetState()
+                        }
                     }
                 }
                 is OperationState.Error -> {
-                    val errorMessage = (recoveryProcessState as OperationState.Error).message
-                    LaunchedEffect(errorMessage) {
-                        snackbarHostState.showSnackbar(
+                    LaunchedEffect(recoveryProcessState) {
+                        val errorState = recoveryProcessState as OperationState.Error
+                        val errorMessage = errorState.stringKey?.let { context.getString(it) } ?: errorState.message
+                        val result = snackbarHostState.showSnackbar(
                             message = errorMessage,
                             duration = SnackbarDuration.Long
                         )
+                        if (result == SnackbarResult.Dismissed) {
+                            passwordRecoveryViewModel.resetState()
+                        }
                     }
                 }
-                is OperationState.Idle -> {}
+                is OperationState.Idle -> { /* CircularProgressIndicator() */ }
             }
         }
     }

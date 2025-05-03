@@ -34,4 +34,8 @@
     <string name="discover_new_music">Discover new music</string>
     <string name="username_label">Username</string>
     <string name="create_account">Create account</string>
+    <string name="unexpected_error">An unexpected error occurred</string>
+    <string name="network_error">A network error occurred</string>
+    <string name="no_user_found">No user corresponding to the given mail was found</string>
+    <string name="invalid_email">Invalid email</string>
 </resources>
