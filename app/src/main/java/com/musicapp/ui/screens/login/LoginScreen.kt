@@ -47,12 +47,14 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.musicapp.R
 import com.musicapp.data.util.OperationState
 import com.musicapp.ui.MusicAppRoute
 import org.koin.androidx.compose.koinViewModel
@@ -95,7 +97,7 @@ fun LoginScreen(navController: NavController) {
             ) {
                 Image(
                     imageVector = Icons.Outlined.MusicNote,
-                    contentDescription = "App Logo",
+                    contentDescription = stringResource(R.string.app_logo_description),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(96.dp)
@@ -105,14 +107,14 @@ fun LoginScreen(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "MusicApp",
+                    text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineLarge
                 )
             }
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.email_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
@@ -121,7 +123,7 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
+                label = { Text(stringResource(R.string.password_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -132,7 +134,11 @@ fun LoginScreen(navController: NavController) {
                 }),
                 trailingIcon = {
                     val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (passwordVisible) "Hide password" else "Show password"
+                    val description = if (passwordVisible) {
+                        stringResource(R.string.hide_password)
+                    } else {
+                        stringResource(R.string.show_password)
+                    }
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(imageVector = image, contentDescription = description)
                     }
@@ -141,7 +147,7 @@ fun LoginScreen(navController: NavController) {
             TextButton(
                 onClick = { navController.navigate(MusicAppRoute.PasswordRecovery) },
             ) {
-                Text("Forgot your password?")
+                Text(stringResource(R.string.forgot_password))
             }
             Button(
                 onClick = {
@@ -154,7 +160,7 @@ fun LoginScreen(navController: NavController) {
                 ),
                 enabled = email.isNotBlank() && password.isNotBlank()
             ) {
-                Text("Log in")
+                Text(stringResource(R.string.login))
             }
 
             when (loginState) {
@@ -183,7 +189,7 @@ fun LoginScreen(navController: NavController) {
             }
 
             TextButton (onClick = { navController.navigate(MusicAppRoute.SignUp) }) {
-                Text("Don't have an account? Sign up now!")
+                Text(stringResource(R.string.sign_up_now))
             }
             Spacer(modifier = Modifier.weight(2f))
         }

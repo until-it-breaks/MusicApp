@@ -9,7 +9,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,7 +26,7 @@ fun MainTopBar(navController: NavController, title: String) {
         },
         actions = {
             IconButton(onClick = { navController.navigate(MusicAppRoute.Settings)}) {
-                Icon(Icons.Outlined.Person, contentDescription = "Account")
+                Icon(Icons.Outlined.Person, contentDescription = stringResource(R.string.account_description))
             }
         }
     )

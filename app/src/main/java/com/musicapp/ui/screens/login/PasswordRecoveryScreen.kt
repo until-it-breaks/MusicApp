@@ -28,11 +28,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.musicapp.R
 import com.musicapp.data.util.OperationState
 import com.musicapp.ui.composables.TopBarWithBackButton
 import org.koin.androidx.compose.koinViewModel
@@ -43,10 +46,12 @@ fun PasswordRecoveryScreen(navController: NavController) {
     val recoveryProcessState by passwordRecoveryViewModel.recoveryProcessState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+
     var email by remember { mutableStateOf("") }
 
     Scaffold(
-        topBar = { TopBarWithBackButton("Password Recovery", navController) },
+        topBar = { TopBarWithBackButton(stringResource(R.string.password_recovery_screen_name), navController) },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { contentPadding ->
         Column(
@@ -64,13 +69,13 @@ fun PasswordRecoveryScreen(navController: NavController) {
                 }
         ) {
             Text(
-                text = "Enter your email address below and we'll send you instructions to reset your password.",
+                text = stringResource(R.string.enter_instructions_to_reset_password),
                 style = MaterialTheme.typography.bodyMedium
             )
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.email_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Go),
@@ -83,22 +88,23 @@ fun PasswordRecoveryScreen(navController: NavController) {
                 },
                 enabled = email.isNotBlank()
             ) {
-                Text("Send Reset Email")
+                Text(stringResource(R.string.send_password_reset_email))
             }
             when(recoveryProcessState) {
                 is OperationState.Ongoing -> CircularProgressIndicator()
                 is OperationState.Success -> {
                     LaunchedEffect(Unit) {
                         snackbarHostState.showSnackbar(
-                            message = "Password reset email sent successfully!",
+                            message = context.getString(R.string.password_reset_email_sent),
                             duration = SnackbarDuration.Long
                         )
                     }
                 }
                 is OperationState.Error -> {
-                    LaunchedEffect(Unit) {
+                    val errorMessage = (recoveryProcessState as OperationState.Error).message
+                    LaunchedEffect(errorMessage) {
                         snackbarHostState.showSnackbar(
-                            message = (recoveryProcessState as OperationState.Error).message,
+                            message = errorMessage,
                             duration = SnackbarDuration.Long
                         )
                     }

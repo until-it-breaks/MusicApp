@@ -29,8 +29,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.TopBarWithBackButton
 
@@ -40,7 +42,7 @@ fun SettingsScreen(navController: NavController) {
     var setting1 by remember { mutableStateOf(true) }
 
     Scaffold(
-        topBar = { TopBarWithBackButton("Account & Settings", navController) }
+        topBar = { TopBarWithBackButton(stringResource(R.string.account_settings_screen_name), navController) }
     ) { contentPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -58,7 +60,7 @@ fun SettingsScreen(navController: NavController) {
                 ) {
                     Image(
                         imageVector = Icons.Filled.Image,
-                        contentDescription = "Profile picture",
+                        contentDescription = stringResource(R.string.profile_picture_description),
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.size(72.dp)
                     )
@@ -67,13 +69,13 @@ fun SettingsScreen(navController: NavController) {
                             text = "Profile Name",
                             style = MaterialTheme.typography.headlineSmall)
                         Text(
-                            text = "View Profile",
+                            text = stringResource(R.string.view_profile),
                             style = MaterialTheme.typography.bodyMedium)
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
-                        contentDescription = "Forward",
+                        contentDescription = stringResource(R.string.forward_description),
                         modifier = Modifier.padding(8.dp)
                     )
                 }
@@ -90,10 +92,10 @@ fun SettingsScreen(navController: NavController) {
                     ) {
                         Column {
                             Text(
-                                text = "Allow explicit songs",
+                                text = stringResource(R.string.allow_explicit_songs),
                                 style = MaterialTheme.typography.titleMedium)
                             Text(
-                                text = "Songs containing explicit content won't be shown",
+                                text = stringResource(R.string.allow_explicit_songs_description),
                                 style = MaterialTheme.typography.bodyMedium)
                         }
                         Switch(

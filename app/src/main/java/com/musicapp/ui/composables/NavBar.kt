@@ -13,12 +13,26 @@ import androidx.compose.runtime.Composable
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.musicapp.R
 
 @Composable
 fun NavBar(selectedItem: Int, onItemSelected: (Int) -> Unit) {
-    val items = listOf("Home", "Search", "Library")
-    val selectedIcons = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.AutoMirrored.Filled.LibraryBooks)
-    val unselectedIcons = listOf(Icons.Outlined.Home, Icons.Outlined.Search, Icons.AutoMirrored.Outlined.LibraryBooks)
+    val items = listOf(
+        stringResource(R.string.home_screen_name),
+        stringResource(R.string.search_screen_name),
+        stringResource(R.string.library_screen_name)
+    )
+    val selectedIcons = listOf(
+        Icons.Filled.Home,
+        Icons.Filled.Search,
+        Icons.AutoMirrored.Filled.LibraryBooks
+    )
+    val unselectedIcons = listOf(
+        Icons.Outlined.Home,
+        Icons.Outlined.Search,
+        Icons.AutoMirrored.Outlined.LibraryBooks
+    )
 
     NavigationBar {
         items.forEachIndexed { index, item ->

@@ -9,7 +9,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.musicapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,7 +24,9 @@ fun TopBarWithBackButton(title: String, navController: NavController) {
         navigationIcon = {
             if (navController.previousBackStackEntry != null) {
                 IconButton(onClick = {navController.navigateUp() }) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Go Back")
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack,
+                        stringResource(R.string.back_description)
+                    )
                 }
             }
         }

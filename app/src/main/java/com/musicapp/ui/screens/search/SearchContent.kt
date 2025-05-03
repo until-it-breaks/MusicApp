@@ -25,7 +25,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.musicapp.R
 
 @Composable
 fun SearchContent(modifier: Modifier) {
@@ -40,16 +42,16 @@ fun SearchContent(modifier: Modifier) {
         OutlinedTextField(
             value = searchText,
             onValueChange = { searchText = it },
-            placeholder = { Text("What do you want to play?") },
+            placeholder = { Text(stringResource(R.string.what_to_play)) },
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Outlined.Search, "Search")
+                    Icon(Icons.Outlined.Search, stringResource(R.string.search_description))
                 }
             }
         )
         Text(
-            text = "Discover something new",
+            text = stringResource(R.string.discover_new_things),
             style = MaterialTheme.typography.titleLarge
         )
         LazyVerticalGrid(

@@ -29,15 +29,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.musicapp.R
 import com.musicapp.ui.composables.TopBarWithBackButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
     Scaffold(
-        topBar = { TopBarWithBackButton("Profile", navController) }
+        topBar = { TopBarWithBackButton(stringResource(R.string.profile_screen_name), navController) }
     ) { contentPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -49,7 +51,7 @@ fun ProfileScreen(navController: NavController) {
         ) {
             Image(
                 imageVector = Icons.Outlined.Image,
-                contentDescription = "Profile picture",
+                contentDescription = stringResource(R.string.profile_picture_description),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(128.dp)
@@ -64,7 +66,7 @@ fun ProfileScreen(navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Username",
+                    text = stringResource(R.string.username),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(12.dp, 0.dp, 0.dp, 0.dp)
                 )
@@ -84,7 +86,8 @@ fun ProfileScreen(navController: NavController) {
                         Spacer(Modifier.weight(1f))
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                            contentDescription = "Forward")
+                            contentDescription = stringResource(R.string.forward_description)
+                        )
                     }
                 }
             }
@@ -101,7 +104,7 @@ fun ProfileScreen(navController: NavController) {
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    Text("Change Password")
+                    Text(stringResource(R.string.change_password))
                 }
                 Spacer(modifier = Modifier.width(24.dp))
                 Button(
@@ -112,7 +115,7 @@ fun ProfileScreen(navController: NavController) {
                         contentColor = MaterialTheme.colorScheme.onError
                     )
                 ) {
-                    Text("Delete profile")
+                    Text(stringResource(R.string.delete_profile))
                 }
             }
         }

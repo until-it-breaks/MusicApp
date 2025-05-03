@@ -15,13 +15,14 @@ class PasswordRecoveryViewModel(private val auth: FirebaseAuth): ViewModel() {
 
     fun sendPasswordResetEmail(email: String) {
         val trimmedEmail = email.trim()
+
         viewModelScope.launch {
             _recoveryProcessState.value = OperationState.Ongoing
             auth.sendPasswordResetEmail(trimmedEmail).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     _recoveryProcessState.value = OperationState.Success
                 } else {
-                    val message = task.exception?.localizedMessage ?: "An unexpected error occurred."
+                    val message = task.exception?.localizedMessage ?: "An unexpected error occurred"
                     _recoveryProcessState.value = OperationState.Error(message)
                 }
             }

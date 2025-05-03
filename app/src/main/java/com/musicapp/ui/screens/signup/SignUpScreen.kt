@@ -34,11 +34,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.musicapp.R
 import com.musicapp.data.util.OperationState
 import com.musicapp.ui.MusicAppRoute
 import org.koin.androidx.compose.koinViewModel
@@ -66,7 +68,7 @@ fun SignUpScreen(navController: NavController) {
             ) {
                 Image(
                     imageVector = Icons.Outlined.MusicNote,
-                    contentDescription = "App Logo",
+                    contentDescription = stringResource(R.string.app_logo_description),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(96.dp)
@@ -76,7 +78,7 @@ fun SignUpScreen(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "MusicApp",
+                    text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineLarge
                 )
             }
@@ -84,12 +86,12 @@ fun SignUpScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Sign Up",
+                    text = stringResource(R.string.sign_up),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Discover new music",
+                    text = stringResource(R.string.discover_new_music),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -103,19 +105,19 @@ fun SignUpScreen(navController: NavController) {
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text("Username") },
+                label = { Text(stringResource(R.string.username_label)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.email_label)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
+                label = { Text(stringResource(R.string.password_label)) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
@@ -123,7 +125,7 @@ fun SignUpScreen(navController: NavController) {
             Button(
                 onClick = { signUpViewModel.signUp(email, password, username) },
             ) {
-                Text("Create account")
+                Text(stringResource(R.string.create_account))
             }
 
             when (signUpState) {
