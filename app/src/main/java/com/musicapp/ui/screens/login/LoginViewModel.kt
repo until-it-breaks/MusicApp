@@ -7,39 +7,63 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.musicapp.R
-import com.musicapp.data.util.OperationState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class LoginViewModel(private val auth: FirebaseAuth): ViewModel() {
-    private val _loginState = MutableStateFlow<OperationState>(OperationState.Idle)
-    val loginState: StateFlow<OperationState> = _loginState.asStateFlow()
+data class LoginState(
+    val email: String = "",
+    val password: String = "",
+    val isPasswordVisible: Boolean = false,
+    val errorMessageId: Int? = null,
+    val isLoading: Boolean = false,
+    val navigateToMain: Boolean = false
+) {
+    val canSubmit = email.isNotBlank() && password.isNotBlank() // Can be improved
+}
 
-    fun login(email: String, password: String) {
-        val trimmedEmail = email.trim()
-        val trimmedPassword = password.trim()
+class LoginViewModel(private val auth: FirebaseAuth): ViewModel() {
+    private val _state = MutableStateFlow(LoginState())
+    val state: StateFlow<LoginState> = _state.asStateFlow()
+
+    fun onEmailChanged(email: String) {
+        _state.update { it.copy(email = email) }
+    }
+
+    fun onPasswordChanged(password: String) {
+        _state.update { it.copy(password = password)}
+    }
+
+    fun togglePasswordVisibility() {
+        _state.update { it.copy(isPasswordVisible = !state.value.isPasswordVisible) }
+    }
+
+    fun login() {
+        if (!state.value.canSubmit) return
+
+        _state.update { it.copy(isLoading = true, errorMessageId = null) }
 
         viewModelScope.launch {
-            _loginState.value = OperationState.Ongoing
-            auth.signInWithEmailAndPassword(trimmedEmail, trimmedPassword).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _loginState.value = OperationState.Success
-                } else {
-                    val errorKey = when (task.exception) {
-                        is FirebaseAuthInvalidUserException -> R.string.account_not_found_or_disabled
-                        is FirebaseAuthInvalidCredentialsException -> R.string.invalid_credentials
-                        is FirebaseNetworkException -> R.string.network_error
-                        else -> R.string.unexpected_error
+            auth.signInWithEmailAndPassword(state.value.email, state.value.password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        _state.update { it.copy(isLoading = false, navigateToMain = true) }
+                    } else {
+                        val errorKey = when (task.exception) {
+                            is FirebaseAuthInvalidUserException -> R.string.account_not_found_or_disabled
+                            is FirebaseAuthInvalidCredentialsException -> R.string.invalid_credentials
+                            is FirebaseNetworkException -> R.string.network_error
+                            else -> R.string.unexpected_error
+                        }
+                        _state.update { it.copy(isLoading = false, errorMessageId = errorKey) }
                     }
-                    _loginState.value = OperationState.Error(stringKey = errorKey)
-                }
             }
         }
     }
 
-    fun resetState() {
-        _loginState.value = OperationState.Idle
+    fun resetNavigation() {
+        _state.update { it.copy(navigateToMain = false) }
     }
 }

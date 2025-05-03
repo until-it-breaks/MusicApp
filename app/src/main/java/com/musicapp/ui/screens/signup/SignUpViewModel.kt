@@ -2,33 +2,84 @@ package com.musicapp.ui.screens.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestore
-import com.musicapp.data.util.OperationState
+import com.musicapp.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+data class SignUpState(
+    val username: String = "",
+    val email: String = "",
+    val password: String = "",
+    val isPasswordVisible: Boolean = false,
+    val errorMessageId: Int? = null,
+    val isLoading: Boolean = false,
+    val navigateToMain: Boolean = false
+) {
+    val canSubmit = username.isNotBlank() && email.isNotBlank() && password.isNotBlank()
+}
+
 class SignUpViewModel(private val auth: FirebaseAuth, private val store: FirebaseFirestore): ViewModel() {
 
-    private val _signUpState = MutableStateFlow<OperationState>(OperationState.Idle)
-    val signUpState: StateFlow<OperationState> = _signUpState
+    private val _state = MutableStateFlow(SignUpState())
+    val state: StateFlow<SignUpState> = _state.asStateFlow()
 
-    fun signUp(email: String, password: String, username: String) {
-        _signUpState.update { OperationState.Ongoing }
+    fun onUsernameChanged(username: String) {
+        _state.update { it.copy(username = username) }
+    }
+
+    fun onEmailChanged(email: String) {
+        _state.update { it.copy(email = email) }
+    }
+
+    fun onPasswordChanged(password: String) {
+        _state.update { it.copy(password = password) }
+    }
+
+    fun togglePasswordVisibility() {
+        _state.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+    }
+
+    fun resetNavigation() {
+        _state.update { it.copy(navigateToMain = false) }
+    }
+
+    fun signUp() {
+        if (!state.value.canSubmit) return
+
+        _state.update { it.copy(isLoading = true, errorMessageId = null) }
+
         viewModelScope.launch {
             try {
-                val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-                authResult.user?.uid?.let { userId ->
-                    saveUserData(userId, username)
-                    _signUpState.update { OperationState.Success }
-                } ?: run {
-                    _signUpState.update { OperationState.Error("Could not retrieve user ID.") }
+                auth.signOut()
+                val authResult = auth.createUserWithEmailAndPassword(state.value.email, state.value.password).await() // TODO consider trimming
+                val userId = authResult.user?.uid
+                if (userId != null) {
+                    saveUserData(userId, state.value.username)
+                    _state.update { it.copy(isLoading = false, navigateToMain = true) }
+                } else {
+                    _state.update { it.copy(isLoading = false, errorMessageId = R.string.unexpected_error) }
                 }
+            } catch (e: FirebaseNetworkException) {
+                _state.update { it.copy(isLoading = false, errorMessageId = R.string.network_error) }
+            } catch (e: FirebaseAuthWeakPasswordException) {
+                _state.update { it.copy(isLoading = false, errorMessageId = R.string.weak_password) }
+            } catch (e: FirebaseAuthUserCollisionException) {
+                _state.update { it.copy(isLoading = false, errorMessageId = R.string.email_already_in_use) }
+            } catch (e: FirebaseAuthInvalidCredentialsException) {
+                _state.update { it.copy(isLoading = false, errorMessageId = R.string.malformed_email) }
             } catch (e: Exception) {
-                _signUpState.update { OperationState.Error(e.localizedMessage ?: "Sign up failed") }
+                _state.update { it.copy(isLoading = false, errorMessageId = R.string.sign_up_fail) }
+                auth.currentUser?.delete()
             }
         }
     }
@@ -42,7 +93,7 @@ class SignUpViewModel(private val auth: FirebaseAuth, private val store: Firebas
             )
             userDocument.set(userData).await()
         } catch (e: Exception) {
-            println("Error saving user data to Firestore: ${e.localizedMessage}")
+            throw e
         }
     }
 }

@@ -31,16 +31,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,21 +54,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.musicapp.R
-import com.musicapp.data.util.OperationState
 import com.musicapp.ui.MusicAppRoute
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(navController: NavController) {
     val loginViewModel = koinViewModel<LoginViewModel>()
-    val loginState by loginViewModel.loginState.collectAsState()
+    val state by loginViewModel.state.collectAsState()
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
-    var passwordVisible by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
-
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
@@ -85,11 +76,7 @@ fun LoginScreen(navController: NavController) {
                 .padding(contentPadding)
                 .fillMaxSize()
                 .imePadding()
-                .pointerInput(Unit) {
-                    detectTapGestures { offset ->
-                        focusManager.clearFocus()
-                    }
-                }
+                .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
         ) {
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -115,34 +102,38 @@ fun LoginScreen(navController: NavController) {
                 )
             }
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = state.email,
+                onValueChange = loginViewModel::onEmailChanged,
                 label = { Text(stringResource(R.string.email_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
             )
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = state.password,
+                onValueChange = loginViewModel::onPasswordChanged,
                 label = { Text(stringResource(R.string.password_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Go),
-                keyboardActions = KeyboardActions(onGo = {
-                    focusManager.clearFocus()
-                    loginViewModel.login(email, password)
-                }),
+                visualTransformation = if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 trailingIcon = {
-                    val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (passwordVisible) {
+                    val image =
+                        if (state.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    val description = if (state.isPasswordVisible) {
                         stringResource(R.string.hide_password)
                     } else {
                         stringResource(R.string.show_password)
                     }
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    IconButton(onClick = loginViewModel::togglePasswordVisibility) {
                         Icon(imageVector = image, contentDescription = description)
                     }
                 }
@@ -155,49 +146,46 @@ fun LoginScreen(navController: NavController) {
             Button(
                 onClick = {
                     focusManager.clearFocus()
-                    loginViewModel.login(email, password)
+                    loginViewModel.login()
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
-                enabled = email.isNotBlank() && password.isNotBlank()
+                enabled = state.canSubmit
             ) {
                 Text(stringResource(R.string.login))
             }
 
-            when (loginState) {
-                is OperationState.Ongoing -> {
-                    Spacer(modifier = Modifier.weight(0.25f))
-                    CircularProgressIndicator()
-                    Spacer(modifier = Modifier.weight(0.25f))
+            if (state.isLoading) {
+                Spacer(modifier = Modifier.weight(0.25f))
+                CircularProgressIndicator()
+                Spacer(modifier = Modifier.weight(0.25f))
+            }
+
+            if (state.errorMessageId != null) {
+                LaunchedEffect(state.errorMessageId) {
+                    val errorMessage = context.getString(state.errorMessageId!!)
+                    snackbarHostState.showSnackbar(
+                        message = errorMessage,
+                        duration = SnackbarDuration.Long,
+                        withDismissAction = true
+                    )
                 }
-                is OperationState.Success -> {
-                    LaunchedEffect(loginState) {
-                        navController.navigate(MusicAppRoute.Main)
+            } else {
+                Spacer(modifier = Modifier.weight(0.5f))
+            }
+
+            if (state.navigateToMain) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(MusicAppRoute.Main) {
+                        popUpTo(navController.graph.id) { inclusive = true }
                     }
-                }
-                is OperationState.Error -> {
-                    LaunchedEffect(loginState) {
-                        val errorState = loginState as OperationState.Error
-                        val errorMessage = errorState.stringKey?.let { context.getString(it) } ?: errorState.message
-                        val result = snackbarHostState.showSnackbar(
-                            message = errorMessage,
-                            duration = SnackbarDuration.Long,
-                            withDismissAction = true
-                        )
-                        if (result == SnackbarResult.Dismissed) {
-                            loginViewModel.resetState()
-                        }
-                    }
-                }
-                is OperationState.Idle -> {
-                    /* CircularProgressIndicator() */
-                    Spacer(modifier = Modifier.weight(0.5f))
+                    loginViewModel.resetNavigation()
                 }
             }
 
-            TextButton (onClick = { navController.navigate(MusicAppRoute.SignUp) }) {
+            TextButton(onClick = { navController.navigate(MusicAppRoute.SignUp) }) {
                 Text(stringResource(R.string.sign_up_now))
             }
             Spacer(modifier = Modifier.weight(2f))
