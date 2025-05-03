@@ -4,3 +4,6 @@ search, song, player (franco)
 library (jiekai)
 setting
 profilo (franco)
+
+
+login page password reset -> consider refactoring for a more viewmodel-sided validation
