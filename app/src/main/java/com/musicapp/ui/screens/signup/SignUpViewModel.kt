@@ -1,5 +1,6 @@
 package com.musicapp.ui.screens.signup
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.FirebaseNetworkException
@@ -61,9 +62,9 @@ class SignUpViewModel(private val auth: FirebaseAuth, private val store: Firebas
                 val userId = authResult.user?.uid
                 if (userId != null) {
                     saveUserData(userId, state.value.username)
-                    _state.update { it.copy(isLoading = false, navigateToMain = true) }
+                    _state.update { it.copy(navigateToMain = true) }
                 } else {
-                    _state.update { it.copy(isLoading = false, errorMessageId = R.string.unexpected_error) }
+                    _state.update { it.copy(errorMessageId = R.string.unexpected_error) }
                 }
             } catch (e: FirebaseNetworkException) {
                 _state.update { it.copy(errorMessageId = R.string.network_error) }
@@ -74,7 +75,7 @@ class SignUpViewModel(private val auth: FirebaseAuth, private val store: Firebas
             } catch (e: FirebaseAuthInvalidCredentialsException) {
                 _state.update { it.copy(errorMessageId = R.string.malformed_email) }
             } catch (e: Exception) {
-                _state.update { it.copy(errorMessageId = R.string.sign_up_fail) }
+                _state.update { it.copy(errorMessageId = R.string.unexpected_error) }
                 auth.currentUser?.delete()
             } finally {
                 _state.update { it.copy(isLoading = false) }
@@ -91,6 +92,7 @@ class SignUpViewModel(private val auth: FirebaseAuth, private val store: Firebas
             )
             userDocument.set(userData).await()
         } catch (e: Exception) {
+            Log.e("SIGNUP", e.localizedMessage ?: "Unexpected error while trying to save username")
             throw e
         }
     }

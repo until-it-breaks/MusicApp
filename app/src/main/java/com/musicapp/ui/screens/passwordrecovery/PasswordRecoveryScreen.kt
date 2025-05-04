@@ -17,15 +17,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -35,21 +31,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
-import com.musicapp.data.util.OperationState
 import com.musicapp.ui.composables.TopBarWithBackButton
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PasswordRecoveryScreen(navController: NavController) {
     val passwordRecoveryViewModel = koinViewModel<PasswordRecoveryViewModel>()
-    val recoveryState by passwordRecoveryViewModel.recoveryState.collectAsState()
+    val state by passwordRecoveryViewModel.state.collectAsStateWithLifecycle()
+
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-
-    var email by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = { TopBarWithBackButton(stringResource(R.string.password_recovery_screen_name), navController) },
@@ -63,19 +58,15 @@ fun PasswordRecoveryScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(12.dp)
                 .imePadding()
-                .pointerInput(Unit) {
-                    detectTapGestures { offset ->
-                        focusManager.clearFocus()
-                    }
-                }
+                .pointerInput(Unit) { detectTapGestures { offset -> focusManager.clearFocus() } }
         ) {
             Text(
                 text = stringResource(R.string.enter_instructions_to_reset_password),
                 style = MaterialTheme.typography.bodyMedium
             )
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = state.email,
+                onValueChange = passwordRecoveryViewModel::onEmailChanged,
                 label = { Text(stringResource(R.string.email_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
@@ -83,44 +74,36 @@ fun PasswordRecoveryScreen(navController: NavController) {
                 keyboardActions = KeyboardActions(onGo = { focusManager.clearFocus() })
             )
             Button(
+                enabled = state.canSubmit,
                 onClick = {
                     focusManager.clearFocus()
-                    passwordRecoveryViewModel.sendPasswordResetEmail(email)
+                    passwordRecoveryViewModel.sendPasswordResetEmail()
                 },
-                enabled = email.isNotBlank()
             ) {
                 Text(stringResource(R.string.send_password_reset_email))
             }
-            when(recoveryState) {
-                is OperationState.Ongoing -> CircularProgressIndicator()
-                is OperationState.Success -> {
-                    LaunchedEffect(recoveryState) {
-                        email = ""
-                        val result = snackbarHostState.showSnackbar(
-                            message = context.getString(R.string.password_reset_email_sent),
-                            duration = SnackbarDuration.Long,
-                            withDismissAction = true
-                        )
-                        if (result == SnackbarResult.Dismissed) {
-                            passwordRecoveryViewModel.resetState()
-                        }
-                    }
+            if (state.isLoading) {
+                CircularProgressIndicator()
+            }
+            if (state.errorMessageId != null) {
+                LaunchedEffect(state.errorMessageId) {
+                    val errorMessage = context.getString(state.errorMessageId!!)
+                    snackbarHostState.showSnackbar(
+                        message = errorMessage,
+                        duration = SnackbarDuration.Long,
+                        withDismissAction = true
+                    )
                 }
-                is OperationState.Error -> {
-                    LaunchedEffect(recoveryState) {
-                        val errorState = recoveryState as OperationState.Error
-                        val errorMessage = errorState.stringKey?.let { context.getString(it) } ?: errorState.message
-                        val result = snackbarHostState.showSnackbar(
-                            message = errorMessage,
-                            duration = SnackbarDuration.Long,
-                            withDismissAction = true
-                        )
-                        if (result == SnackbarResult.Dismissed) {
-                            passwordRecoveryViewModel.resetState()
-                        }
-                    }
+            }
+            if (state.emailSent) {
+                LaunchedEffect(Unit) {
+                    val message = context.getString(R.string.password_reset_email_sent)
+                    snackbarHostState.showSnackbar(
+                        message = message,
+                        duration = SnackbarDuration.Long,
+                        withDismissAction = true
+                    )
                 }
-                is OperationState.Idle -> { /* CircularProgressIndicator() */ }
             }
         }
     }
