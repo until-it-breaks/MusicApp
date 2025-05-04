@@ -29,12 +29,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
@@ -61,9 +63,11 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SignUpScreen(navController: NavController) {
     val signUpViewModel: SignUpViewModel = koinViewModel()
-    val state by signUpViewModel.state.collectAsState()
+    val state by signUpViewModel.state.collectAsStateWithLifecycle()
+
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
     Scaffold(
         topBar = { TopBarWithBackButton("", navController) },
@@ -76,10 +80,7 @@ fun SignUpScreen(navController: NavController) {
                 .padding(contentPadding)
                 .fillMaxSize()
                 .imePadding()
-                .pointerInput(Unit) {
-                detectTapGestures { offset ->
-                    focusManager.clearFocus()
-                }
+                .pointerInput(Unit) { detectTapGestures { offset -> focusManager.clearFocus() }
             }
         ) {
             Row(
@@ -87,7 +88,7 @@ fun SignUpScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(3f)
+                    .weight(2f)
             ) {
                 Image(
                     imageVector = Icons.Outlined.MusicNote,
@@ -153,7 +154,7 @@ fun SignUpScreen(navController: NavController) {
                     } else {
                         stringResource(R.string.show_password)
                     }
-                    IconButton(onClick = { signUpViewModel::togglePasswordVisibility }) {
+                    IconButton(onClick = signUpViewModel::togglePasswordVisibility) {
                         Icon(imageVector = image, contentDescription = description)
                     }
                 }
@@ -161,7 +162,9 @@ fun SignUpScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 enabled = state.canSubmit,
-                onClick = { signUpViewModel.signUp() }
+                onClick = {
+                    focusManager.clearFocus()
+                    signUpViewModel.signUp() }
             ) {
                 Text(stringResource(R.string.create_account))
             }
@@ -171,11 +174,14 @@ fun SignUpScreen(navController: NavController) {
             }
 
             if (state.errorMessageId != null) {
-                // TODO maybe use snackbar
-                Text(
-                    text = stringResource(state.errorMessageId!!),
-                    color = MaterialTheme.colorScheme.error
-                )
+                LaunchedEffect(state.errorMessageId) {
+                    val errorMessage = context.getString(state.errorMessageId!!)
+                    snackbarHostState.showSnackbar(
+                        message = errorMessage,
+                        duration = SnackbarDuration.Long,
+                        withDismissAction = true
+                    )
+                }
             }
 
             if (state.navigateToMain) {
@@ -183,7 +189,6 @@ fun SignUpScreen(navController: NavController) {
                     navController.navigate(MusicAppRoute.Main) {
                         popUpTo(navController.graph.id) { inclusive = true} // Prevents going back to this screen
                     }
-                    signUpViewModel.resetNavigation()
                 }
             }
             Spacer(modifier = Modifier.weight(2f))

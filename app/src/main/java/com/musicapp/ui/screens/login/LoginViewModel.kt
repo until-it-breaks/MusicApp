@@ -38,7 +38,11 @@ class LoginViewModel(private val auth: FirebaseAuth): ViewModel() {
     }
 
     fun togglePasswordVisibility() {
-        _state.update { it.copy(isPasswordVisible = !state.value.isPasswordVisible) }
+        _state.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+    }
+
+    fun resetState() {
+        _state.value = LoginState()
     }
 
     fun login() {
@@ -48,7 +52,7 @@ class LoginViewModel(private val auth: FirebaseAuth): ViewModel() {
 
         viewModelScope.launch {
             try {
-                auth.signInWithEmailAndPassword(state.value.email, state.value.password).await()
+                auth.signInWithEmailAndPassword(state.value.email.trim(), state.value.password.trim()).await()
                 _state.update { it.copy(navigateToMain = true) }
             } catch (e: FirebaseAuthInvalidUserException) {
                 _state.update { it.copy(errorMessageId = R.string.account_not_found_or_disabled) }

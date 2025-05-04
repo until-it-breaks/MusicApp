@@ -49,10 +49,6 @@ class SignUpViewModel(private val auth: FirebaseAuth, private val store: Firebas
         _state.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
     }
 
-    fun resetNavigation() {
-        _state.update { it.copy(navigateToMain = false) }
-    }
-
     fun signUp() {
         if (!state.value.canSubmit) return
 
@@ -61,7 +57,7 @@ class SignUpViewModel(private val auth: FirebaseAuth, private val store: Firebas
         viewModelScope.launch {
             try {
                 auth.signOut()
-                val authResult = auth.createUserWithEmailAndPassword(state.value.email, state.value.password).await() // TODO consider trimming
+                val authResult = auth.createUserWithEmailAndPassword(state.value.email.trim(), state.value.password.trim()).await()
                 val userId = authResult.user?.uid
                 if (userId != null) {
                     saveUserData(userId, state.value.username)
@@ -70,16 +66,18 @@ class SignUpViewModel(private val auth: FirebaseAuth, private val store: Firebas
                     _state.update { it.copy(isLoading = false, errorMessageId = R.string.unexpected_error) }
                 }
             } catch (e: FirebaseNetworkException) {
-                _state.update { it.copy(isLoading = false, errorMessageId = R.string.network_error) }
+                _state.update { it.copy(errorMessageId = R.string.network_error) }
             } catch (e: FirebaseAuthWeakPasswordException) {
-                _state.update { it.copy(isLoading = false, errorMessageId = R.string.weak_password) }
+                _state.update { it.copy(errorMessageId = R.string.weak_password) }
             } catch (e: FirebaseAuthUserCollisionException) {
-                _state.update { it.copy(isLoading = false, errorMessageId = R.string.email_already_in_use) }
+                _state.update { it.copy(errorMessageId = R.string.email_already_in_use) }
             } catch (e: FirebaseAuthInvalidCredentialsException) {
-                _state.update { it.copy(isLoading = false, errorMessageId = R.string.malformed_email) }
+                _state.update { it.copy(errorMessageId = R.string.malformed_email) }
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessageId = R.string.sign_up_fail) }
+                _state.update { it.copy(errorMessageId = R.string.sign_up_fail) }
                 auth.currentUser?.delete()
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }

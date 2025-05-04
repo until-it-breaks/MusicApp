@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,7 +58,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    val loginViewModel = koinViewModel<LoginViewModel>()
+    val loginViewModel: LoginViewModel = koinViewModel()
     val state by loginViewModel.state.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -136,20 +135,19 @@ fun LoginScreen(navController: NavController) {
                 }
             )
             TextButton(
-                onClick = { navController.navigate(MusicAppRoute.PasswordRecovery) },
+                onClick = {
+                    loginViewModel.resetState()
+                    navController.navigate(MusicAppRoute.PasswordRecovery)
+                }
             ) {
                 Text(stringResource(R.string.forgot_password))
             }
             Button(
+                enabled = state.canSubmit,
                 onClick = {
                     focusManager.clearFocus()
                     loginViewModel.login()
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                enabled = state.canSubmit
+                }
             ) {
                 Text(stringResource(R.string.login))
             }
@@ -179,7 +177,10 @@ fun LoginScreen(navController: NavController) {
                 }
             }
 
-            TextButton(onClick = { navController.navigate(MusicAppRoute.SignUp) }) {
+            TextButton(onClick = {
+                loginViewModel.resetState()
+                navController.navigate(MusicAppRoute.SignUp)
+            }) {
                 Text(stringResource(R.string.sign_up_now))
             }
             Spacer(modifier = Modifier.weight(2f))
