@@ -17,15 +17,18 @@ import com.musicapp.R
 @Composable
 fun TopBarWithBackButton(title: String, navController: NavController) {
     CenterAlignedTopAppBar(
-        title = { Text(
-            text = title,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.headlineMedium) },
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineMedium
+            )
+        },
         navigationIcon = {
             if (navController.previousBackStackEntry != null) {
                 IconButton(onClick = {navController.navigateUp() }) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack,
-                        stringResource(R.string.back_description)
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = stringResource(R.string.back_description)
                     )
                 }
             }

@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens.search
+package com.musicapp.ui.screens.main.search
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

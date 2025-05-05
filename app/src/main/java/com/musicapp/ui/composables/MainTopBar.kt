@@ -1,7 +1,7 @@
 package com.musicapp.ui.composables
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,12 +21,15 @@ fun MainTopBar(navController: NavController, title: String) {
         title = {
             Text(
                 text = title,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.headlineMedium)
+                style = MaterialTheme.typography.headlineMedium
+            )
         },
         actions = {
             IconButton(onClick = { navController.navigate(MusicAppRoute.Settings)}) {
-                Icon(Icons.Outlined.Person, contentDescription = stringResource(R.string.account_description))
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = stringResource(R.string.settings_description)
+                )
             }
         }
     )

@@ -18,7 +18,6 @@ import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -37,7 +36,6 @@ import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.TopBarWithBackButton
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
     val profileScreenViewModel: ProfileScreenViewModel = koinViewModel()
@@ -102,11 +100,7 @@ fun ProfileScreen(navController: NavController) {
             ) {
                 Button(
                     modifier = Modifier.weight(1f),
-                    onClick = { /* TODO */ },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                    onClick = { /* TODO */ }
                 ) {
                     Text(stringResource(R.string.change_password))
                 }

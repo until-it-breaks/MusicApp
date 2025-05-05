@@ -43,5 +43,5 @@
     <string name="weak_password">Password is not good enough</string>
     <string name="email_already_in_use">Email is already in use</string>
     <string name="malformed_email">Email is malformed</string>
-    <string name="sign_up_fail">Sign up failed due to an unknown error</string>
+    <string name="settings_description">Settings</string>
 </resources>

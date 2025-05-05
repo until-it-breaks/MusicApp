@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens.library
+package com.musicapp.ui.screens.main.library
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

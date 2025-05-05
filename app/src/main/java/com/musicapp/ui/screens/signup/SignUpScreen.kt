@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,7 +58,6 @@ import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.TopBarWithBackButton
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavController) {
     val signUpViewModel: SignUpViewModel = koinViewModel()
@@ -80,7 +78,7 @@ fun SignUpScreen(navController: NavController) {
                 .padding(contentPadding)
                 .fillMaxSize()
                 .imePadding()
-                .pointerInput(Unit) { detectTapGestures { offset -> focusManager.clearFocus() }
+                .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() }
             }
         ) {
             Row(
@@ -149,13 +147,12 @@ fun SignUpScreen(navController: NavController) {
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 trailingIcon = {
                     val image = if (state.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (state.isPasswordVisible) {
-                        stringResource(R.string.hide_password)
-                    } else {
-                        stringResource(R.string.show_password)
-                    }
+                    val description = if (state.isPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
                     IconButton(onClick = signUpViewModel::togglePasswordVisibility) {
-                        Icon(imageVector = image, contentDescription = description)
+                        Icon(
+                            imageVector = image,
+                            contentDescription = description
+                        )
                     }
                 }
             )
@@ -164,7 +161,8 @@ fun SignUpScreen(navController: NavController) {
                 enabled = state.canSubmit,
                 onClick = {
                     focusManager.clearFocus()
-                    signUpViewModel.signUp() }
+                    signUpViewModel.signUp()
+                }
             ) {
                 Text(stringResource(R.string.create_account))
             }

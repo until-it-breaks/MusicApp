@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.musicapp.ui.screens.login.LoginScreen
-import com.musicapp.ui.screens.MainScreen
+import com.musicapp.ui.screens.main.MainScreen
 import com.musicapp.ui.screens.passwordrecovery.PasswordRecoveryScreen
 import com.musicapp.ui.screens.profile.ProfileScreen
 import com.musicapp.ui.screens.settings.SettingsScreen
