@@ -6,4 +6,4 @@ setting
 profilo (franco)
 
 
-login page password reset -> consider refactoring for a more viewmodel-sided validation
+signup -> consider making an email verification based one (currently any mail is considered ok)

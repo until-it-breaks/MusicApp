@@ -5,6 +5,6 @@ import com.google.firebase.auth.FirebaseAuth
 
 class ProfileScreenViewModel(private val auth: FirebaseAuth): ViewModel() {
     fun logout() {
-        auth.signOut() // For debug purposes. Could use a lot of improvements.
+        auth.signOut()
     }
 }
