@@ -39,7 +39,7 @@ class DeezerDataSource(private val httpClient: HttpClient) {
                 dataElement
             )
         } else {
-            emptyList() // Or handle the error appropriately
+            emptyList()
         }
     }
 }

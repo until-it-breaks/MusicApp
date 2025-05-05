@@ -18,10 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import coil.compose.AsyncImage
 import com.musicapp.data.remote.DeezerPlaylist
 import org.koin.androidx.compose.koinViewModel
 
