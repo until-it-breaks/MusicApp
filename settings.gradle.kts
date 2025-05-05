@@ -19,6 +19,11 @@ dependencyResolutionManagement {
     }
 }
 
+plugins {
+    id("com.autonomousapps.build-health") version "2.17.0"
+    id("com.android.application") version "8.9.2" apply false
+}
+
 rootProject.name = "MusicApp"
 include(":app")
  
