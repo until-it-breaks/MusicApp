@@ -44,4 +44,9 @@
     <string name="email_already_in_use">Email is already in use</string>
     <string name="malformed_email">Email is malformed</string>
     <string name="settings_description">Settings</string>
+    <string name="artist_picture_description">Artist picture</string>
+    <string name="playlist_picture_description">Playlist picture</string>
+    <string name="top_playlists">Top Playlists</string>
+    <string name="top_artists">Top Artists</string>
+    <string name="top_albums">Top Albums</string>
 </resources>

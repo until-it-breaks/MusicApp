@@ -31,6 +31,18 @@ data class DeezerArtist(
     val position: Int
 )
 
+@Serializable
+data class DeezerAlbum(
+    @SerialName("id")
+    val id: Long,
+    @SerialName("title")
+    val title: String,
+    @SerialName("cover_medium")
+    val mediumCover: String,
+    @SerialName("explicit_lyrics")
+    val explicit: Boolean
+)
+
 class DeezerDataSource(private val httpClient: HttpClient) {
     companion object {
         private const val BASE_URL = "https://api.deezer.com"
@@ -60,6 +72,20 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         return if (dataElement != null) {
             json.decodeFromJsonElement(
                 ListSerializer(DeezerArtist.serializer()),
+                dataElement
+            )
+        } else {
+            emptyList()
+        }
+    }
+
+    suspend fun getTopAlbums(): List<DeezerAlbum> {
+        val url = "$BASE_URL/chart/0/albums"
+        val responseBody: JsonObject = httpClient.get(url).body()
+        val dataElement = responseBody["data"]
+        return if (dataElement != null) {
+            json.decodeFromJsonElement(
+                ListSerializer(DeezerAlbum.serializer()),
                 dataElement
             )
         } else {

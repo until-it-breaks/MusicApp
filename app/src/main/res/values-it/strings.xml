@@ -44,4 +44,9 @@
     <string name="weak_password">Password debole</string>
     <string name="email_already_in_use">L\'email è già in uso</string>
     <string name="malformed_email">L\'email è mal formattata</string>
+    <string name="artist_picture_description">Immagine dell\'artista</string>
+    <string name="playlist_picture_description">Immagine della playlist</string>
+    <string name="top_playlists">Le migliori playlist</string>
+    <string name="top_artists">I migliori artisti</string>
+    <string name="top_albums">I migliori album</string>
 </resources>
