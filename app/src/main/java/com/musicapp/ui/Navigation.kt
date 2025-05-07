@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.musicapp.ui.screens.login.LoginScreen
+import com.musicapp.ui.screens.main.AlbumScreen
 import com.musicapp.ui.screens.main.MainScreen
 import com.musicapp.ui.screens.passwordrecovery.PasswordRecoveryScreen
 import com.musicapp.ui.screens.profile.ProfileScreen
@@ -19,6 +21,7 @@ sealed interface MusicAppRoute {
     @Serializable data object Settings: MusicAppRoute
     @Serializable data object Profile: MusicAppRoute
     @Serializable data object PasswordRecovery: MusicAppRoute
+    @Serializable data class Album(val id: Long): MusicAppRoute
 }
 
 @Composable
@@ -44,6 +47,10 @@ fun MusicAppNavGraph(navController: NavHostController, musicAppRoute: MusicAppRo
         }
         composable<MusicAppRoute.PasswordRecovery> {
             PasswordRecoveryScreen(navController)
+        }
+        composable<MusicAppRoute.Album> { backStackEntry ->
+            val route = backStackEntry.toRoute<MusicAppRoute.Album>()
+            AlbumScreen(navController, route.id)
         }
     }
 }

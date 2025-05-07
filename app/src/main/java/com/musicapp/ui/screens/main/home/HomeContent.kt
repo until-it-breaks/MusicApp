@@ -30,13 +30,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.musicapp.R
+import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.LoadableImage
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeContent(modifier: Modifier) {
+fun HomeContent(navController: NavController, modifier: Modifier) {
     val viewModel = koinViewModel<HomeViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -102,7 +104,7 @@ fun HomeContent(modifier: Modifier) {
                     PlayListCard(
                         title = item.title,
                         imageUrl = item.mediumCover,
-                        onClick = { /*TODO*/ }
+                        onClick = { navController.navigate(MusicAppRoute.Album(item.id)) }
                     )
                 }
             }

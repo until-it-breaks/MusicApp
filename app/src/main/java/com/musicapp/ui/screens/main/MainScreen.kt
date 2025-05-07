@@ -61,7 +61,7 @@ fun MainScreen(navController: NavController) {
             .padding(contentPadding)
             .fillMaxSize()
         when (selectedCategory) {
-            MainCategory.HOME -> HomeContent(modifier)
+            MainCategory.HOME -> HomeContent(navController, modifier)
             MainCategory.SEARCH -> SearchContent(modifier)
             MainCategory.LIBRARY -> LibraryContent(modifier)
         }

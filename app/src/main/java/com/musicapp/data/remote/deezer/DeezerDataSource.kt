@@ -6,6 +6,7 @@ import io.ktor.client.request.get
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 
 class DeezerDataSource(private val httpClient: HttpClient) {
     companion object {
@@ -55,5 +56,11 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         } else {
             emptyList()
         }
+    }
+
+    suspend fun getAlbumDetails(id: Long): DeezerAlbumDetails {
+        val url = "$BASE_URL/album/${id}"
+        val response: JsonObject = httpClient.get(url).body()
+        return json.decodeFromJsonElement(response)
     }
 }
