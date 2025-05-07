@@ -1,47 +1,11 @@
-package com.musicapp.data.remote
+package com.musicapp.data.remote.deezer
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-
-@Serializable
-data class DeezerPlaylist(
-    @SerialName("id")
-    val id: Long,
-    @SerialName("title")
-    val title: String,
-    @SerialName("picture_medium")
-    val mediumPicture: String
-)
-
-@Serializable
-data class DeezerArtist(
-    @SerialName("id")
-    val id: Long,
-    @SerialName("name")
-    val name: String,
-    @SerialName("picture_medium")
-    val mediumPicture: String,
-    @SerialName("position")
-    val position: Int
-)
-
-@Serializable
-data class DeezerAlbum(
-    @SerialName("id")
-    val id: Long,
-    @SerialName("title")
-    val title: String,
-    @SerialName("cover_medium")
-    val mediumCover: String,
-    @SerialName("explicit_lyrics")
-    val explicit: Boolean
-)
 
 class DeezerDataSource(private val httpClient: HttpClient) {
     companion object {
@@ -51,8 +15,8 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         }
     }
 
-    suspend fun getTopPlaylists(): List<DeezerPlaylist> {
-        val url = "$BASE_URL/chart/0/playlists"
+    suspend fun getTopPlaylists(limit: Int? = null): List<DeezerPlaylist> {
+        val url = if (limit == null) "$BASE_URL/chart/0/playlists" else "$BASE_URL/chart/0/playlists?limit=${limit}"
         val responseBody: JsonObject = httpClient.get(url).body()
         val dataElement = responseBody["data"]
         return if (dataElement != null) {
@@ -65,8 +29,8 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         }
     }
 
-    suspend fun getTopArtists(): List<DeezerArtist> {
-        val url = "$BASE_URL/chart/0/artists"
+    suspend fun getTopArtists(limit: Int? = null): List<DeezerArtist> {
+        val url = if (limit == null) "$BASE_URL/chart/0/artists" else "$BASE_URL/chart/0/artists?limit=${limit}"
         val responseBody: JsonObject = httpClient.get(url).body()
         val dataElement = responseBody["data"]
         return if (dataElement != null) {
@@ -79,8 +43,8 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         }
     }
 
-    suspend fun getTopAlbums(): List<DeezerAlbum> {
-        val url = "$BASE_URL/chart/0/albums"
+    suspend fun getTopAlbums(limit: Int? = null): List<DeezerAlbum> {
+        val url = if (limit == null) "$BASE_URL/chart/0/albums" else "$BASE_URL/chart/0/albums?limit=${limit}"
         val responseBody: JsonObject = httpClient.get(url).body()
         val dataElement = responseBody["data"]
         return if (dataElement != null) {

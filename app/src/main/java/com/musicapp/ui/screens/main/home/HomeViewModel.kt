@@ -3,10 +3,10 @@ package com.musicapp.ui.screens.main.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.musicapp.data.remote.DeezerAlbum
-import com.musicapp.data.remote.DeezerArtist
-import com.musicapp.data.remote.DeezerDataSource
-import com.musicapp.data.remote.DeezerPlaylist
+import com.musicapp.data.remote.deezer.DeezerAlbum
+import com.musicapp.data.remote.deezer.DeezerArtist
+import com.musicapp.data.remote.deezer.DeezerDataSource
+import com.musicapp.data.remote.deezer.DeezerPlaylist
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow

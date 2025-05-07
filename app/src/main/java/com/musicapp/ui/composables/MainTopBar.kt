@@ -25,7 +25,7 @@ fun MainTopBar(navController: NavController, title: String) {
             )
         },
         actions = {
-            IconButton(onClick = { navController.navigate(MusicAppRoute.Settings)}) {
+            IconButton(onClick = { navController.navigate(MusicAppRoute.Settings) }) {
                 Icon(
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = stringResource(R.string.settings_description)
