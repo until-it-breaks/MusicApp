@@ -70,7 +70,7 @@ fun HomeContent(navController: NavController, modifier: Modifier) {
                     PlayListCard(
                         title = item.title,
                         imageUrl = item.mediumPicture,
-                        onClick = { /*TODO*/ }
+                        onClick = { navController.navigate(MusicAppRoute.Playlist(item.id)) }
                     )
                 }
             }
@@ -86,7 +86,7 @@ fun HomeContent(navController: NavController, modifier: Modifier) {
                     ArtistCard(
                         title = item.name,
                         imageUrl = item.mediumPicture,
-                        onClick = { /*TODO*/ }
+                        onClick = { navController.navigate(MusicAppRoute.Artist(item.id)) }
                     )
                 }
             }

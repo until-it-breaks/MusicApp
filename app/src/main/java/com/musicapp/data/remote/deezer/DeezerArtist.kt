@@ -10,7 +10,5 @@ data class DeezerArtist(
     @SerialName("name")
     val name: String,
     @SerialName("picture_medium")
-    val mediumPicture: String,
-    @SerialName("position")
-    val position: Int
+    val mediumPicture: String
 )

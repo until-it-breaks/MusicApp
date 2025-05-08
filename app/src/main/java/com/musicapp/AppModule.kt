@@ -5,6 +5,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.ui.screens.login.LoginViewModel
 import com.musicapp.ui.screens.main.AlbumViewModel
+import com.musicapp.ui.screens.main.ArtistViewModel
+import com.musicapp.ui.screens.main.PlaylistViewModel
 import com.musicapp.ui.screens.main.home.HomeViewModel
 import com.musicapp.ui.screens.passwordrecovery.PasswordRecoveryViewModel
 import com.musicapp.ui.screens.profile.ProfileScreenViewModel
@@ -48,4 +50,8 @@ val appModule = module {
     viewModel { HomeViewModel() }
 
     viewModel { AlbumViewModel() }
+
+    viewModel { PlaylistViewModel() }
+
+    viewModel { ArtistViewModel() }
 }

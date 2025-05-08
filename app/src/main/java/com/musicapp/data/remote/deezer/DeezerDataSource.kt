@@ -21,10 +21,7 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         val responseBody: JsonObject = httpClient.get(url).body()
         val dataElement = responseBody["data"]
         return if (dataElement != null) {
-            json.decodeFromJsonElement(
-                ListSerializer(DeezerPlaylist.serializer()),
-                dataElement
-            )
+            json.decodeFromJsonElement(ListSerializer(DeezerPlaylist.serializer()), dataElement)
         } else {
             emptyList()
         }
@@ -35,10 +32,7 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         val responseBody: JsonObject = httpClient.get(url).body()
         val dataElement = responseBody["data"]
         return if (dataElement != null) {
-            json.decodeFromJsonElement(
-                ListSerializer(DeezerArtist.serializer()),
-                dataElement
-            )
+            json.decodeFromJsonElement(ListSerializer(DeezerArtist.serializer()), dataElement)
         } else {
             emptyList()
         }
@@ -49,18 +43,38 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         val responseBody: JsonObject = httpClient.get(url).body()
         val dataElement = responseBody["data"]
         return if (dataElement != null) {
-            json.decodeFromJsonElement(
-                ListSerializer(DeezerAlbum.serializer()),
-                dataElement
-            )
+            json.decodeFromJsonElement(ListSerializer(DeezerAlbum.serializer()), dataElement)
         } else {
             emptyList()
         }
     }
 
-    suspend fun getAlbumDetails(id: Long): DeezerAlbumDetails {
+    suspend fun getAlbumDetails(id: Long): DeezerAlbumDetailed {
         val url = "$BASE_URL/album/${id}"
         val response: JsonObject = httpClient.get(url).body()
         return json.decodeFromJsonElement(response)
+    }
+
+    suspend fun getPlaylistDetails(id: Long): DeezerPlaylistDetailed {
+        val url = "$BASE_URL/playlist/${id}"
+        val response: JsonObject = httpClient.get(url).body()
+        return json.decodeFromJsonElement(response)
+    }
+
+    suspend fun getArtistDetails(id: Long): DeezerArtist {
+        val url = "$BASE_URL/artist/${id}"
+        val response: JsonObject = httpClient.get(url).body()
+        return json.decodeFromJsonElement(response)
+    }
+
+    suspend fun getArtistAlbums(id: Long): List<DeezerAlbum> {
+        val url = "$BASE_URL/artist/${id}/albums"
+        val responseBody: JsonObject = httpClient.get(url).body()
+        val dataElement = responseBody["data"]
+        return if (dataElement != null) {
+            json.decodeFromJsonElement(ListSerializer(DeezerAlbum.serializer()), dataElement)
+        } else {
+            emptyList()
+        }
     }
 }
