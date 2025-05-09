@@ -49,4 +49,10 @@
     <string name="top_playlists">Le migliori playlist</string>
     <string name="top_artists">I migliori artisti</string>
     <string name="top_albums">I migliori album</string>
+    <string name="album_details">Dettagli album</string>
+    <string name="explicit_description">Contenuti espliciti</string>
+    <string name="more_description">Altro</string>
+    <string name="album_picture_description">Immagine dell\'album</string>
+    <string name="artist_details">Dettagli artista</string>
+    <string name="playlist_details">Dettagli playlist</string>
 </resources>

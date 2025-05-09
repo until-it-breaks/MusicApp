@@ -47,7 +47,7 @@ fun PasswordRecoveryScreen(navController: NavController) {
     val context = LocalContext.current
 
     Scaffold(
-        topBar = { TopBarWithBackButton(stringResource(R.string.password_recovery_screen_name), navController) },
+        topBar = { TopBarWithBackButton(navController, stringResource(R.string.password_recovery_screen_name)) },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { contentPadding ->
         Column(

@@ -1,5 +1,6 @@
 package com.musicapp.ui.screens.main.home
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,8 +33,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.CenteredCircularProgressIndicator
 import com.musicapp.ui.composables.LoadableImage
 import org.koin.androidx.compose.koinViewModel
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,12 +63,7 @@ fun HomeContent(navController: NavController, modifier: Modifier) {
             }
             item {
                 if (state.isLoading) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    CenteredCircularProgressIndicator()
                 }
             }
             items(state.playlists.chunked(2)) { rowItems ->
@@ -76,7 +73,7 @@ fun HomeContent(navController: NavController, modifier: Modifier) {
                     rowItems.forEach { playlist ->
                         PlayListCard(
                             title = playlist.title,
-                            imageUrl = playlist.mediumPicture,
+                            imageUri = playlist.mediumPicture.toUri(),
                             modifier = Modifier.weight(1f),
                             onClick = { navController.navigate(MusicAppRoute.Playlist(playlist.id)) }
                         )
@@ -94,21 +91,16 @@ fun HomeContent(navController: NavController, modifier: Modifier) {
             }
             item {
                 if (state.isLoading) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    CenteredCircularProgressIndicator()
                 }
             }
             item {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(state.artists) { item ->
+                    items(state.artists) { artist ->
                         ArtistCard(
-                            title = item.name,
-                            imageUrl = item.mediumPicture,
-                            onClick = { navController.navigate(MusicAppRoute.Artist(item.id)) }
+                            title = artist.name,
+                            imageUrl = artist.mediumPicture,
+                            onClick = { navController.navigate(MusicAppRoute.Artist(artist.id)) }
                         )
                     }
                 }
@@ -121,12 +113,7 @@ fun HomeContent(navController: NavController, modifier: Modifier) {
             }
             item {
                 if (state.isLoading) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    CenteredCircularProgressIndicator()
                 }
             }
             items(state.albums.chunked(2)) { rowItems ->
@@ -136,7 +123,7 @@ fun HomeContent(navController: NavController, modifier: Modifier) {
                     rowItems.forEach { item ->
                         PlayListCard(
                             title = item.title,
-                            imageUrl = item.mediumCover,
+                            imageUri = item.mediumCover.toUri(),
                             modifier = Modifier.weight(1f),
                             onClick = { navController.navigate(MusicAppRoute.Album(item.id)) }
                         )
@@ -151,7 +138,7 @@ fun HomeContent(navController: NavController, modifier: Modifier) {
 }
 
 @Composable
-fun PlayListCard(title: String, imageUrl: String? = null, modifier: Modifier, onClick: () -> Unit) {
+fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = null, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = modifier
@@ -161,7 +148,7 @@ fun PlayListCard(title: String, imageUrl: String? = null, modifier: Modifier, on
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             LoadableImage(
-                imageUrl = imageUrl,
+                imageUri = imageUri,
                 contentDescription = stringResource(R.string.playlist_picture_description),
                 modifier = Modifier.size(72.dp)
             )
@@ -188,7 +175,7 @@ fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: String? =
             modifier = Modifier.fillMaxWidth().padding(4.dp)
         ) {
             LoadableImage(
-                imageUrl = imageUrl,
+                imageUri = imageUrl?.toUri(),
                 contentDescription = stringResource(R.string.artist_picture_description),
                 modifier = Modifier
                     .size(72.dp)

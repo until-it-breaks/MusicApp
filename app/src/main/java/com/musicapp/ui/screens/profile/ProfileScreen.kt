@@ -41,7 +41,7 @@ fun ProfileScreen(navController: NavController) {
     val profileScreenViewModel: ProfileScreenViewModel = koinViewModel()
 
     Scaffold(
-        topBar = { TopBarWithBackButton(stringResource(R.string.profile_screen_name), navController) }
+        topBar = { TopBarWithBackButton(navController, stringResource(R.string.profile_screen_name)) }
     ) { contentPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),

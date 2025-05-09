@@ -5,12 +5,15 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.musicapp.ui.screens.main.MainCategory
 
 @Composable
-fun MainNavBar(items: List<MainCategory>, selectedItem: MainCategory, onItemSelected: (MainCategory) -> Unit) {
-    NavigationBar {
+fun MainNavBar(items: List<MainCategory>, selectedItem: MainCategory, modifier: Modifier = Modifier, onItemSelected: (MainCategory) -> Unit) {
+    NavigationBar(
+        modifier = modifier,
+    ) {
         items.forEach { item ->
             NavigationBarItem(
                 selected = selectedItem == item,

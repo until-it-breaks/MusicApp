@@ -8,13 +8,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explicit
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,21 +25,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.CenteredCircularProgressIndicator
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.TopBarWithBackButton
 import org.koin.androidx.compose.koinViewModel
+import androidx.core.net.toUri
+import com.musicapp.R
 
 @Composable
 fun PlaylistScreen(navController: NavController, playlistId: Long) {
     val viewModel = koinViewModel<PlaylistViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val scrollState = rememberScrollState()
     val context = LocalContext.current
 
     LaunchedEffect(playlistId) {
@@ -48,30 +50,30 @@ fun PlaylistScreen(navController: NavController, playlistId: Long) {
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton("Playlist details", navController) }
+        topBar = { TopBarWithBackButton(navController, stringResource(R.string.playlist_details)) }
     ) { contentPadding ->
-        Column(
+        LazyColumn(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .padding(contentPadding)
                 .padding(12.dp)
-                .verticalScroll(scrollState)
         ) {
-            if (state.playlistDetailsAreLoading) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    CircularProgressIndicator()
+            item {
+                if (state.playlistDetailsAreLoading) {
+                    CenteredCircularProgressIndicator()
+                } else if (state.error != null) {
+                    Text("Error: ${state.error}")
                 }
-            } else if (state.error != null) {
-                Text("Error: ${state.error}")
-            } else {
+            }
+            item {
                 state.playlistDetails?.let { playlist ->
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        LoadableImage(playlist.pictureMedium, "Playlist picture", modifier = Modifier.fillMaxWidth())
+                        LoadableImage(
+                            imageUri = playlist.pictureBig.toUri(),
+                            stringResource(R.string.playlist_picture_description),
+                            modifier = Modifier.fillMaxWidth())
                         Text(
                             text = playlist.title,
                             style = MaterialTheme.typography.headlineMedium,
@@ -80,55 +82,50 @@ fun PlaylistScreen(navController: NavController, playlistId: Long) {
                     }
                 }
             }
-            if (state.tracksAreLoading && state.playlistDetails != null) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    CircularProgressIndicator()
+            item {
+                if (state.tracksAreLoading) {
+                    CenteredCircularProgressIndicator()
                 }
-            } else {
-                state.tracks.forEach { track ->
-                    Card(
-                        onClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() } // TODO trigger actual music player
+            }
+            items(state.tracks) { track ->
+                Card(
+                    onClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() } // TODO trigger actual music player
+                ) {
+                    Row(
+                        modifier = Modifier.padding(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.padding(4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(track.title)
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    if (track.explicitLyrics) {
-                                        Icon(Icons.Filled.Explicit, "Explicit")
-                                    }
-                                    track.contributors.forEachIndexed { index, contributor ->
+                        Column {
+                            Text(text = track.title)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (track.explicitLyrics) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Explicit,
+                                        stringResource(R.string.explicit_description)
+                                    )
+                                }
+                                track.contributors.forEachIndexed { index, contributor ->
+                                    Text(
+                                        text = contributor.name,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        textDecoration = TextDecoration.Underline,
+                                        modifier = Modifier
+                                            .clickable(onClick = { navController.navigate(MusicAppRoute.Artist(contributor.id)) })
+                                    )
+                                    if (index < track.contributors.lastIndex) {
                                         Text(
-                                            text = contributor.name,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            textDecoration = TextDecoration.Underline,
-                                            modifier = Modifier
-                                                .clickable(onClick = {
-                                                    navController.navigate(
-                                                        MusicAppRoute.Artist(contributor.id)
-                                                    )
-                                                })
+                                            text = ", ",
+                                            style = MaterialTheme.typography.bodyMedium
                                         )
-                                        if (index < track.contributors.lastIndex) {
-                                            Text(
-                                                text = ", ",
-                                                style = MaterialTheme.typography.bodyMedium
-                                            )
-                                        }
                                     }
                                 }
                             }
-                            Spacer(modifier = Modifier.weight(1f))
-                            IconButton(onClick = { /*TODO show additional option*/ }) {
-                                Icon(imageVector = Icons.Filled.MoreHoriz, "More")
-                            }
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(onClick = { /*TODO show additional option*/ }) {
+                            Icon(imageVector = Icons.Filled.MoreHoriz, stringResource(R.string.more_description))
                         }
                     }
                 }

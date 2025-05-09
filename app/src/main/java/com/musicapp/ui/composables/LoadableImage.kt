@@ -1,5 +1,6 @@
 package com.musicapp.ui.composables
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Image
@@ -12,15 +13,15 @@ import coil.request.ImageRequest
 
 @Composable
 fun LoadableImage(
-    imageUrl: String?,
+    imageUri: Uri?,
     contentDescription: String,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit
 ) {
-    if (imageUrl != null) {
+    if (imageUri != null) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUrl)
+                .data(imageUri)
                 .crossfade(true)
                 .build(),
             contentDescription = contentDescription,
@@ -30,7 +31,8 @@ fun LoadableImage(
     } else {
         Image(
             imageVector = Icons.Outlined.Image,
-            contentDescription = contentDescription,
+            contentDescription = "Image placeholder",
+            contentScale = contentScale,
             modifier = modifier
         )
     }

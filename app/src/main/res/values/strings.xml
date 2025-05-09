@@ -49,4 +49,10 @@
     <string name="top_playlists">Top Playlists</string>
     <string name="top_artists">Top Artists</string>
     <string name="top_albums">Top Albums</string>
+    <string name="album_details">Album details</string>
+    <string name="explicit_description">Explicit</string>
+    <string name="more_description">More</string>
+    <string name="album_picture_description">Album picture</string>
+    <string name="artist_details">Artist details</string>
+    <string name="playlist_details">Playlist details</string>
 </resources>
