@@ -18,7 +18,6 @@ import org.koin.core.component.inject
 import kotlin.getValue
 
 data class AlbumState(
-    val albumId: Long? = null,
     val albumDetails: DeezerAlbumDetailed? = null,
     val tracks: List<DeezerTrackDetailed> = emptyList(),
     val albumDetailsAreLoading: Boolean = false,
@@ -54,7 +53,7 @@ class AlbumViewModel(): ViewModel(), KoinComponent {
                 try {
                     val detailedTracks = withContext(Dispatchers.IO) {
                         tracks.map { track ->
-                            deezerDataSource.getAlbumTrackDetails(track.id)
+                            deezerDataSource.getTrackDetails(track.id)
                         }
                     }
                     _state.update { it.copy(tracks = detailedTracks, tracksAreLoading = false) }

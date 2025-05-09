@@ -7,6 +7,7 @@ import com.musicapp.data.remote.deezer.DeezerAlbum
 import com.musicapp.data.remote.deezer.DeezerArtist
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerPlaylist
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,11 +15,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 data class HomeState(
-    val refreshing: Boolean = false,
+    val isLoading: Boolean = false,
     val playlists: List<DeezerPlaylist> = emptyList(),
     val artists: List<DeezerArtist> = emptyList(),
     val albums: List<DeezerAlbum> = emptyList()
@@ -30,45 +32,57 @@ class HomeViewModel : ViewModel(), KoinComponent {
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
     init {
-        onRefresh()
+        loadContent()
     }
 
-    private suspend fun loadTopPlaylist() {
-        try {
-            val result = deezerDataSource.getTopPlaylists()
-            _state.update { it.copy(playlists = result.shuffled()) }
-        } catch (e: Exception) {
-            Log.e("API", e.localizedMessage ?: "Unexpected playlist error")
-        }
-    }
-
-    private suspend fun loadTopArtists() {
-        try {
-            val result = deezerDataSource.getTopArtists()
-            _state.update { it.copy(artists = result.shuffled()) }
-        } catch (e: Exception) {
-            Log.e("API", e.localizedMessage ?: "Unexpected artists error")
-        }
-    }
-
-    private suspend fun loadTopAlbums() {
-        try {
-            val result = deezerDataSource.getTopAlbums()
-            _state.update { it.copy(albums = result.shuffled()) }
-        } catch (e: Exception) {
-            Log.e("API", e.localizedMessage ?: "Unexpected albums error")
-        }
-    }
-
-    fun onRefresh() {
+    private fun loadTopPlaylist() {
         viewModelScope.launch {
-            _state.update { it.copy(refreshing = true, playlists = emptyList(), artists = emptyList(), albums = emptyList()) }
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    deezerDataSource.getTopPlaylists()
+                }
+                _state.update { it.copy(playlists = result) }
+            } catch (e: Exception) {
+                Log.e("API", e.localizedMessage ?: "Unexpected playlist error")
+            }
+        }
+    }
+
+    private fun loadTopArtists() {
+        viewModelScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    deezerDataSource.getTopArtists()
+                }
+                _state.update { it.copy(artists = result) }
+            } catch (e: Exception) {
+                Log.e("API", e.localizedMessage ?: "Unexpected artists error")
+            }
+        }
+    }
+
+    private fun loadTopAlbums() {
+        viewModelScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    deezerDataSource.getTopAlbums()
+                }
+                _state.update { it.copy(albums = result) }
+            } catch (e: Exception) {
+                Log.e("API", e.localizedMessage ?: "Unexpected albums error")
+            }
+        }
+    }
+
+    fun loadContent() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, playlists = emptyList(), artists = emptyList(), albums = emptyList()) }
             awaitAll(
                 async { loadTopPlaylist() },
                 async { loadTopArtists() },
                 async { loadTopAlbums() }
             )
-            _state.update { it.copy(refreshing = false) }
+            _state.update { it.copy(isLoading = false) }
         }
     }
 }

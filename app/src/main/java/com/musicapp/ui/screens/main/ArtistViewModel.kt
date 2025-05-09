@@ -2,21 +2,27 @@ package com.musicapp.ui.screens.main
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.musicapp.data.remote.deezer.DeezerAlbum
 import com.musicapp.data.remote.deezer.DeezerArtist
 import com.musicapp.data.remote.deezer.DeezerDataSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.getValue
 
 data class ArtistState(
-    val id: Long? = null,
-    val artistDetails: DeezerArtist? = null,
-    val artistAlbums: List<DeezerAlbum> = emptyList()
+    val artist: DeezerArtist? = null,
+    val artistAlbums: List<DeezerAlbum> = emptyList(),
+    val artistIsLoading: Boolean = false,
+    val artistAlbumsAreLoading: Boolean = false,
+    val error: String? = null
 )
 
 class ArtistViewModel(): ViewModel(), KoinComponent {
@@ -24,21 +30,33 @@ class ArtistViewModel(): ViewModel(), KoinComponent {
     private val _state = MutableStateFlow(ArtistState())
     val state: StateFlow<ArtistState> = _state.asStateFlow()
 
-    suspend fun loadArtist(id: Long) {
-        try {
-            val result = deezerDataSource.getArtistDetails(id)
-            _state.update { it.copy(artistDetails = result) }
-        } catch (e: Exception) {
-            Log.e("ARTIST", e.localizedMessage ?: "Unexpected error")
+    fun loadArtist(id: Long) {
+        viewModelScope.launch {
+            _state.update { it.copy(artistIsLoading = true, error = null) }
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    deezerDataSource.getArtistDetails(id)
+                }
+                _state.update { it.copy(artist = result, artistIsLoading = false) }
+            } catch (e: Exception) {
+                Log.e("ARTIST", e.localizedMessage ?: "Unexpected error loading artist")
+                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error", artistIsLoading = false) }
+            }
         }
     }
 
-    suspend fun loadArtistAlbums(id: Long) {
-        try {
-            val result = deezerDataSource.getArtistAlbums(id)
-            _state.update { it.copy(artistAlbums = result) }
-        } catch (e: Exception) {
-            Log.e("ARTIST", e.localizedMessage ?: "Unexpected error")
+    fun loadArtistAlbums(id: Long) {
+        viewModelScope.launch {
+            _state.update { it.copy(artistAlbumsAreLoading = true, error = null) }
+            try {
+                val result = withContext(Dispatchers.IO)  {
+                    deezerDataSource.getArtistAlbums(id)
+                }
+                _state.update { it.copy(artistAlbums = result, artistAlbumsAreLoading = false) }
+            } catch (e: Exception) {
+                Log.e("ARTIST", e.localizedMessage ?: "Unexpected error")
+                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error", artistAlbumsAreLoading = false) }
+            }
         }
     }
 }
