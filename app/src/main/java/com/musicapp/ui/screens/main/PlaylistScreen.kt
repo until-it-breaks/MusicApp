@@ -54,7 +54,7 @@ fun PlaylistScreen(navController: NavController, playlistId: Long) {
                     Text(details.title, style = MaterialTheme.typography.headlineMedium)
                 }
             }
-            state.details?.tracks?.data?.forEach { track ->
+            state.details?.tracks?.tracks?.forEach { track ->
                 Card {
                     Row(
                         modifier = Modifier.padding(4.dp),

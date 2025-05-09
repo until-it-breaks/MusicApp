@@ -55,6 +55,12 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         return json.decodeFromJsonElement(response)
     }
 
+    suspend fun getAlbumTrackDetails(id: Long): DeezerTrackDetailed {
+        val url = "$BASE_URL/track/${id}"
+        val response: JsonObject = httpClient.get(url).body()
+        return json.decodeFromJsonElement(response)
+    }
+
     suspend fun getPlaylistDetails(id: Long): DeezerPlaylistDetailed {
         val url = "$BASE_URL/playlist/${id}"
         val response: JsonObject = httpClient.get(url).body()

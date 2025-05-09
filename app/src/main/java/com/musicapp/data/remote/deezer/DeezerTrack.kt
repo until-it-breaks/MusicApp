@@ -18,7 +18,19 @@ data class DeezerTrack(
 )
 
 @Serializable
-data class DeezerTracksWrapper(
-    @SerialName("data")
-    val data: List<DeezerTrack>
+data class DeezerTrackDetailed(
+    @SerialName("id")
+    val id: Long,
+    @SerialName("title")
+    val title: String,
+    @SerialName("duration")
+    val duration: Long,
+    @SerialName("release_date")
+    val releaseDate: String,
+    @SerialName("explicit_lyrics")
+    val explicitLyrics: Boolean,
+    @SerialName("preview")
+    val preview: String,
+    @SerialName("contributors")
+    val contributors: List<DeezerArtist>
 )

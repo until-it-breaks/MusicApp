@@ -32,3 +32,9 @@ data class DeezerAlbumDetailed(
     @SerialName("tracks")
     val tracks: DeezerTracksWrapper
 )
+
+@Serializable
+data class DeezerTracksWrapper(
+    @SerialName("data")
+    val tracks: List<DeezerTrack>
+)
