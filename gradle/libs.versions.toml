@@ -10,13 +10,14 @@ ktorClientContentNegotiation = "2.3.8"
 ktorClientCore = "2.3.8"
 ktorClientOkhttp = "2.3.8"
 ktorSerializationKotlinxJson = "2.3.8"
-lifecycleRuntimeCompose = "2.8.7"
-lifecycleRuntimeKtx = "2.8.7"
+lifecycleRuntimeCompose = "2.9.0"
+lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
-composeBom = "2025.04.01"
-lifecycleViewmodelCompose = "2.8.7"
-navigationCompose = "2.8.9"
+composeBom = "2025.05.00"
+lifecycleViewmodelCompose = "2.9.0"
+navigationCompose = "2.9.0"
 ksp = "2.0.0-1.0.24"
+room = "2.7.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,6 +45,9 @@ ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negoti
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClientOkhttp" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorSerializationKotlinxJson" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
