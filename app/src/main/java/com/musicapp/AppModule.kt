@@ -1,8 +1,13 @@
 package com.musicapp
 
+import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.musicapp.data.database.MusicAppDatabase
 import com.musicapp.data.remote.deezer.DeezerDataSource
+import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.data.repositories.TracksRepository
+import com.musicapp.data.repositories.UsersRepository
 import com.musicapp.ui.screens.login.LoginViewModel
 import com.musicapp.ui.screens.main.AlbumViewModel
 import com.musicapp.ui.screens.main.ArtistViewModel
@@ -22,6 +27,28 @@ val appModule = module {
     single { FirebaseAuth.getInstance() }
 
     single { FirebaseFirestore.getInstance() }
+
+    single {
+        Room.databaseBuilder(
+            get(),
+            MusicAppDatabase::class.java,
+            "music-app"
+        )
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    single {
+        PlaylistsRepository(get<MusicAppDatabase>().playlistDAO(), get())
+    }
+
+    single {
+        TracksRepository(get<MusicAppDatabase>().trackDAO(), get())
+    }
+
+    single {
+        UsersRepository(get<MusicAppDatabase>().userDAO(), get())
+    }
 
     single {
         HttpClient {
