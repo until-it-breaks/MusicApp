@@ -30,8 +30,8 @@ data class User(
 
 @Entity
 data class Playlist(
-    @PrimaryKey
-    val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
     @ColumnInfo
     val name: String,
     @ColumnInfo

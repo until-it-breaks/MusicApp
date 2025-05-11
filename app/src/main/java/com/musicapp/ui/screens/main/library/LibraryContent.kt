@@ -17,13 +17,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LibraryContent(modifier: Modifier) {
-    val playlists = (1..8).map { "Playlist #$it" } // TODO remove
+    val viewModel = koinViewModel<LibraryViewModel>()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier.padding(12.dp)
@@ -35,9 +40,9 @@ fun LibraryContent(modifier: Modifier) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(playlists) { playlist ->
+            items(state.playlists) { playlist ->
                 PlaylistItem(
-                    playlist,
+                    playlist.name,
                     onClick = { /*TODO*/ }
                 )
             }

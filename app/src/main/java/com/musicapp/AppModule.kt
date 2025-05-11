@@ -1,5 +1,6 @@
 package com.musicapp
 
+import android.content.Context
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -13,6 +14,7 @@ import com.musicapp.ui.screens.main.AlbumViewModel
 import com.musicapp.ui.screens.main.ArtistViewModel
 import com.musicapp.ui.screens.main.PlaylistViewModel
 import com.musicapp.ui.screens.main.home.HomeViewModel
+import com.musicapp.ui.screens.main.library.LibraryViewModel
 import com.musicapp.ui.screens.passwordrecovery.PasswordRecoveryViewModel
 import com.musicapp.ui.screens.profile.ProfileScreenViewModel
 import com.musicapp.ui.screens.signup.SignUpViewModel
@@ -39,15 +41,15 @@ val appModule = module {
     }
 
     single {
-        PlaylistsRepository(get<MusicAppDatabase>().playlistDAO(), get())
+        PlaylistsRepository(get<MusicAppDatabase>().playlistDAO(), get<Context>().contentResolver)
     }
 
     single {
-        TracksRepository(get<MusicAppDatabase>().trackDAO(), get())
+        TracksRepository(get<MusicAppDatabase>().trackDAO(), get<Context>().contentResolver)
     }
 
     single {
-        UsersRepository(get<MusicAppDatabase>().userDAO(), get())
+        UsersRepository(get<MusicAppDatabase>().userDAO(), get<Context>().contentResolver)
     }
 
     single {
@@ -81,4 +83,6 @@ val appModule = module {
     viewModel { PlaylistViewModel() }
 
     viewModel { ArtistViewModel() }
+
+    viewModel { LibraryViewModel() }
 }

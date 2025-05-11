@@ -10,12 +10,18 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.musicapp.R
+import com.musicapp.data.database.Playlist
+import com.musicapp.data.database.User
+import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.data.repositories.UsersRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 data class SignUpState(
     val username: String = "",
@@ -29,10 +35,13 @@ data class SignUpState(
     val canSubmit = username.isNotBlank() && email.isNotBlank() && password.isNotBlank()
 }
 
-class SignUpViewModel(private val auth: FirebaseAuth, private val store: FirebaseFirestore): ViewModel() {
+class SignUpViewModel(private val auth: FirebaseAuth, private val store: FirebaseFirestore): ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(SignUpState())
     val state: StateFlow<SignUpState> = _state.asStateFlow()
+
+    private val userRepository: UsersRepository by inject<UsersRepository>()
+    private val playlistRepository: PlaylistsRepository by inject<PlaylistsRepository>()
 
     fun onUsernameChanged(username: String) {
         _state.update { it.copy(username = username) }
@@ -91,6 +100,14 @@ class SignUpViewModel(private val auth: FirebaseAuth, private val store: Firebas
                 "email" to auth.currentUser?.email
             )
             userDocument.set(userData).await()
+
+            val user = User(auth.currentUser!!.uid, username)
+            userRepository.upsertUser(user)
+            val liked = Playlist(1, "Liked", auth.currentUser!!.uid, true, false)
+            val history = Playlist(2, "History", auth.currentUser!!.uid, false, true)
+            playlistRepository.upsertPlaylist(liked)
+            playlistRepository.upsertPlaylist(history)
+
         } catch (e: Exception) {
             Log.e("SIGNUP", e.localizedMessage ?: "Unexpected error while trying to save username")
             throw e

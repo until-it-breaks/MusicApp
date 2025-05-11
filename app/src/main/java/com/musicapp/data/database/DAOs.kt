@@ -14,7 +14,7 @@ interface PlaylistsDAO {
     @Query("SELECT * FROM playlist WHERE playlist.ownerId = :userId AND playlist.isHistoryPlaylist = 1")
     fun getHistoryPlaylist(userId: String): Flow<Playlist>
 
-    @Query("SELECT * FROM playlist WHERE playlist.ownerId = :userId AND playlist.isLikedPlaylist = 0 AND playlist.isHistoryPlaylist = 0")
+    @Query("SELECT * FROM playlist WHERE playlist.ownerId = :userId")
     fun getUserPlaylists(userId: String): Flow<List<Playlist>>
 
     @Upsert()
