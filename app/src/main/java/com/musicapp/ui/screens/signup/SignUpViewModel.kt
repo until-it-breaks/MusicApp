@@ -10,7 +10,10 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.musicapp.R
+import com.musicapp.data.database.LikedTracksPlaylist
 import com.musicapp.data.database.Playlist
+import com.musicapp.data.database.TrackHistory
+import com.musicapp.data.database.TrackHistoryWithTracks
 import com.musicapp.data.database.User
 import com.musicapp.data.repositories.PlaylistsRepository
 import com.musicapp.data.repositories.UsersRepository
@@ -101,12 +104,11 @@ class SignUpViewModel(private val auth: FirebaseAuth, private val store: Firebas
             )
             userDocument.set(userData).await()
 
-            val user = User(auth.currentUser!!.uid, username)
+            val userId = auth.currentUser!!.uid
+            val user = User(userId, username, auth.currentUser!!.email!!)
             userRepository.upsertUser(user)
-            val liked = Playlist(1, "Liked", auth.currentUser!!.uid, true, false)
-            val history = Playlist(2, "History", auth.currentUser!!.uid, false, true)
-            playlistRepository.upsertPlaylist(liked)
-            playlistRepository.upsertPlaylist(history)
+            playlistRepository.upsertTrackHistory(TrackHistory(userId, "Now"))
+            playlistRepository.upsertLikedTracks(LikedTracksPlaylist(userId, "Now"))
 
         } catch (e: Exception) {
             Log.e("SIGNUP", e.localizedMessage ?: "Unexpected error while trying to save username")

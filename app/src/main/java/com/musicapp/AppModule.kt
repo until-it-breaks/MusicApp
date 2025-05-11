@@ -41,7 +41,12 @@ val appModule = module {
     }
 
     single {
-        PlaylistsRepository(get<MusicAppDatabase>().playlistDAO(), get<Context>().contentResolver)
+        PlaylistsRepository(
+            get<MusicAppDatabase>().playlistDAO(),
+            get<MusicAppDatabase>().likedTracksDAO(),
+            get<MusicAppDatabase>().trackHistoryDAO(),
+            get<Context>().contentResolver
+        )
     }
 
     single {

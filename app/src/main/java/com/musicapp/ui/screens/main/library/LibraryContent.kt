@@ -33,18 +33,42 @@ fun LibraryContent(modifier: Modifier) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier.padding(12.dp)
     ) {
-        Text(
-            text = "Your playlists",
-            style = MaterialTheme.typography.titleLarge,
-        )
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(state.playlists) { playlist ->
-                PlaylistItem(
-                    playlist.name,
-                    onClick = { /*TODO*/ }
+            item {
+                state.likedTracksPlaylist?.let { likedPlaylist ->
+                    PlaylistItem(
+                        "Liked songs",
+                        onClick = { /*TODO*/ }
+                    )
+                }
+            }
+            item {
+                state.trackHistory?.let { history ->
+                    PlaylistItem(
+                        "Track history",
+                        onClick = { /*TODO*/ }
+                    )
+                }
+            }
+            item {
+                Text(
+                    text = "Your playlists",
+                    style = MaterialTheme.typography.titleLarge,
                 )
+            }
+            if (state.playlists.isEmpty()) {
+                item {
+                    Text("No playlists yet!")
+                }
+            } else {
+                items(state.playlists) { playlist ->
+                    PlaylistItem(
+                        playlist.name,
+                        onClick = { /*TODO*/ }
+                    )
+                }
             }
         }
     }
