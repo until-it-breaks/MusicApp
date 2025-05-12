@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.automirrored.outlined.LibraryBooks
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,7 +57,8 @@ fun MainScreen(navController: NavController) {
             MainNavBar(
                 items = MainCategory.entries.toList(),
                 selectedItem = selectedCategory,
-                onItemSelected = { category -> selectedCategory = category })
+                onItemSelected = { category -> selectedCategory = category }
+            )
         }
     ) { contentPadding ->
         val modifier = Modifier

@@ -1,6 +1,7 @@
 package com.musicapp.ui.screens.main.library
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,9 +12,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,8 +33,7 @@ fun LibraryContent(modifier: Modifier) {
     val viewModel = koinViewModel<LibraryViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+    Box(
         modifier = modifier.padding(12.dp)
     ) {
         LazyColumn(
@@ -70,6 +73,12 @@ fun LibraryContent(modifier: Modifier) {
                     )
                 }
             }
+        }
+        FloatingActionButton(
+            onClick = { /*TODO*/ },
+            modifier = Modifier.padding(16.dp).align(Alignment.BottomEnd)
+        ) {
+            Icon(Icons.Filled.Add, "Create new playlist")
         }
     }
 }
