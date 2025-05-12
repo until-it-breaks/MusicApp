@@ -54,7 +54,8 @@ fun MainScreen(navController: NavController) {
     Scaffold(
         topBar = { MainTopBar(navController, title = stringResource(selectedCategory.stringId)) },
         bottomBar = {
-            MainNavBar(
+            // Put the music player bar here
+            MainNavBar( // Bottom nav bar
                 items = MainCategory.entries.toList(),
                 selectedItem = selectedCategory,
                 onItemSelected = { category -> selectedCategory = category }
