@@ -10,6 +10,7 @@ import com.musicapp.data.database.PlaylistWithTracks
 import com.musicapp.data.database.TrackHistory
 import com.musicapp.data.database.TrackHistoryDAO
 import com.musicapp.data.database.TrackHistoryWithTracks
+import kotlinx.coroutines.flow.Flow
 
 class PlaylistsRepository(
     private val playlistDAO: PlaylistsDAO,
@@ -20,7 +21,7 @@ class PlaylistsRepository(
 ) {
     // Normal playlists
 
-    suspend fun getUserPlaylists(userId: String): List<Playlist> = playlistDAO.getUserPlaylists(userId)
+    fun getUserPlaylists(userId: String): Flow<List<Playlist>> = playlistDAO.getUserPlaylists(userId)
 
     suspend fun getUserPlaylistsWithTracks(playlistId: String): PlaylistWithTracks = playlistDAO.getPlaylistWithTracks(playlistId)
 

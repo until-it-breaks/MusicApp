@@ -3,8 +3,8 @@ package com.musicapp.data.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
-@Database(entities =
-    [
+@Database(
+    entities = [
         User::class,
         Track::class,
         Playlist::class,

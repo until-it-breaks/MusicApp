@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TracksDAO {
@@ -30,7 +31,7 @@ interface UsersDAO {
 @Dao
 interface PlaylistsDAO {
     @Query("SELECT * FROM playlist WHERE playlist.ownerId = :userId")
-    suspend fun getUserPlaylists(userId: String): List<Playlist>
+    fun getUserPlaylists(userId: String): Flow<List<Playlist>>
 
     @Query("SELECT * FROM playlist WHERE playlist.playlistId = :playlistId")
     suspend fun getPlaylistWithTracks(playlistId: String): PlaylistWithTracks

@@ -38,6 +38,8 @@ fun LibraryContent(modifier: Modifier) {
     val viewModel = koinViewModel<LibraryViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    val playlists = state.playlists.collectAsStateWithLifecycle(emptyList())
+
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
@@ -69,12 +71,12 @@ fun LibraryContent(modifier: Modifier) {
                     style = MaterialTheme.typography.titleLarge,
                 )
             }
-            if (state.playlists.isEmpty()) {
+            if (playlists.value.isEmpty()) {
                 item {
                     Text("No playlists yet!")
                 }
             } else {
-                items(state.playlists) { playlist ->
+                items(playlists.value) { playlist ->
                     PlaylistItem(
                         playlist.name,
                         onClick = { /*TODO*/ }

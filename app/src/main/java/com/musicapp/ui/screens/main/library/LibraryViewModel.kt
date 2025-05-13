@@ -8,6 +8,7 @@ import com.musicapp.data.database.LikedTracksPlaylist
 import com.musicapp.data.database.Playlist
 import com.musicapp.data.database.TrackHistory
 import com.musicapp.data.repositories.PlaylistsRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +19,7 @@ data class LibraryState(
     val isLoading: Boolean = false,
     val likedTracksPlaylist: LikedTracksPlaylist? = null,
     val trackHistory: TrackHistory? = null,
-    val playlists: List<Playlist> = emptyList(),
+    val playlists: Flow<List<Playlist>> = MutableStateFlow(emptyList()),
 )
 
 class LibraryViewModel(private val playlistsRepository: PlaylistsRepository, private val auth: FirebaseAuth): ViewModel() {
