@@ -21,7 +21,7 @@ dependencyResolutionManagement {
 
 plugins {
     id("com.autonomousapps.build-health") version "2.17.0"
-    id("com.android.application") version "8.9.2" apply false
+    id("com.android.application") version "8.10.0" apply false
 }
 
 rootProject.name = "MusicApp"
