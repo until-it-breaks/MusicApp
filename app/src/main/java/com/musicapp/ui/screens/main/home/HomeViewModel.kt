@@ -16,8 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 data class HomeState(
     val isLoading: Boolean = false,
@@ -26,8 +24,7 @@ data class HomeState(
     val albums: List<DeezerAlbum> = emptyList()
 )
 
-class HomeViewModel : ViewModel(), KoinComponent {
-    private val deezerDataSource: DeezerDataSource by inject()
+class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel() {
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 

@@ -13,9 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import kotlin.getValue
 
 data class LibraryState(
     val isLoading: Boolean = false,
@@ -24,10 +21,7 @@ data class LibraryState(
     val playlists: List<Playlist> = emptyList(),
 )
 
-class LibraryViewModel(): ViewModel(), KoinComponent {
-    private val playlistRepository: PlaylistsRepository by inject()
-    private val auth: FirebaseAuth by inject()
-
+class LibraryViewModel(private val playlistsRepository: PlaylistsRepository, private val auth: FirebaseAuth): ViewModel() {
     private val _state = MutableStateFlow(LibraryState())
     val state: StateFlow<LibraryState> = _state.asStateFlow()
 
@@ -42,9 +36,9 @@ class LibraryViewModel(): ViewModel(), KoinComponent {
                 val userId = auth.currentUser!!.uid
                 _state.update {
                     it.copy(
-                        trackHistory = playlistRepository.getTrackHistory(userId),
-                        likedTracksPlaylist = playlistRepository.getLikedTracks(userId),
-                        playlists = playlistRepository.getUserPlaylists(userId)
+                        trackHistory = playlistsRepository.getTrackHistory(userId),
+                        likedTracksPlaylist = playlistsRepository.getLikedTracks(userId),
+                        playlists = playlistsRepository.getUserPlaylists(userId)
                     )
                 }
                 _state.update { it.copy(isLoading = false) }
@@ -58,7 +52,7 @@ class LibraryViewModel(): ViewModel(), KoinComponent {
     fun createPlaylist(name: String) {
         viewModelScope.launch {
             val playlist = Playlist(name = name, ownerId = auth.currentUser!!.uid)
-            playlistRepository.upsertPlaylist(playlist)
+            playlistsRepository.upsertPlaylist(playlist)
         }
     }
 }

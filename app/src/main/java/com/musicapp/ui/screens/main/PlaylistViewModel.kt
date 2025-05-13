@@ -13,9 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import kotlin.getValue
 
 data class PlaylistState(
     val playlistDetails: DeezerPlaylistDetailed? = null,
@@ -25,8 +22,7 @@ data class PlaylistState(
     val error: String? = null
 )
 
-class PlaylistViewModel(): ViewModel(), KoinComponent {
-    private val deezerDataSource: DeezerDataSource by inject()
+class PlaylistViewModel(private val deezerDataSource: DeezerDataSource): ViewModel() {
     private val _state = MutableStateFlow(PlaylistState())
     val state: StateFlow<PlaylistState> = _state.asStateFlow()
 

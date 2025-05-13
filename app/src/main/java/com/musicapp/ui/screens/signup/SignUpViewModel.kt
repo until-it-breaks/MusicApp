@@ -38,13 +38,15 @@ data class SignUpState(
     val canSubmit = username.isNotBlank() && email.isNotBlank() && password.isNotBlank()
 }
 
-class SignUpViewModel(private val auth: FirebaseAuth, private val store: FirebaseFirestore): ViewModel(), KoinComponent {
+class SignUpViewModel(
+        private val auth: FirebaseAuth,
+        private val store: FirebaseFirestore,
+        private val usersRepository: UsersRepository,
+        private val playlistsRepository: PlaylistsRepository
+    ): ViewModel() {
 
     private val _state = MutableStateFlow(SignUpState())
     val state: StateFlow<SignUpState> = _state.asStateFlow()
-
-    private val userRepository: UsersRepository by inject<UsersRepository>()
-    private val playlistRepository: PlaylistsRepository by inject<PlaylistsRepository>()
 
     fun onUsernameChanged(username: String) {
         _state.update { it.copy(username = username) }
@@ -106,9 +108,9 @@ class SignUpViewModel(private val auth: FirebaseAuth, private val store: Firebas
 
             val userId = auth.currentUser!!.uid
             val user = User(userId, username, auth.currentUser!!.email!!)
-            userRepository.upsertUser(user)
-            playlistRepository.upsertTrackHistory(TrackHistory(userId, "Now"))
-            playlistRepository.upsertLikedTracks(LikedTracksPlaylist(userId, "Now"))
+            usersRepository.upsertUser(user)
+            playlistsRepository.upsertTrackHistory(TrackHistory(userId, "Now"))
+            playlistsRepository.upsertLikedTracks(LikedTracksPlaylist(userId, "Now"))
 
         } catch (e: Exception) {
             Log.e("SIGNUP", e.localizedMessage ?: "Unexpected error while trying to save username")

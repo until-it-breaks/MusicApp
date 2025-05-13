@@ -71,7 +71,7 @@ val appModule = module {
 
     single { DeezerDataSource(get()) }
 
-    viewModel { SignUpViewModel(get(), get()) }
+    viewModel { SignUpViewModel(get(), get(), get(), get()) }
 
     viewModel { LoginViewModel(get()) }
 
@@ -81,13 +81,13 @@ val appModule = module {
 
     viewModel { MainViewModel(get()) }
 
-    viewModel { HomeViewModel() }
+    viewModel { HomeViewModel(get()) }
 
-    viewModel { AlbumViewModel() }
+    viewModel { AlbumViewModel(get()) }
 
-    viewModel { PlaylistViewModel() }
+    viewModel { PlaylistViewModel(get()) }
 
-    viewModel { ArtistViewModel() }
+    viewModel { ArtistViewModel(get()) }
 
-    viewModel { LibraryViewModel() }
+    viewModel { LibraryViewModel(get(), get()) }
 }
