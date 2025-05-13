@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.getValue
 
 data class LibraryState(
     val isLoading: Boolean = false,
@@ -51,6 +52,13 @@ class LibraryViewModel(): ViewModel(), KoinComponent {
                 Log.e("LibraryViewModel", "Error loading playlists: ${e.localizedMessage}")
                 _state.update { it.copy(isLoading = false) }
             }
+        }
+    }
+
+    fun createPlaylist(name: String) {
+        viewModelScope.launch {
+            val playlist = Playlist(name = name, ownerId = auth.currentUser!!.uid)
+            playlistRepository.upsertPlaylist(playlist)
         }
     }
 }

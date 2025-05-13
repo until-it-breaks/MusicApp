@@ -93,7 +93,7 @@ fun LibraryContent(modifier: Modifier) {
         showBottomSheet = showBottomSheet,
         sheetState = sheetState,
         onDismiss = { showBottomSheet = false },
-        onCreatePlaylist = { /* call viewmodel method to create playlist */ }
+        onCreatePlaylist = { name -> viewModel.createPlaylist(name) }
     )
 }
 
