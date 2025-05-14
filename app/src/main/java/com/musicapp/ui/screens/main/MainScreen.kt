@@ -52,6 +52,7 @@ fun MainScreen(navController: NavController) {
     val libraryNavController = rememberNavController()
 
     Column(modifier = Modifier.fillMaxSize()) {
+        // Music player bar goes --> HERE <--
         Row(
             modifier = Modifier.weight(1f)
         ) {

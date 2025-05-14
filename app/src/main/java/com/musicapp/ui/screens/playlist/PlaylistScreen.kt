@@ -39,7 +39,6 @@ import com.musicapp.ui.composables.TopBarWithBackButton
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.net.toUri
 import com.musicapp.R
-import com.musicapp.ui.composables.TrackDropdownMenu
 
 @Composable
 fun PlaylistScreen(navController: NavController, playlistId: Long) {

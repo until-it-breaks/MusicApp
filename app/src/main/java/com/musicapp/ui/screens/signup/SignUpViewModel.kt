@@ -11,9 +11,7 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.musicapp.R
 import com.musicapp.data.database.LikedTracksPlaylist
-import com.musicapp.data.database.Playlist
 import com.musicapp.data.database.TrackHistory
-import com.musicapp.data.database.TrackHistoryWithTracks
 import com.musicapp.data.database.User
 import com.musicapp.data.repositories.PlaylistsRepository
 import com.musicapp.data.repositories.UsersRepository
@@ -23,8 +21,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 data class SignUpState(
     val username: String = "",

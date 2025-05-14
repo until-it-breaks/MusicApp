@@ -19,8 +19,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
-import com.musicapp.data.database.Track
-import com.musicapp.data.remote.deezer.DeezerTrack
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
 
 @Composable
