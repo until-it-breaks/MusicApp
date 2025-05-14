@@ -1,5 +1,6 @@
 package com.musicapp.ui.screens.album
 
+import android.text.format.Time
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -86,7 +87,12 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    Row {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        album.contributors.forEach { contributor ->
+                            LoadableImage(contributor.smallPicture.toUri(), "Artist picture")
+                        }
                         album.contributors.forEachIndexed { index, contributor ->
                             Text(
                                 text = contributor.name,
@@ -145,7 +151,18 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                     }
                 }
             }
-            // TODO show more info about album
+            item {
+                val details = state.albumDetails
+                if (details != null) {
+                    val durationInMinutes = details.duration / 60
+                    Row {
+                        Text("${details.trackCount} songs")
+                        Text(" · ")
+                        Text("${durationInMinutes}min")
+                    }
+                    Text("Label: ${details.label}")
+                }
+            }
         }
     }
 }

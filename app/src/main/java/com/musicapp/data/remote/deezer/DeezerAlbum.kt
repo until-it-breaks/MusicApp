@@ -27,6 +27,8 @@ data class DeezerAlbumDetailed(
     val coverBig: String,
     @SerialName("label")
     val label: String,
+    @SerialName("nb_tracks")
+    val trackCount: Int,
     @SerialName("duration")
     val duration: Long,
     @SerialName("explicit_lyrics")

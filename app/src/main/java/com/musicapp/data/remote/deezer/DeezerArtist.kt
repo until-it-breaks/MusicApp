@@ -9,6 +9,8 @@ data class DeezerArtist(
     val id: Long,
     @SerialName("name")
     val name: String,
+    @SerialName("picture_small")
+    val smallPicture: String,
     @SerialName("picture_medium")
     val mediumPicture: String,
     @SerialName("picture_big")
