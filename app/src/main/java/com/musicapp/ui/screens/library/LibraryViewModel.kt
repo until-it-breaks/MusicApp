@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens.main.library
+package com.musicapp.ui.screens.library
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens.main.library
+package com.musicapp.ui.screens.library
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,12 +29,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.CreatePlaylistModal
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LibraryContent(modifier: Modifier) {
+fun LibraryScreen(navController: NavController, modifier: Modifier) {
     val viewModel = koinViewModel<LibraryViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -79,7 +81,7 @@ fun LibraryContent(modifier: Modifier) {
                 items(playlists.value) { playlist ->
                     PlaylistItem(
                         playlist.name,
-                        onClick = { /*TODO*/ }
+                        onClick = { navController.navigate(MusicAppRoute.UserPlaylist(playlist.playlistId)) }
                     )
                 }
             }

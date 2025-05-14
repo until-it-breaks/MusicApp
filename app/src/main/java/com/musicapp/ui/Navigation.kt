@@ -6,10 +6,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.musicapp.ui.screens.login.LoginScreen
-import com.musicapp.ui.screens.main.AlbumScreen
-import com.musicapp.ui.screens.main.ArtistScreen
+import com.musicapp.ui.screens.album.AlbumScreen
+import com.musicapp.ui.screens.artist.ArtistScreen
 import com.musicapp.ui.screens.main.MainScreen
-import com.musicapp.ui.screens.main.PlaylistScreen
+import com.musicapp.ui.screens.playlist.PlaylistScreen
+import com.musicapp.ui.screens.playlist.UserPlaylistScreen
 import com.musicapp.ui.screens.passwordrecovery.PasswordRecoveryScreen
 import com.musicapp.ui.screens.profile.ProfileScreen
 import com.musicapp.ui.screens.settings.SettingsScreen
@@ -26,6 +27,7 @@ sealed interface MusicAppRoute {
     @Serializable data class Album(val id: Long): MusicAppRoute
     @Serializable data class Playlist(val id: Long): MusicAppRoute
     @Serializable data class Artist(val id: Long): MusicAppRoute
+    @Serializable data class UserPlaylist(val uuid: String): MusicAppRoute
 }
 
 @Composable
@@ -63,6 +65,10 @@ fun MusicAppNavGraph(navController: NavHostController, musicAppRoute: MusicAppRo
         composable<MusicAppRoute.Artist> { backStackEntry ->
             val route = backStackEntry.toRoute<MusicAppRoute.Artist>()
             ArtistScreen(navController, route.id)
+        }
+        composable<MusicAppRoute.UserPlaylist> { backStackEntry ->
+            val route = backStackEntry.toRoute<MusicAppRoute.UserPlaylist>()
+            UserPlaylistScreen(navController, route.uuid)
         }
     }
 }

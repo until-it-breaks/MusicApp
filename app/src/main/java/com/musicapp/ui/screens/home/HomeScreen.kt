@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens.main.home
+package com.musicapp.ui.screens.home
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
@@ -40,7 +40,7 @@ import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeContent(navController: NavController, modifier: Modifier) {
+fun HomeScreen(navController: NavController, modifier: Modifier) {
     val viewModel = koinViewModel<HomeViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 

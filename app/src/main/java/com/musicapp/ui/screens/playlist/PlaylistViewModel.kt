@@ -1,10 +1,10 @@
-package com.musicapp.ui.screens.main
+package com.musicapp.ui.screens.playlist
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.musicapp.data.remote.deezer.DeezerAlbumDetailed
 import com.musicapp.data.remote.deezer.DeezerDataSource
+import com.musicapp.data.remote.deezer.DeezerPlaylistDetailed
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,37 +14,37 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-data class AlbumState(
-    val albumDetails: DeezerAlbumDetailed? = null,
+data class PlaylistState(
+    val playlistDetails: DeezerPlaylistDetailed? = null,
     val tracks: List<DeezerTrackDetailed> = emptyList(),
-    val albumDetailsAreLoading: Boolean = false,
+    val playlistDetailsAreLoading: Boolean = false,
     val tracksAreLoading: Boolean = false,
     val error: String? = null
 )
 
-class AlbumViewModel(private val deezerDataSource: DeezerDataSource): ViewModel() {
-    private val _state = MutableStateFlow(AlbumState())
-    val state: StateFlow<AlbumState> = _state.asStateFlow()
+class PlaylistViewModel(private val deezerDataSource: DeezerDataSource): ViewModel() {
+    private val _state = MutableStateFlow(PlaylistState())
+    val state: StateFlow<PlaylistState> = _state.asStateFlow()
 
-    fun loadAlbum(albumId: Long) {
+    fun loadPlaylist(id: Long) {
         viewModelScope.launch {
-            _state.update { it.copy(albumDetailsAreLoading = true, error = null) }
+            _state.update { it.copy(playlistDetailsAreLoading = true, error = null) }
             try {
                 val result = withContext(Dispatchers.IO) {
-                    deezerDataSource.getAlbumDetails(albumId)
+                    deezerDataSource.getPlaylistDetails(id)
                 }
-                _state.update { it.copy(albumDetails = result, albumDetailsAreLoading = false) }
+                _state.update { it.copy(playlistDetails = result, playlistDetailsAreLoading = false) }
                 loadTracks()
             } catch (e: Exception) {
-                Log.e("ALBUM", e.localizedMessage ?: "Unexpected error loading album")
-                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error", albumDetailsAreLoading = false) }
+                Log.e("PLAYLIST", e.localizedMessage ?: "Unexpected error")
+                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error", playlistDetailsAreLoading = false) }
             }
         }
     }
 
     private fun loadTracks() {
         viewModelScope.launch {
-            state.value.albumDetails?.tracks?.data?.let { tracks ->
+            state.value.playlistDetails?.tracks?.data?.let { tracks ->
                 _state.update { it.copy(tracksAreLoading = true, error = null) }
                 try {
                     val detailedTracks = withContext(Dispatchers.IO) {
@@ -54,7 +54,7 @@ class AlbumViewModel(private val deezerDataSource: DeezerDataSource): ViewModel(
                     }
                     _state.update { it.copy(tracks = detailedTracks, tracksAreLoading = false) }
                 } catch (e: Exception) {
-                    Log.e("ALBUM", e.localizedMessage ?: "Unexpected error loading tracks")
+                    Log.e("PLAYLIST", e.localizedMessage ?: "Unexpected error loading tracks")
                     _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error", tracksAreLoading = false) }
                 }
             } ?: run {

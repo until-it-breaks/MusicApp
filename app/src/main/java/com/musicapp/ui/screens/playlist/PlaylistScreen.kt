@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens.main
+package com.musicapp.ui.screens.playlist
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -12,11 +12,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explicit
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,29 +27,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.CenteredCircularProgressIndicator
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.TopBarWithBackButton
 import org.koin.androidx.compose.koinViewModel
+import androidx.core.net.toUri
+import com.musicapp.R
+import com.musicapp.ui.composables.TrackDropdownMenu
 
 @Composable
-fun AlbumScreen(navController: NavController, albumId: Long) {
-    val viewModel = koinViewModel<AlbumViewModel>()
+fun PlaylistScreen(navController: NavController, playlistId: Long) {
+    val viewModel = koinViewModel<PlaylistViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-
     val context = LocalContext.current
 
-    LaunchedEffect(albumId) {
-        viewModel.loadAlbum(albumId)
+    LaunchedEffect(playlistId) {
+        viewModel.loadPlaylist(playlistId)
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, stringResource(R.string.album_details)) }
+        topBar = { TopBarWithBackButton(navController, stringResource(R.string.playlist_details)) }
     ) { contentPadding ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -61,39 +58,26 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 .padding(12.dp)
         ) {
             item {
-                if (state.albumDetailsAreLoading) {
-                    CircularProgressIndicator()
+                if (state.playlistDetailsAreLoading) {
+                    CenteredCircularProgressIndicator()
                 } else if (state.error != null) {
-                    Text("Error: ${state.error}") // TODO improve message displayed to user
+                    Text("Error: ${state.error}")
                 }
             }
             item {
-                state.albumDetails?.let { album ->
-                    Row(
-                        horizontalArrangement = Arrangement.Center
+                state.playlistDetails?.let { playlist ->
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         LoadableImage(
-                            imageUri = album.coverBig.toUri(),
-                            contentDescription = stringResource(R.string.album_picture_description),
-                            modifier = Modifier.fillMaxWidth()
+                            imageUri = playlist.pictureBig.toUri(),
+                            stringResource(R.string.playlist_picture_description),
+                            modifier = Modifier.fillMaxWidth())
+                        Text(
+                            text = playlist.title,
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
                         )
-                    }
-                    Text(
-                        text = album.title,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Row {
-                        album.contributors.forEachIndexed { index, contributor ->
-                            Text(
-                                text = contributor.name,
-                                textDecoration = TextDecoration.Underline,
-                                modifier = Modifier.clickable(onClick = { navController.navigate(MusicAppRoute.Artist(contributor.id)) })
-                            )
-                            if (index < album.contributors.lastIndex) {
-                                Text("·")
-                            }
-                        }
                     }
                 }
             }
@@ -118,7 +102,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                                 if (track.explicitLyrics) {
                                     Icon(
                                         imageVector = Icons.Filled.Explicit,
-                                        contentDescription = stringResource(R.string.explicit_description)
+                                        stringResource(R.string.explicit_description)
                                     )
                                 }
                                 track.contributors.forEachIndexed { index, contributor ->
@@ -126,7 +110,8 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                                         text = contributor.name,
                                         style = MaterialTheme.typography.bodyMedium,
                                         textDecoration = TextDecoration.Underline,
-                                        modifier = Modifier.clickable(onClick = { navController.navigate(MusicAppRoute.Artist(contributor.id)) })
+                                        modifier = Modifier
+                                            .clickable(onClick = { navController.navigate(MusicAppRoute.Artist(contributor.id)) })
                                     )
                                     if (index < track.contributors.lastIndex) {
                                         Text(
@@ -138,16 +123,10 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                             }
                         }
                         Spacer(modifier = Modifier.weight(1f))
-                        IconButton(onClick = { /*TODO show additional option*/ }) {
-                            Icon(
-                                imageVector = Icons.Filled.MoreHoriz,
-                                contentDescription = stringResource(R.string.more_description)
-                            )
-                        }
+                        // TrackDropdownMenu(dee)
                     }
                 }
             }
-            // TODO show more info about album
         }
     }
 }

@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TracksDAO {
+    @Query("SELECT * FROM track WHERE track.trackId = :trackId")
+    fun getTrackById(trackId: Long): Track?
+
     @Upsert
     suspend fun upsertTrack(track: Track)
 
@@ -41,6 +44,9 @@ interface PlaylistsDAO {
 
     @Delete
     suspend fun deletePlaylist(playlist: Playlist)
+
+    @Query("DELETE FROM playlist WHERE playlistId = :playlistId")
+    suspend fun deletePlaylistById(playlistId: String)
 }
 
 @Dao
@@ -50,6 +56,9 @@ interface LikedTracksDAO {
 
     @Query("SELECT * FROM likedtracksplaylist WHERE likedtracksplaylist.ownerId = :userId")
     suspend fun getLikedTracksPlaylistWithTracks(userId: String): LikedTracksPlaylistWithTracks
+
+    @Insert
+    suspend fun addTrackToLikedTracksPlaylist(crossRef: LikedTracksTrackCrossRef)
 
     @Upsert
     suspend fun upsertLikedTracksPlaylist(likedTracksPlaylist: LikedTracksPlaylist)

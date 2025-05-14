@@ -8,6 +8,8 @@ class TracksRepository(
     private val dao: TracksDAO,
     private val contentResolver: ContentResolver
 ) {
+    fun getTrackById(trackId: Long) = dao.getTrackById(trackId)
+
     suspend fun upsertTrack(track: Track) = dao.upsertTrack(track)
 
     suspend fun deleteTrack(track: Track) = dao.deleteTrack(track)

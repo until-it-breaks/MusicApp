@@ -5,13 +5,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.automirrored.outlined.LibraryBooks
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,11 +20,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.musicapp.R
-import com.musicapp.ui.screens.main.home.HomeContent
-import com.musicapp.ui.screens.main.library.LibraryContent
 import com.musicapp.ui.composables.MainTopBar
 import com.musicapp.ui.composables.MainNavBar
-import com.musicapp.ui.screens.main.search.SearchContent
+import com.musicapp.ui.screens.home.HomeScreen
+import com.musicapp.ui.screens.library.LibraryScreen
+import com.musicapp.ui.screens.search.SearchScreen
 
 enum class MainCategory(val stringId: Int, val primaryIcon: ImageVector, val secondaryIcon: ImageVector) {
     HOME(
@@ -66,9 +63,9 @@ fun MainScreen(navController: NavController) {
             .padding(contentPadding)
             .fillMaxSize()
         when (selectedCategory) {
-            MainCategory.HOME -> HomeContent(navController, modifier)
-            MainCategory.SEARCH -> SearchContent(modifier)
-            MainCategory.LIBRARY -> LibraryContent(modifier)
+            MainCategory.HOME -> HomeScreen(navController, modifier)
+            MainCategory.SEARCH -> SearchScreen(modifier)
+            MainCategory.LIBRARY -> LibraryScreen(navController, modifier)
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens.main.search
+package com.musicapp.ui.screens.search
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.musicapp.R
 
 @Composable
-fun SearchContent(modifier: Modifier) {
+fun SearchScreen(modifier: Modifier) {
     val genres = (1..8).map { "Genre #$it" } // TODO replace with actual content
     var searchText by remember { mutableStateOf("") }
 
