@@ -1,9 +1,9 @@
 package com.musicapp.ui.screens.library
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,6 +18,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -32,11 +35,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.CreatePlaylistModal
+import com.musicapp.ui.composables.MainTopBar
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LibraryScreen(navController: NavController, modifier: Modifier) {
+fun LibraryScreen(mainNavController: NavController, subNavController: NavController) {
     val viewModel = koinViewModel<LibraryViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -45,11 +49,20 @@ fun LibraryScreen(navController: NavController, modifier: Modifier) {
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = modifier.padding(12.dp)
-    ) {
+    Scaffold(
+        topBar = { MainTopBar(mainNavController, "Library") },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showBottomSheet = true}
+            ) {
+                Icon(Icons.Filled.Add, "Create new playlist")
+            }
+        },
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
+    ) { contentPadding ->
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(contentPadding).padding(12.dp)
         ) {
             item {
                 state.likedTracksPlaylist?.let { likedPlaylist ->
@@ -81,16 +94,10 @@ fun LibraryScreen(navController: NavController, modifier: Modifier) {
                 items(playlists.value) { playlist ->
                     PlaylistItem(
                         playlist.name,
-                        onClick = { navController.navigate(MusicAppRoute.UserPlaylist(playlist.playlistId)) }
+                        onClick = { subNavController.navigate(MusicAppRoute.UserPlaylist(playlist.playlistId)) }
                     )
                 }
             }
-        }
-        FloatingActionButton(
-            onClick = { showBottomSheet = true},
-            modifier = Modifier.padding(16.dp).align(Alignment.BottomEnd)
-        ) {
-            Icon(Icons.Filled.Add, "Create new playlist")
         }
     }
     CreatePlaylistModal(

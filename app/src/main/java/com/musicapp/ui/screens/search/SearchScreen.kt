@@ -3,6 +3,7 @@ package com.musicapp.ui.screens.search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,7 +17,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,45 +31,53 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.musicapp.R
+import com.musicapp.ui.composables.MainTopBar
 
 @Composable
-fun SearchScreen(modifier: Modifier) {
+fun SearchScreen(mainNavController: NavController, subNavController: NavController) {
     val genres = (1..8).map { "Genre #$it" } // TODO replace with actual content
     var searchText by remember { mutableStateOf("") }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = modifier.padding(12.dp)
-    ) {
-        // TODO consider swapping for a pre-made search composable
-        OutlinedTextField(
-            value = searchText,
-            onValueChange = { searchText = it },
-            placeholder = { Text(stringResource(R.string.what_to_play)) },
-            modifier = Modifier.fillMaxWidth(),
-            trailingIcon = {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Outlined.Search, stringResource(R.string.search_description))
+    Scaffold(
+        topBar = { MainTopBar(mainNavController, "Search") },
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
+    ) { contentPadding ->
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(contentPadding).padding(12.dp)
+        ) {
+            // TODO consider swapping for a pre-made search composable
+            OutlinedTextField(
+                value = searchText,
+                onValueChange = { searchText = it },
+                placeholder = { Text(stringResource(R.string.what_to_play)) },
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(Icons.Outlined.Search, stringResource(R.string.search_description))
+                    }
+                }
+            )
+            Text(
+                text = stringResource(R.string.discover_new_things),
+                style = MaterialTheme.typography.titleLarge
+            )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(genres) { genre ->
+                    GenreItem(
+                        genre,
+                        onClick = { /*TODO*/ }
+                    )
                 }
             }
-        )
-        Text(
-            text = stringResource(R.string.discover_new_things),
-            style = MaterialTheme.typography.titleLarge
-        )
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(genres) { genre ->
-                GenreItem(
-                    genre,
-                    onClick = { /*TODO*/ }
-                )
-            }
         }
+
     }
 }
 

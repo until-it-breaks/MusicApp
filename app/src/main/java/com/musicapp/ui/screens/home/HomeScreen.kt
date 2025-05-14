@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,6 +17,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -37,99 +41,106 @@ import com.musicapp.ui.composables.CenteredCircularProgressIndicator
 import com.musicapp.ui.composables.LoadableImage
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.net.toUri
+import com.musicapp.ui.composables.MainTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, modifier: Modifier) {
+fun HomeScreen(mainNavController: NavController, subNavController: NavController) {
     val viewModel = koinViewModel<HomeViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val pullToRefreshState = rememberPullToRefreshState()
 
-    PullToRefreshBox(
-        isRefreshing = state.isLoading,
-        onRefresh = viewModel::loadContent,
-        state = pullToRefreshState
-    ) {
-        LazyColumn (
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = modifier.padding(12.dp)
+    Scaffold(
+        topBar = { MainTopBar(mainNavController, "Home") },
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
+    ) { contentPadding ->
+        PullToRefreshBox(
+            isRefreshing = state.isLoading,
+            onRefresh = viewModel::loadContent,
+            state = pullToRefreshState,
+            modifier = Modifier.padding(contentPadding)
         ) {
-            item {
-                Text(
-                    text = stringResource(R.string.top_playlists),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-            item {
-                if (state.isLoading) {
-                    CenteredCircularProgressIndicator()
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(12.dp)
+            ) {
+                item {
+                    Text(
+                        text = stringResource(R.string.top_playlists),
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 }
-            }
-            items(state.playlists.chunked(2)) { rowItems ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    rowItems.forEach { playlist ->
-                        PlayListCard(
-                            title = playlist.title,
-                            imageUri = playlist.mediumPicture.toUri(),
-                            modifier = Modifier.weight(1f),
-                            onClick = { navController.navigate(MusicAppRoute.Playlist(playlist.id)) }
-                        )
-                    }
-                    if (rowItems.size == 1) {
-                        Spacer(modifier = Modifier.weight(1f))
+                item {
+                    if (state.isLoading) {
+                        CenteredCircularProgressIndicator()
                     }
                 }
-            }
-            item {
-                Text(
-                    text = stringResource(R.string.top_artists),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-            item {
-                if (state.isLoading) {
-                    CenteredCircularProgressIndicator()
-                }
-            }
-            item {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(state.artists) { artist ->
-                        ArtistCard(
-                            title = artist.name,
-                            imageUrl = artist.mediumPicture,
-                            onClick = { navController.navigate(MusicAppRoute.Artist(artist.id)) }
-                        )
+                items(state.playlists.chunked(2)) { rowItems ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        rowItems.forEach { playlist ->
+                            PlayListCard(
+                                title = playlist.title,
+                                imageUri = playlist.mediumPicture.toUri(),
+                                modifier = Modifier.weight(1f),
+                                onClick = { subNavController.navigate(MusicAppRoute.Playlist(playlist.id)) }
+                            )
+                        }
+                        if (rowItems.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                     }
                 }
-            }
-            item {
-                Text(
-                    text = stringResource(R.string.top_albums),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-            item {
-                if (state.isLoading) {
-                    CenteredCircularProgressIndicator()
+                item {
+                    Text(
+                        text = stringResource(R.string.top_artists),
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 }
-            }
-            items(state.albums.chunked(2)) { rowItems ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    rowItems.forEach { item ->
-                        PlayListCard(
-                            title = item.title,
-                            imageUri = item.mediumCover.toUri(),
-                            modifier = Modifier.weight(1f),
-                            onClick = { navController.navigate(MusicAppRoute.Album(item.id)) }
-                        )
+                item {
+                    if (state.isLoading) {
+                        CenteredCircularProgressIndicator()
                     }
-                    if (rowItems.size == 1) {
-                        Spacer(modifier = Modifier.weight(1f))
+                }
+                item {
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(state.artists) { artist ->
+                            ArtistCard(
+                                title = artist.name,
+                                imageUrl = artist.mediumPicture,
+                                onClick = { subNavController.navigate(MusicAppRoute.Artist(artist.id)) }
+                            )
+                        }
+                    }
+                }
+                item {
+                    Text(
+                        text = stringResource(R.string.top_albums),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+                item {
+                    if (state.isLoading) {
+                        CenteredCircularProgressIndicator()
+                    }
+                }
+                items(state.albums.chunked(2)) { rowItems ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        rowItems.forEach { item ->
+                            PlayListCard(
+                                title = item.title,
+                                imageUri = item.mediumCover.toUri(),
+                                modifier = Modifier.weight(1f),
+                                onClick = { subNavController.navigate(MusicAppRoute.Album(item.id)) }
+                            )
+                        }
+                        if (rowItems.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                     }
                 }
             }
