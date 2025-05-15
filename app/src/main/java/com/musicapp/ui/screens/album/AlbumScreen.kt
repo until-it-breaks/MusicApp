@@ -3,12 +3,15 @@ package com.musicapp.ui.screens.album
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -87,28 +91,41 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold
                         )
-                        FlowRow(
-                            itemVerticalAlignment = Alignment.CenterVertically,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            album.contributors.forEach { contributor ->
-                                LoadableImage(
-                                    imageUri = contributor.smallPicture.toUri(),
-                                    contentDescription = "Artist picture",
-                                    modifier = Modifier
-                                        .padding(2.dp)
-                                        .size(32.dp)
-                                        .clip(CircleShape)
-                                )
+                            Box(
+                                modifier = Modifier
+                                    .width((36 + (album.contributors.size - 1) * 24).dp)
+                                    .height(36.dp)
+                            ) {
+                                album.contributors.forEachIndexed { index, contributor ->
+                                    LoadableImage(
+                                        imageUri = contributor.smallPicture.toUri(),
+                                        contentDescription = "Artist picture",
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .offset(x = (index * 24).dp)
+                                            .zIndex((album.contributors.size - index).toFloat())
+                                            .clip(CircleShape)
+                                    )
+                                }
                             }
-                            Spacer(modifier = Modifier.width(6.dp))
-                            album.contributors.forEachIndexed { index, contributor ->
-                                Text(
-                                    text = contributor.name,
-                                    textDecoration = TextDecoration.Underline,
-                                    modifier = Modifier.clickable(onClick = { navController.navigate(MusicAppRoute.Artist(contributor.id)) })
-                                )
-                                if (index < album.contributors.lastIndex) {
-                                    Text(" · ")
+                            Spacer(modifier = Modifier.width(8.dp))
+                            FlowRow(
+                                itemVerticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                album.contributors.forEachIndexed { index, contributor ->
+                                    Text(
+                                        text = contributor.name,
+                                        textDecoration = TextDecoration.Underline,
+                                        modifier = Modifier.clickable {
+                                            navController.navigate(MusicAppRoute.Artist(contributor.id))
+                                        }
+                                    )
+                                    if (index < album.contributors.lastIndex) {
+                                        Text(" · ")
+                                    }
                                 }
                             }
                         }
