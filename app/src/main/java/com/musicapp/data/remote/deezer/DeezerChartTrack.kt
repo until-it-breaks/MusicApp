@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DeezerTrack(
+data class DeezerChartTrack(
     @SerialName("id")
     val id: Long,
     @SerialName("title")
@@ -32,5 +32,7 @@ data class DeezerTrackDetailed(
     @SerialName("preview")
     val preview: String,
     @SerialName("contributors")
-    val contributors: List<DeezerArtist>
+    val contributors: List<DeezerArtist>,
+    @SerialName("album")
+    val album: DeezerTrackAlbum
 )

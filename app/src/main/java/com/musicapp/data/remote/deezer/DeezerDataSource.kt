@@ -16,12 +16,12 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         }
     }
 
-    suspend fun getTopPlaylists(limit: Int? = null): List<DeezerPlaylist> {
+    suspend fun getTopPlaylists(limit: Int? = null): List<DeezerChartPlaylist> {
         val url = if (limit == null) "$BASE_URL/chart/0/playlists" else "$BASE_URL/chart/0/playlists?limit=${limit}"
         val responseBody: JsonObject = httpClient.get(url).body()
         val dataElement = responseBody["data"]
         return if (dataElement != null) {
-            json.decodeFromJsonElement(ListSerializer(DeezerPlaylist.serializer()), dataElement)
+            json.decodeFromJsonElement(ListSerializer(DeezerChartPlaylist.serializer()), dataElement)
         } else {
             emptyList()
         }
@@ -38,12 +38,12 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         }
     }
 
-    suspend fun getTopAlbums(limit: Int? = null): List<DeezerAlbum> {
+    suspend fun getTopAlbums(limit: Int? = null): List<DeezerChartAlbum> {
         val url = if (limit == null) "$BASE_URL/chart/0/albums" else "$BASE_URL/chart/0/albums?limit=${limit}"
         val responseBody: JsonObject = httpClient.get(url).body()
         val dataElement = responseBody["data"]
         return if (dataElement != null) {
-            json.decodeFromJsonElement(ListSerializer(DeezerAlbum.serializer()), dataElement)
+            json.decodeFromJsonElement(ListSerializer(DeezerChartAlbum.serializer()), dataElement)
         } else {
             emptyList()
         }
@@ -73,12 +73,12 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         return json.decodeFromJsonElement(response)
     }
 
-    suspend fun getArtistAlbums(id: Long): List<DeezerAlbum> {
+    suspend fun getArtistAlbums(id: Long): List<DeezerChartAlbum> {
         val url = "$BASE_URL/artist/${id}/albums"
         val responseBody: JsonObject = httpClient.get(url).body()
         val dataElement = responseBody["data"]
         return if (dataElement != null) {
-            json.decodeFromJsonElement(ListSerializer(DeezerAlbum.serializer()), dataElement)
+            json.decodeFromJsonElement(ListSerializer(DeezerChartAlbum.serializer()), dataElement)
         } else {
             emptyList()
         }

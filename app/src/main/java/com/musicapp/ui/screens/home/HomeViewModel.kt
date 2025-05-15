@@ -3,10 +3,10 @@ package com.musicapp.ui.screens.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.musicapp.data.remote.deezer.DeezerAlbum
+import com.musicapp.data.remote.deezer.DeezerChartAlbum
 import com.musicapp.data.remote.deezer.DeezerArtist
 import com.musicapp.data.remote.deezer.DeezerDataSource
-import com.musicapp.data.remote.deezer.DeezerPlaylist
+import com.musicapp.data.remote.deezer.DeezerChartPlaylist
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -19,9 +19,9 @@ import kotlinx.coroutines.withContext
 
 data class HomeState(
     val isLoading: Boolean = false,
-    val playlists: List<DeezerPlaylist> = emptyList(),
+    val playlists: List<DeezerChartPlaylist> = emptyList(),
     val artists: List<DeezerArtist> = emptyList(),
-    val albums: List<DeezerAlbum> = emptyList()
+    val albums: List<DeezerChartAlbum> = emptyList()
 )
 
 class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel() {

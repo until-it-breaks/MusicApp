@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DeezerAlbum(
+data class DeezerChartAlbum(
     @SerialName("id")
     val id: Long,
     @SerialName("title")
@@ -13,6 +13,16 @@ data class DeezerAlbum(
     val mediumCover: String,
     @SerialName("explicit_lyrics")
     val explicit: Boolean
+)
+
+@Serializable
+data class DeezerTrackAlbum(
+    @SerialName("id")
+    val id: Long,
+    @SerialName("title")
+    val title: String,
+    @SerialName("cover_medium")
+    val mediumCover: String
 )
 
 @Serializable
@@ -44,5 +54,5 @@ data class DeezerAlbumDetailed(
 @Serializable
 data class DeezerTracksWrapper(
     @SerialName("data")
-    val data: List<DeezerTrack>
+    val data: List<DeezerChartTrack>
 )

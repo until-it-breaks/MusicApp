@@ -3,7 +3,7 @@ package com.musicapp.ui.screens.artist
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.musicapp.data.remote.deezer.DeezerAlbum
+import com.musicapp.data.remote.deezer.DeezerChartAlbum
 import com.musicapp.data.remote.deezer.DeezerArtist
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 data class ArtistState(
     val artist: DeezerArtist? = null,
-    val artistAlbums: List<DeezerAlbum> = emptyList(),
+    val artistAlbums: List<DeezerChartAlbum> = emptyList(),
     val artistIsLoading: Boolean = false,
     val artistAlbumsAreLoading: Boolean = false,
     val error: String? = null

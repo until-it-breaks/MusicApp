@@ -1,9 +1,11 @@
 package com.musicapp.ui.composables
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explicit
 import androidx.compose.material3.Card
@@ -17,12 +19,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.musicapp.R
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
 
 @Composable
 fun TrackCard(
     track: DeezerTrackDetailed,
+    showPicture: Boolean = false,
     onTrackClick: (DeezerTrackDetailed) -> Unit,
     onArtistClick: (Long) -> Unit,
     onAddToLiked: (DeezerTrackDetailed) -> Unit
@@ -32,8 +36,12 @@ fun TrackCard(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.padding(8.dp)
         ) {
+            if (showPicture) {
+                LoadableImage(track.album.mediumCover.toUri(), "Track picture", modifier = Modifier.size(48.dp))
+            }
             Column(
                 modifier = Modifier.weight(1f)
             ) {
