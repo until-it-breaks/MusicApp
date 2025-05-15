@@ -29,6 +29,8 @@ data class DeezerPlaylistDetailed(
     val pictureMedium: String,
     @SerialName("picture_big")
     val pictureBig: String,
+    @SerialName("creator")
+    val creator: DeezerCreator,
     @SerialName("tracks")
     val tracks: DeezerTracksWrapper
 )

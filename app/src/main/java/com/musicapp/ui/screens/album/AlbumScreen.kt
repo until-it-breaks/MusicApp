@@ -59,7 +59,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .padding(contentPadding)
-                .padding(horizontal = 12.dp)
+                .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
         ) {
             item {
                 if (state.error != null) {

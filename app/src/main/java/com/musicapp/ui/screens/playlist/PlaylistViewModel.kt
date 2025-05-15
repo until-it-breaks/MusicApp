@@ -1,6 +1,5 @@
 package com.musicapp.ui.screens.playlist
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.musicapp.data.remote.deezer.DeezerDataSource
@@ -33,32 +32,31 @@ class PlaylistViewModel(private val deezerDataSource: DeezerDataSource): ViewMod
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getPlaylistDetails(id)
                 }
-                _state.update { it.copy(playlistDetails = result, playlistDetailsAreLoading = false) }
+                _state.update { it.copy(playlistDetails = result) }
                 loadTracks()
             } catch (e: Exception) {
-                Log.e("PLAYLIST", e.localizedMessage ?: "Unexpected error")
-                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error", playlistDetailsAreLoading = false) }
+                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error") }
+            } finally {
+                _state.update { it.copy(playlistDetailsAreLoading = false) }
             }
         }
     }
 
     private fun loadTracks() {
         viewModelScope.launch {
-            state.value.playlistDetails?.tracks?.data?.let { tracks ->
-                _state.update { it.copy(tracksAreLoading = true, error = null) }
+            val tracks = state.value.playlistDetails?.tracks?.data.orEmpty()
+            _state.update { it.copy(tracksAreLoading = true, error = null) }
+            for(track in tracks) {
                 try {
-                    val detailedTracks = withContext(Dispatchers.IO) {
-                        tracks.map { track ->
-                            deezerDataSource.getTrackDetails(track.id)
-                        }
+                    val detailedTrack: DeezerTrackDetailed = withContext(Dispatchers.IO) {
+                        deezerDataSource.getTrackDetails(track.id)
                     }
-                    _state.update { it.copy(tracks = detailedTracks, tracksAreLoading = false) }
+                    _state.update { it.copy(tracks = it.tracks + detailedTrack) }
                 } catch (e: Exception) {
-                    Log.e("PLAYLIST", e.localizedMessage ?: "Unexpected error loading tracks")
-                    _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error", tracksAreLoading = false) }
+                    _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error") }
+                } finally {
+                    _state.update { it.copy(tracksAreLoading = false) }
                 }
-            } ?: run {
-                _state.update { it.copy(tracks = emptyList(), tracksAreLoading = false) }
             }
         }
     }
