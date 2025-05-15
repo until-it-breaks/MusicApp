@@ -15,10 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Explicit
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
@@ -34,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,7 +38,7 @@ import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.TopBarWithBackButton
-import com.musicapp.ui.composables.TrackDropdownMenu
+import com.musicapp.ui.composables.TrackCard
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -74,7 +69,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
             item {
                 state.albumDetails?.let { album ->
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Row(
                             horizontalArrangement = Arrangement.Center,
@@ -93,7 +88,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                         FlowRow(
                             itemVerticalAlignment = Alignment.CenterVertically,
                         ) {
-                            album.contributors.forEachIndexed { index, contributor ->
+                            album.contributors.forEach { contributor ->
                                 LoadableImage(
                                     imageUri = contributor.smallPicture.toUri(),
                                     contentDescription = "Artist picture",
@@ -120,51 +115,12 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 }
             }
             items(state.tracks) { track ->
-                Card(
-                    onClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() } // TODO trigger actual music player
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = track.title,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                if (track.explicitLyrics) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Explicit,
-                                        contentDescription = stringResource(R.string.explicit_description)
-                                    )
-                                }
-                                track.contributors.forEachIndexed { index, contributor ->
-                                    Text(
-                                        text = contributor.name,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        textDecoration = TextDecoration.Underline,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.clickable(onClick = { navController.navigate(MusicAppRoute.Artist(contributor.id)) })
-                                    )
-                                    if (index < track.contributors.lastIndex) {
-                                        Text(
-                                            text = ", ",
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        TrackDropdownMenu(track, onAddToLiked = viewModel::addToLiked)
-                    }
-                }
+                TrackCard(
+                    track = track,
+                    onTrackClick = { Toast.makeText(context, "Playing ${it.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
+                    onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
+                    onAddToLiked = viewModel::addToLiked
+                )
             }
             item {
                 val details = state.albumDetails
