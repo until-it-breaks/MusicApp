@@ -55,9 +55,11 @@ fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onD
 }
 
 @Composable
-fun TrackDropdownMenu(deezerTrackDetailed: DeezerTrackDetailed, onAddToLiked: (track: DeezerTrackDetailed) -> Unit) {
+fun TrackDropdownMenu(deezerTrackDetailed: DeezerTrackDetailed, modifier: Modifier = Modifier, onAddToLiked: (track: DeezerTrackDetailed) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    Box {
+    Box(
+        modifier = modifier
+    ) {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(Icons.Default.MoreVert, contentDescription = "More options")
         }

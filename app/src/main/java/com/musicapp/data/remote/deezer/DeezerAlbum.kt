@@ -31,6 +31,8 @@ data class DeezerAlbumDetailed(
     val trackCount: Int,
     @SerialName("duration")
     val duration: Long,
+    @SerialName("release_date")
+    val releaseDate: String,
     @SerialName("explicit_lyrics")
     val explicitLyrics: Boolean,
     @SerialName("contributors")

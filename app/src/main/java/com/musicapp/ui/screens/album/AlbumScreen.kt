@@ -1,21 +1,23 @@
 package com.musicapp.ui.screens.album
 
-import android.text.format.Time
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explicit
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
@@ -27,17 +29,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
-import com.musicapp.ui.composables.CenteredCircularProgressIndicator
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackDropdownMenu
@@ -47,7 +50,6 @@ import org.koin.androidx.compose.koinViewModel
 fun AlbumScreen(navController: NavController, albumId: Long) {
     val viewModel = koinViewModel<AlbumViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-
     val context = LocalContext.current
 
     LaunchedEffect(albumId) {
@@ -55,60 +57,66 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, stringResource(R.string.album_details)) },
+        topBar = { TopBarWithBackButton(navController, "Album Details") },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .padding(contentPadding)
-                .padding(12.dp)
+                .padding(horizontal = 12.dp)
         ) {
             item {
-                if (state.albumDetailsAreLoading) {
-                    CircularProgressIndicator()
-                } else if (state.error != null) {
-                    Text("Error: ${state.error}") // TODO improve message displayed to user
+                if (state.error != null) {
+                    Text("Error: ${state.error}")
                 }
             }
             item {
                 state.albumDetails?.let { album ->
-                    Row(
-                        horizontalArrangement = Arrangement.Center
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        LoadableImage(
-                            imageUri = album.coverBig.toUri(),
-                            contentDescription = stringResource(R.string.album_picture_description),
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    Text(
-                        text = album.title,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        album.contributors.forEach { contributor ->
-                            LoadableImage(contributor.smallPicture.toUri(), "Artist picture")
-                        }
-                        album.contributors.forEachIndexed { index, contributor ->
-                            Text(
-                                text = contributor.name,
-                                textDecoration = TextDecoration.Underline,
-                                modifier = Modifier.clickable(onClick = { navController.navigate(MusicAppRoute.Artist(contributor.id)) })
+                        ) {
+                            LoadableImage(
+                                imageUri = album.coverBig.toUri(),
+                                contentDescription = stringResource(R.string.album_picture_description)
                             )
-                            if (index < album.contributors.lastIndex) {
-                                Text("·")
+                        }
+                        Text(
+                            text = album.title,
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        FlowRow(
+                            itemVerticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            album.contributors.forEachIndexed { index, contributor ->
+                                LoadableImage(
+                                    imageUri = contributor.smallPicture.toUri(),
+                                    contentDescription = "Artist picture",
+                                    modifier = Modifier
+                                        .padding(2.dp)
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(6.dp))
+                            album.contributors.forEachIndexed { index, contributor ->
+                                Text(
+                                    text = contributor.name,
+                                    textDecoration = TextDecoration.Underline,
+                                    modifier = Modifier.clickable(onClick = { navController.navigate(MusicAppRoute.Artist(contributor.id)) })
+                                )
+                                if (index < album.contributors.lastIndex) {
+                                    Text(" · ")
+                                }
                             }
                         }
+                        Text("Album · ${album.releaseDate}")
                     }
-                }
-            }
-            item {
-                if (state.tracksAreLoading) {
-                    CenteredCircularProgressIndicator()
                 }
             }
             items(state.tracks) { track ->
@@ -116,11 +124,17 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                     onClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() } // TODO trigger actual music player
                 ) {
                     Row(
-                        modifier = Modifier.padding(4.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(8.dp)
                     ) {
-                        Column {
-                            Text(text = track.title)
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = track.title,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -135,6 +149,8 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                                         text = contributor.name,
                                         style = MaterialTheme.typography.bodyMedium,
                                         textDecoration = TextDecoration.Underline,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.clickable(onClick = { navController.navigate(MusicAppRoute.Artist(contributor.id)) })
                                     )
                                     if (index < track.contributors.lastIndex) {
@@ -146,8 +162,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                                 }
                             }
                         }
-                        Spacer(modifier = Modifier.weight(1f))
-                        TrackDropdownMenu(track, viewModel::addToLiked)
+                        TrackDropdownMenu(track, onAddToLiked = viewModel::addToLiked)
                     }
                 }
             }

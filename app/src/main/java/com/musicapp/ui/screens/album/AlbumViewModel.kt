@@ -1,6 +1,5 @@
 package com.musicapp.ui.screens.album
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -43,52 +42,49 @@ class AlbumViewModel(
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getAlbumDetails(albumId)
                 }
-                _state.update { it.copy(albumDetails = result, albumDetailsAreLoading = false) }
+                _state.update { it.copy(albumDetails = result) }
                 loadTracks()
             } catch (e: Exception) {
-                Log.e("ALBUM", e.localizedMessage ?: "Unexpected error loading album")
-                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error", albumDetailsAreLoading = false) }
+                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error") }
+            } finally {
+                _state.update { it.copy(albumDetailsAreLoading = false) }
             }
         }
     }
 
     private fun loadTracks() {
         viewModelScope.launch {
-            state.value.albumDetails?.tracks?.data?.let { tracks ->
-                _state.update { it.copy(tracksAreLoading = true, error = null) }
+            val tracks = state.value.albumDetails?.tracks?.data.orEmpty()
+            _state.update { it.copy(tracks = emptyList(), tracksAreLoading = true, error = null) }
+            for (track in tracks) {
                 try {
-                    val detailedTracks = withContext(Dispatchers.IO) {
-                        tracks.map { track ->
-                            deezerDataSource.getTrackDetails(track.id)
-                        }
+                    val detailedTrack: DeezerTrackDetailed = withContext(Dispatchers.IO) {
+                        deezerDataSource.getTrackDetails(track.id)
                     }
-                    _state.update { it.copy(tracks = detailedTracks, tracksAreLoading = false) }
+                    _state.update { it.copy(tracks = it.tracks + detailedTrack) }
                 } catch (e: Exception) {
-                    Log.e("ALBUM", e.localizedMessage ?: "Unexpected error loading tracks")
-                    _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error", tracksAreLoading = false) }
+                    _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error") }
+                } finally {
+                    _state.update { it.copy(tracksAreLoading = false) }
                 }
-            } ?: run {
-                _state.update { it.copy(tracks = emptyList(), tracksAreLoading = false) }
             }
         }
     }
 
-    fun addToLiked(trackItem: DeezerTrackDetailed) {
+    fun addToLiked(detailedTrack: DeezerTrackDetailed) {
         viewModelScope.launch {
-            val userId: String? = auth.currentUser?.uid
+            val userId = auth.currentUser?.uid
             if (userId != null) {
                 withContext(Dispatchers.IO) {
-                    val track: Track? = tracksRepository.getTrackById(trackItem.id)
+                    val track: Track? = tracksRepository.getTrackById(detailedTrack.id)
                     if (track != null) {
-                        playlistsRepository.addTrackToLikedTracksPlaylist(LikedTracksTrackCrossRef(userId, trackItem.id))
+                        playlistsRepository.addTrackToLikedTracksPlaylist(LikedTracksTrackCrossRef(userId, detailedTrack.id))
                     } else {
-                        val newTrack = Track(trackItem.id, trackItem.title, trackItem.duration, trackItem.releaseDate, trackItem.explicitLyrics)
+                        val newTrack = Track(detailedTrack.id, detailedTrack.title, detailedTrack.duration, detailedTrack.releaseDate, detailedTrack.explicitLyrics)
                         tracksRepository.upsertTrack(newTrack)
                         playlistsRepository.addTrackToLikedTracksPlaylist(LikedTracksTrackCrossRef(userId, newTrack.trackId))
                     }
                 }
-            } else {
-                Log.e("AUTH", "Invalid user")
             }
         }
     }
