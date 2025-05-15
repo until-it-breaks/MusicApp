@@ -26,9 +26,9 @@ data class DeezerPlaylistDetailed(
     @SerialName("nb_tracks")
     val trackCount: Int,
     @SerialName("picture_medium")
-    val pictureMedium: String,
+    val mediumPicture: String,
     @SerialName("picture_big")
-    val pictureBig: String,
+    val bigPicture: String,
     @SerialName("creator")
     val creator: DeezerCreator,
     @SerialName("tracks")

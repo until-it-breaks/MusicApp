@@ -19,7 +19,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
-import com.musicapp.data.remote.deezer.DeezerTrackDetailed
+import com.musicapp.ui.models.TrackModel
 
 @Composable
 fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onDeletePlaylist: () -> Unit) {
@@ -55,7 +55,7 @@ fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onD
 }
 
 @Composable
-fun TrackDropdownMenu(deezerTrackDetailed: DeezerTrackDetailed, modifier: Modifier = Modifier, onAddToLiked: (track: DeezerTrackDetailed) -> Unit) {
+fun TrackDropdownMenu(trackModel: TrackModel, modifier: Modifier = Modifier, onAddToLiked: (track: TrackModel) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     Box(
         modifier = modifier
@@ -69,7 +69,7 @@ fun TrackDropdownMenu(deezerTrackDetailed: DeezerTrackDetailed, modifier: Modifi
         ) {
             DropdownMenuItem(
                 text = { Text("Add to liked") },
-                onClick = { onAddToLiked(deezerTrackDetailed) }
+                onClick = { onAddToLiked(trackModel) }
             )
             DropdownMenuItem(
                 text = { Text("Add to playlist") },

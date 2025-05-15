@@ -44,7 +44,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
     val viewModel = koinViewModel<LibraryViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val playlists = state.playlists.collectAsStateWithLifecycle(emptyList())
+    val userPlaylists = state.playlists.collectAsStateWithLifecycle(emptyList())
 
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -68,7 +68,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
                 state.likedTracksPlaylist?.let { likedPlaylist ->
                     PlaylistItem(
                         "Liked songs",
-                        onClick = { /*TODO*/ }
+                        onClick = { subNavController.navigate(MusicAppRoute.LikedSongs) }
                     )
                 }
             }
@@ -76,7 +76,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
                 state.trackHistory?.let { history ->
                     PlaylistItem(
                         "Track history",
-                        onClick = { /*TODO*/ }
+                        onClick = { subNavController.navigate(MusicAppRoute.TrackHistory) }
                     )
                 }
             }
@@ -86,15 +86,15 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
                     style = MaterialTheme.typography.titleLarge,
                 )
             }
-            if (playlists.value.isEmpty()) {
+            if (userPlaylists.value.isEmpty()) {
                 item {
                     Text("No playlists yet!")
                 }
             } else {
-                items(playlists.value) { playlist ->
+                items(userPlaylists.value) { playlist ->
                     PlaylistItem(
                         playlist.name,
-                        onClick = { subNavController.navigate(MusicAppRoute.UserPlaylist(playlist.playlistId)) }
+                        onClick = { subNavController.navigate(MusicAppRoute.UserPlaylist(playlist.id)) }
                     )
                 }
             }

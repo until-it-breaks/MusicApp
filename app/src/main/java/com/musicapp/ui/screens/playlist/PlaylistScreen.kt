@@ -28,7 +28,6 @@ import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.TopBarWithBackButton
 import org.koin.androidx.compose.koinViewModel
-import androidx.core.net.toUri
 import com.musicapp.R
 import com.musicapp.ui.composables.TrackCard
 
@@ -67,7 +66,7 @@ fun PlaylistScreen(navController: NavController, playlistId: Long) {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             LoadableImage(
-                                imageUri = playlist.pictureBig.toUri(),
+                                imageUri = playlist.bigPicture,
                                 stringResource(R.string.playlist_picture_description)
                             )
                         }
@@ -76,20 +75,23 @@ fun PlaylistScreen(navController: NavController, playlistId: Long) {
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold
                         )
-                        Text(
-                            text = playlist.description
-                        )
-                        Text(
-                            text = playlist.creator.name
-                        )
+                        playlist.description?.let {
+                            Text(
+                                text = it
+                            )
+                        }
+                        playlist.creator?.name?.let {
+                            Text(
+                                text = it
+                            )
+                        }
                     }
                 }
             }
             items(state.tracks) { track ->
                 TrackCard(
                     track = track,
-                    showPicture = true,
-                    onTrackClick = { Toast.makeText(context, "Playing ${it.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
+                    onTrackClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     onAddToLiked = { /*viewModel::addToLiked*/ }
                 )

@@ -3,8 +3,8 @@ package com.musicapp.ui.screens.playlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.musicapp.data.remote.deezer.DeezerPlaylistDetailed
-import com.musicapp.data.remote.deezer.DeezerTrackDetailed
 import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +16,7 @@ import org.koin.core.component.inject
 data class UserPlaylistState(
     val playlistId: String? = null,
     val playlistDetails: DeezerPlaylistDetailed? = null,
-    val tracks: List<DeezerTrackDetailed> = emptyList(),
+    val tracks: List<TrackModel> = emptyList(),
     val playlistDetailsAreLoading: Boolean = false,
     val tracksAreLoading: Boolean = false,
     val error: String? = null

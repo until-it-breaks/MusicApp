@@ -27,7 +27,6 @@ import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import org.koin.androidx.compose.koinViewModel
-import androidx.core.net.toUri
 import com.musicapp.ui.composables.ArtistCard
 import com.musicapp.ui.composables.MainTopBar
 import com.musicapp.ui.composables.PlayListCard
@@ -67,7 +66,7 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                         rowItems.forEach { playlist ->
                             PlayListCard(
                                 title = playlist.title,
-                                imageUri = playlist.mediumPicture.toUri(),
+                                imageUri = playlist.mediumPicture,
                                 modifier = Modifier.weight(1f),
                                 onClick = { subNavController.navigate(MusicAppRoute.Playlist(playlist.id)) }
                             )
@@ -107,7 +106,7 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                         rowItems.forEach { item ->
                             PlayListCard(
                                 title = item.title,
-                                imageUri = item.mediumCover.toUri(),
+                                imageUri = item.mediumCover,
                                 modifier = Modifier.weight(1f),
                                 onClick = { subNavController.navigate(MusicAppRoute.Album(item.id)) }
                             )

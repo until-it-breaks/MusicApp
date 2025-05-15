@@ -12,7 +12,7 @@ data class DeezerChartTrack(
     @SerialName("duration")
     val duration: Long,
     @SerialName("explicit_lyrics")
-    val explicitLyrics: Boolean,
+    val isExplicit: Boolean,
     @SerialName("preview")
     val preview: String
 )
@@ -28,7 +28,7 @@ data class DeezerTrackDetailed(
     @SerialName("release_date")
     val releaseDate: String,
     @SerialName("explicit_lyrics")
-    val explicitLyrics: Boolean,
+    val isExplicit: Boolean,
     @SerialName("preview")
     val preview: String,
     @SerialName("contributors")

@@ -26,9 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import com.musicapp.R
-import com.musicapp.data.remote.deezer.DeezerTrackDetailed
+import com.musicapp.ui.models.TrackModel
 
 @Composable
 fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = null, onClick: () -> Unit) {
@@ -56,7 +55,7 @@ fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = 
 }
 
 @Composable
-fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: String? = null, onClick: () -> Unit) {
+fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: Uri? = null, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = modifier.width(96.dp)
@@ -67,7 +66,7 @@ fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: String? =
             modifier = Modifier.fillMaxWidth()
         ) {
             LoadableImage(
-                imageUri = imageUrl?.toUri(),
+                imageUri = imageUrl,
                 contentDescription = stringResource(R.string.artist_picture_description),
                 modifier = Modifier
                     .size(96.dp)
@@ -87,11 +86,11 @@ fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: String? =
 
 @Composable
 fun TrackCard(
-    track: DeezerTrackDetailed,
+    track: TrackModel,
     showPicture: Boolean = false,
-    onTrackClick: (DeezerTrackDetailed) -> Unit,
+    onTrackClick: (TrackModel) -> Unit,
     onArtistClick: (Long) -> Unit,
-    onAddToLiked: (DeezerTrackDetailed) -> Unit
+    onAddToLiked: (TrackModel) -> Unit
 ) {
     Card(
         onClick = { onTrackClick(track) }
@@ -102,7 +101,7 @@ fun TrackCard(
             modifier = Modifier.padding(8.dp)
         ) {
             if (showPicture) {
-                LoadableImage(track.album.mediumCover.toUri(), "Track picture", modifier = Modifier.size(48.dp))
+                LoadableImage(track.album?.mediumCover, "Track picture", modifier = Modifier.size(48.dp))
             }
             Column(
                 modifier = Modifier.weight(1f)
@@ -115,12 +114,13 @@ fun TrackCard(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (track.explicitLyrics) {
+                    track.isExplicit?.let {
                         Icon(
                             imageVector = Icons.Filled.Explicit,
                             contentDescription = stringResource(R.string.explicit_description)
                         )
                     }
+
                     track.contributors.forEachIndexed { index, contributor ->
                         Text(
                             text = contributor.name,

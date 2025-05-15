@@ -35,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
@@ -82,7 +81,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             LoadableImage(
-                                imageUri = album.coverBig.toUri(),
+                                imageUri = album.bigCover,
                                 contentDescription = stringResource(R.string.album_picture_description)
                             )
                         }
@@ -101,7 +100,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                             ) {
                                 album.contributors.forEachIndexed { index, contributor ->
                                     LoadableImage(
-                                        imageUri = contributor.smallPicture.toUri(),
+                                        imageUri = contributor.smallPicture,
                                         contentDescription = "Artist picture",
                                         modifier = Modifier
                                             .size(36.dp)
@@ -136,9 +135,9 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
             items(state.tracks) { track ->
                 TrackCard(
                     track = track,
-                    onTrackClick = { Toast.makeText(context, "Playing ${it.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
+                    onTrackClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
-                    onAddToLiked = viewModel::addToLiked
+                    onAddToLiked = { viewModel::addToLiked }
                 )
             }
             item {
@@ -146,8 +145,10 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 if (albumDetails != null) {
                     Row {
                         Text("${albumDetails.trackCount} songs")
-                        Text(" · ")
-                        Text(convertDurationInSecondsToString(albumDetails.duration))
+                        albumDetails.duration?.let {
+                            Text(" · ")
+                            Text(convertDurationInSecondsToString(it))
+                        }
                     }
                     Text("Label: ${albumDetails.label}")
                 }

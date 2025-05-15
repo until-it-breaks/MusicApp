@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
@@ -61,7 +60,7 @@ fun ArtistScreen(navController: NavController, artistId: Long) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         LoadableImage(
-                            imageUri = artist.bigPicture.toUri(),
+                            imageUri = artist.bigPicture,
                             contentDescription = stringResource(R.string.artist_picture_description)
                         )
                     }
@@ -86,7 +85,7 @@ fun ArtistScreen(navController: NavController, artistId: Long) {
                 PlayListCard(
                     modifier = Modifier.fillMaxWidth(),
                     title = album.title,
-                    imageUri = album.mediumCover.toUri(),
+                    imageUri = album.mediumCover,
                     onClick = { navController.navigate(MusicAppRoute.Album(album.id)) }
                 )
             }

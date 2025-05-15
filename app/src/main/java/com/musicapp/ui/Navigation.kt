@@ -15,6 +15,8 @@ import com.musicapp.ui.screens.main.MainScreen
 import com.musicapp.ui.screens.playlist.PlaylistScreen
 import com.musicapp.ui.screens.playlist.UserPlaylistScreen
 import com.musicapp.ui.screens.passwordrecovery.PasswordRecoveryScreen
+import com.musicapp.ui.screens.playlist.LikedSongsScreen
+import com.musicapp.ui.screens.playlist.TrackHistoryScreen
 import com.musicapp.ui.screens.profile.ProfileScreen
 import com.musicapp.ui.screens.search.SearchScreen
 import com.musicapp.ui.screens.settings.SettingsScreen
@@ -28,13 +30,15 @@ sealed interface MusicAppRoute {
     @Serializable data object Settings: MusicAppRoute
     @Serializable data object Profile: MusicAppRoute
     @Serializable data object PasswordRecovery: MusicAppRoute
+    @Serializable data object Home: MusicAppRoute
+    @Serializable data object Search: MusicAppRoute
+    @Serializable data object Library: MusicAppRoute
+    @Serializable data object LikedSongs: MusicAppRoute
+    @Serializable data object TrackHistory: MusicAppRoute
     @Serializable data class Album(val id: Long): MusicAppRoute
     @Serializable data class Playlist(val id: Long): MusicAppRoute
     @Serializable data class Artist(val id: Long): MusicAppRoute
     @Serializable data class UserPlaylist(val uuid: String): MusicAppRoute
-    @Serializable data object Home: MusicAppRoute
-    @Serializable data object Search: MusicAppRoute
-    @Serializable data object Library: MusicAppRoute
 }
 
 @Composable
@@ -141,6 +145,12 @@ fun LibraryNavGraph(mainNavController: NavController, subNavController: NavHostC
         composable<MusicAppRoute.UserPlaylist> { backStackEntry ->
             val route = backStackEntry.toRoute<MusicAppRoute.UserPlaylist>()
             UserPlaylistScreen(subNavController, route.uuid)
+        }
+        composable<MusicAppRoute.LikedSongs> {
+            LikedSongsScreen(subNavController)
+        }
+        composable<MusicAppRoute.TrackHistory> {
+            TrackHistoryScreen(subNavController)
         }
         composable<MusicAppRoute.Library> {
             LibraryScreen(mainNavController, subNavController)

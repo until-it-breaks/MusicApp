@@ -15,11 +15,11 @@ data class Track(
     @ColumnInfo
     val title: String,
     @ColumnInfo
-    val duration: Long,
+    val duration: Long?,
     @ColumnInfo
-    val releaseDate: String,
+    val releaseDate: String?,
     @ColumnInfo
-    val explicitLyrics: Boolean
+    val isExplicit: Boolean?
 )
 
 @Entity

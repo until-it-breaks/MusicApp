@@ -3,10 +3,12 @@ package com.musicapp.ui.screens.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.musicapp.data.remote.deezer.DeezerChartAlbum
-import com.musicapp.data.remote.deezer.DeezerArtist
 import com.musicapp.data.remote.deezer.DeezerDataSource
-import com.musicapp.data.remote.deezer.DeezerChartPlaylist
+import com.musicapp.ui.models.AlbumModel
+import com.musicapp.ui.models.ArtistModel
+import com.musicapp.ui.models.PlaylistModel
+import com.musicapp.ui.models.UserPlaylistModel
+import com.musicapp.ui.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,9 +20,9 @@ import kotlinx.coroutines.withContext
 
 data class HomeState(
     val isLoading: Boolean = false,
-    val playlists: List<DeezerChartPlaylist> = emptyList(),
-    val artists: List<DeezerArtist> = emptyList(),
-    val albums: List<DeezerChartAlbum> = emptyList()
+    val playlists: List<PlaylistModel> = emptyList(),
+    val artists: List<ArtistModel> = emptyList(),
+    val albums: List<AlbumModel> = emptyList()
 )
 
 class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel() {
@@ -37,7 +39,7 @@ class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel(
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopPlaylists()
                 }
-                _state.update { it.copy(playlists = result) }
+                _state.update { it.copy(playlists = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e("API", e.localizedMessage ?: "Unexpected playlist error")
             }
@@ -50,7 +52,7 @@ class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel(
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopArtists()
                 }
-                _state.update { it.copy(artists = result) }
+                _state.update { it.copy(artists = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e("API", e.localizedMessage ?: "Unexpected artists error")
             }
@@ -63,7 +65,7 @@ class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel(
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopAlbums()
                 }
-                _state.update { it.copy(albums = result) }
+                _state.update { it.copy(albums = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e("API", e.localizedMessage ?: "Unexpected albums error")
             }
