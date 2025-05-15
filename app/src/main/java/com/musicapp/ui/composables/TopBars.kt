@@ -94,6 +94,7 @@ fun MainTopBar(
                 style = MaterialTheme.typography.titleLarge
             )
         },
+        expandedHeight = 40.dp,
         actions = {
             IconButton(onClick = { navController.navigate(MusicAppRoute.Settings) }) {
                 Icon(

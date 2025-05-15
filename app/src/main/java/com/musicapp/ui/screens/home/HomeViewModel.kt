@@ -8,8 +8,7 @@ import com.musicapp.data.remote.deezer.DeezerArtist
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerChartPlaylist
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -74,11 +73,10 @@ class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel(
     fun loadContent() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, playlists = emptyList(), artists = emptyList(), albums = emptyList()) }
-            awaitAll(
-                async { loadTopPlaylist() },
-                async { loadTopArtists() },
-                async { loadTopAlbums() }
-            )
+            delay(20) // Fixes stuck spinner for some reason
+            loadTopPlaylist()
+            loadTopArtists()
+            loadTopAlbums()
             _state.update { it.copy(isLoading = false) }
         }
     }

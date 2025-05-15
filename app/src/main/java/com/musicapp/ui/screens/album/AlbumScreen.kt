@@ -39,7 +39,9 @@ import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
+import com.musicapp.util.convertDurationInSecondsToString
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDate
 
 @Composable
 fun AlbumScreen(navController: NavController, albumId: Long) {
@@ -110,7 +112,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                                 }
                             }
                         }
-                        Text("Album · ${album.releaseDate}")
+                        Text("Album · ${LocalDate.parse(album.releaseDate).year}")
                     }
                 }
             }
@@ -123,15 +125,14 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 )
             }
             item {
-                val details = state.albumDetails
-                if (details != null) {
-                    val durationInMinutes = details.duration / 60
+                val albumDetails = state.albumDetails
+                if (albumDetails != null) {
                     Row {
-                        Text("${details.trackCount} songs")
+                        Text("${albumDetails.trackCount} songs")
                         Text(" · ")
-                        Text("${durationInMinutes}min")
+                        Text(convertDurationInSecondsToString(albumDetails.duration))
                     }
-                    Text("Label: ${details.label}")
+                    Text("Label: ${albumDetails.label}")
                 }
             }
         }

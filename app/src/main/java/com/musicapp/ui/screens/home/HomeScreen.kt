@@ -1,20 +1,14 @@
 package com.musicapp.ui.screens.home
 
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.exclude
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
@@ -27,21 +21,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
-import com.musicapp.ui.composables.CenteredCircularProgressIndicator
-import com.musicapp.ui.composables.LoadableImage
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.net.toUri
+import com.musicapp.ui.composables.ArtistCard
 import com.musicapp.ui.composables.MainTopBar
+import com.musicapp.ui.composables.PlayListCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,18 +52,13 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
         ) {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(12.dp).fillMaxSize()
             ) {
                 item {
                     Text(
                         text = stringResource(R.string.top_playlists),
                         style = MaterialTheme.typography.titleLarge
                     )
-                }
-                item {
-                    if (state.isLoading) {
-                        CenteredCircularProgressIndicator()
-                    }
                 }
                 items(state.playlists.chunked(2)) { rowItems ->
                     Row(
@@ -100,11 +84,6 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                     )
                 }
                 item {
-                    if (state.isLoading) {
-                        CenteredCircularProgressIndicator()
-                    }
-                }
-                item {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(state.artists) { artist ->
                             ArtistCard(
@@ -120,11 +99,6 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                         text = stringResource(R.string.top_albums),
                         style = MaterialTheme.typography.titleLarge
                     )
-                }
-                item {
-                    if (state.isLoading) {
-                        CenteredCircularProgressIndicator()
-                    }
                 }
                 items(state.albums.chunked(2)) { rowItems ->
                     Row(
@@ -144,62 +118,6 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = null, onClick: () -> Unit) {
-    Card(
-        onClick = onClick,
-        modifier = modifier
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            LoadableImage(
-                imageUri = imageUri,
-                contentDescription = stringResource(R.string.playlist_picture_description),
-                modifier = Modifier.size(72.dp)
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(4.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: String? = null, onClick: () -> Unit) {
-    Card(
-        onClick = onClick,
-        modifier = modifier.width(96.dp)
-    ) {
-        Column (
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.fillMaxWidth().padding(4.dp)
-        ) {
-            LoadableImage(
-                imageUri = imageUrl?.toUri(),
-                contentDescription = stringResource(R.string.artist_picture_description),
-                modifier = Modifier
-                    .size(72.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center
-            )
         }
     }
 }
