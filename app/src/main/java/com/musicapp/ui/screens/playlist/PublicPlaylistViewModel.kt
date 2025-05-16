@@ -2,8 +2,13 @@ package com.musicapp.ui.screens.playlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.musicapp.data.database.LikedTracksTrackCrossRef
+import com.musicapp.data.database.Track
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
+import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.data.repositories.TracksRepository
 import com.musicapp.ui.models.PlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
@@ -15,7 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-data class PlaylistState(
+data class PublicPlaylistState(
     val playlistDetails: PlaylistModel? = null,
     val tracks: List<TrackModel> = emptyList(),
     val playlistDetailsAreLoading: Boolean = false,
@@ -23,9 +28,14 @@ data class PlaylistState(
     val error: String? = null
 )
 
-class PlaylistViewModel(private val deezerDataSource: DeezerDataSource): ViewModel() {
-    private val _state = MutableStateFlow(PlaylistState())
-    val state: StateFlow<PlaylistState> = _state.asStateFlow()
+class PublicPlaylistViewModel(
+    private val deezerDataSource: DeezerDataSource,
+    private val auth: FirebaseAuth,
+    private val playlistsRepository: PlaylistsRepository,
+    private val tracksRepository: TracksRepository
+): ViewModel() {
+    private val _state = MutableStateFlow(PublicPlaylistState())
+    val state: StateFlow<PublicPlaylistState> = _state.asStateFlow()
 
     fun loadPlaylist(id: Long) {
         viewModelScope.launch {
@@ -58,6 +68,24 @@ class PlaylistViewModel(private val deezerDataSource: DeezerDataSource): ViewMod
                     _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error") }
                 } finally {
                     _state.update { it.copy(tracksAreLoading = false) }
+                }
+            }
+        }
+    }
+
+    fun addToLiked(trackModel: TrackModel) {
+        viewModelScope.launch {
+            val userId = auth.currentUser?.uid
+            if (userId != null) {
+                withContext(Dispatchers.IO) {
+                    val track: Track? = tracksRepository.getTrackById(trackModel.id)
+                    if (track != null) {
+                        playlistsRepository.addTrackToLikedTracksPlaylist(LikedTracksTrackCrossRef(userId, trackModel.id))
+                    } else {
+                        val newTrack = Track(trackModel.id, trackModel.title, trackModel.duration, trackModel.releaseDate, trackModel.isExplicit)
+                        tracksRepository.upsertTrack(newTrack)
+                        playlistsRepository.addTrackToLikedTracksPlaylist(LikedTracksTrackCrossRef(userId, newTrack.trackId))
+                    }
                 }
             }
         }

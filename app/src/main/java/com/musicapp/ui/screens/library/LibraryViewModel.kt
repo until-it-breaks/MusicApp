@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.musicapp.data.database.LikedTracksPlaylist
 import com.musicapp.data.database.Playlist
-import com.musicapp.data.database.TrackHistory
 import com.musicapp.data.repositories.PlaylistsRepository
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackHistoryModel

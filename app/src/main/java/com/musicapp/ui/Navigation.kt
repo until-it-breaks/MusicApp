@@ -12,10 +12,10 @@ import com.musicapp.ui.screens.artist.ArtistScreen
 import com.musicapp.ui.screens.home.HomeScreen
 import com.musicapp.ui.screens.library.LibraryScreen
 import com.musicapp.ui.screens.main.MainScreen
-import com.musicapp.ui.screens.playlist.PlaylistScreen
-import com.musicapp.ui.screens.playlist.UserPlaylistScreen
-import com.musicapp.ui.screens.passwordrecovery.PasswordRecoveryScreen
-import com.musicapp.ui.screens.playlist.LikedSongsScreen
+import com.musicapp.ui.screens.playlist.PublicPlaylistScreen
+import com.musicapp.ui.screens.playlist.PersonalPlaylistScreen
+import com.musicapp.ui.screens.password.PasswordRecoveryScreen
+import com.musicapp.ui.screens.playlist.LikedTracksScreen
 import com.musicapp.ui.screens.playlist.TrackHistoryScreen
 import com.musicapp.ui.screens.profile.ProfileScreen
 import com.musicapp.ui.screens.search.SearchScreen
@@ -80,7 +80,7 @@ fun HomeNavGraph(mainNavController: NavController, subNavController: NavHostCont
         }
         composable<MusicAppRoute.Playlist> { backStackEntry ->
             val route = backStackEntry.toRoute<MusicAppRoute.Playlist>()
-            PlaylistScreen(subNavController, route.id)
+            PublicPlaylistScreen(subNavController, route.id)
         }
         composable<MusicAppRoute.Artist> { backStackEntry ->
             val route = backStackEntry.toRoute<MusicAppRoute.Artist>()
@@ -88,7 +88,7 @@ fun HomeNavGraph(mainNavController: NavController, subNavController: NavHostCont
         }
         composable<MusicAppRoute.UserPlaylist> { backStackEntry ->
             val route = backStackEntry.toRoute<MusicAppRoute.UserPlaylist>()
-            UserPlaylistScreen(subNavController, route.uuid)
+            PersonalPlaylistScreen(subNavController, route.uuid)
         }
         composable<MusicAppRoute.Home> {
             HomeScreen(mainNavController, subNavController)
@@ -108,7 +108,7 @@ fun SearchNavGraph(mainNavController: NavController, subNavController: NavHostCo
         }
         composable<MusicAppRoute.Playlist> { backStackEntry ->
             val route = backStackEntry.toRoute<MusicAppRoute.Playlist>()
-            PlaylistScreen(subNavController, route.id)
+            PublicPlaylistScreen(subNavController, route.id)
         }
         composable<MusicAppRoute.Artist> { backStackEntry ->
             val route = backStackEntry.toRoute<MusicAppRoute.Artist>()
@@ -116,7 +116,7 @@ fun SearchNavGraph(mainNavController: NavController, subNavController: NavHostCo
         }
         composable<MusicAppRoute.UserPlaylist> { backStackEntry ->
             val route = backStackEntry.toRoute<MusicAppRoute.UserPlaylist>()
-            UserPlaylistScreen(subNavController, route.uuid)
+            PersonalPlaylistScreen(subNavController, route.uuid)
         }
         composable<MusicAppRoute.Search> {
             SearchScreen(mainNavController, subNavController)
@@ -136,7 +136,7 @@ fun LibraryNavGraph(mainNavController: NavController, subNavController: NavHostC
         }
         composable<MusicAppRoute.Playlist> { backStackEntry ->
             val route = backStackEntry.toRoute<MusicAppRoute.Playlist>()
-            PlaylistScreen(subNavController, route.id)
+            PublicPlaylistScreen(subNavController, route.id)
         }
         composable<MusicAppRoute.Artist> { backStackEntry ->
             val route = backStackEntry.toRoute<MusicAppRoute.Artist>()
@@ -144,10 +144,10 @@ fun LibraryNavGraph(mainNavController: NavController, subNavController: NavHostC
         }
         composable<MusicAppRoute.UserPlaylist> { backStackEntry ->
             val route = backStackEntry.toRoute<MusicAppRoute.UserPlaylist>()
-            UserPlaylistScreen(subNavController, route.uuid)
+            PersonalPlaylistScreen(subNavController, route.uuid)
         }
         composable<MusicAppRoute.LikedSongs> {
-            LikedSongsScreen(subNavController)
+            LikedTracksScreen(subNavController)
         }
         composable<MusicAppRoute.TrackHistory> {
             TrackHistoryScreen(subNavController)

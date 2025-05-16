@@ -1,19 +1,12 @@
 package com.musicapp.ui.screens.library
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.exclude
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.Image
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -28,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,6 +28,7 @@ import androidx.navigation.NavController
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.CreatePlaylistModal
 import com.musicapp.ui.composables.MainTopBar
+import com.musicapp.ui.composables.UserPlaylistCard
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,7 +59,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
         ) {
             item {
                 state.likedTracksPlaylist?.let { likedPlaylist ->
-                    PlaylistItem(
+                    UserPlaylistCard(
                         "Liked songs",
                         onClick = { subNavController.navigate(MusicAppRoute.LikedSongs) }
                     )
@@ -74,7 +67,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
             }
             item {
                 state.trackHistory?.let { history ->
-                    PlaylistItem(
+                    UserPlaylistCard(
                         "Track history",
                         onClick = { subNavController.navigate(MusicAppRoute.TrackHistory) }
                     )
@@ -92,7 +85,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
                 }
             } else {
                 items(userPlaylists.value) { playlist ->
-                    PlaylistItem(
+                    UserPlaylistCard(
                         playlist.name,
                         onClick = { subNavController.navigate(MusicAppRoute.UserPlaylist(playlist.id)) }
                     )
@@ -106,32 +99,4 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
         onDismiss = { showBottomSheet = false },
         onCreatePlaylist = { name -> viewModel.createPlaylist(name) }
     )
-}
-
-@Composable
-fun PlaylistItem(title: String, onClick: () -> Unit) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Image,
-                contentDescription = "Playlist Picture",
-                modifier = Modifier.size(72.dp)
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Icon(
-                imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
-                contentDescription = "Forward",
-                modifier = Modifier.padding(8.dp)
-            )
-        }
-    }
 }

@@ -137,7 +137,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                     track = track,
                     onTrackClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
-                    onAddToLiked = { viewModel::addToLiked }
+                    onAddToLiked = viewModel::addToLiked
                 )
             }
             item {

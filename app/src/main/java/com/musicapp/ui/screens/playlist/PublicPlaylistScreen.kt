@@ -32,8 +32,8 @@ import com.musicapp.R
 import com.musicapp.ui.composables.TrackCard
 
 @Composable
-fun PlaylistScreen(navController: NavController, playlistId: Long) {
-    val viewModel = koinViewModel<PlaylistViewModel>()
+fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
+    val viewModel = koinViewModel<PublicPlaylistViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -93,7 +93,7 @@ fun PlaylistScreen(navController: NavController, playlistId: Long) {
                     track = track,
                     onTrackClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
-                    onAddToLiked = { /*viewModel::addToLiked*/ }
+                    onAddToLiked = viewModel::addToLiked
                 )
             }
         }

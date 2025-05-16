@@ -12,11 +12,12 @@ import com.musicapp.data.repositories.UsersRepository
 import com.musicapp.ui.screens.login.LoginViewModel
 import com.musicapp.ui.screens.album.AlbumViewModel
 import com.musicapp.ui.screens.artist.ArtistViewModel
-import com.musicapp.ui.screens.playlist.PlaylistViewModel
+import com.musicapp.ui.screens.playlist.PublicPlaylistViewModel
 import com.musicapp.ui.screens.home.HomeViewModel
 import com.musicapp.ui.screens.library.LibraryViewModel
-import com.musicapp.ui.screens.playlist.UserPlaylistViewModel
-import com.musicapp.ui.screens.passwordrecovery.PasswordRecoveryViewModel
+import com.musicapp.ui.screens.playlist.PersonalPlaylistViewModel
+import com.musicapp.ui.screens.password.PasswordRecoveryViewModel
+import com.musicapp.ui.screens.playlist.LikedTracksViewModel
 import com.musicapp.ui.screens.profile.ProfileScreenViewModel
 import com.musicapp.ui.screens.signup.SignUpViewModel
 import io.ktor.client.HttpClient
@@ -86,11 +87,13 @@ val appModule = module {
 
     viewModel { AlbumViewModel(get(), get(), get(), get()) }
 
-    viewModel { PlaylistViewModel(get()) }
+    viewModel { PublicPlaylistViewModel(get(), get(), get(), get()) }
 
     viewModel { ArtistViewModel(get()) }
 
     viewModel { LibraryViewModel(get(), get()) }
 
-    viewModel { UserPlaylistViewModel() }
+    viewModel { PersonalPlaylistViewModel() }
+
+    viewModel { LikedTracksViewModel(get(), get()) }
 }

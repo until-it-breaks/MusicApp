@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-data class UserPlaylistState(
+data class PersonalPlaylistState(
     val playlistId: String? = null,
     val playlistDetails: DeezerPlaylistDetailed? = null,
     val tracks: List<TrackModel> = emptyList(),
@@ -22,9 +22,9 @@ data class UserPlaylistState(
     val error: String? = null
 )
 
-class UserPlaylistViewModel(): ViewModel(), KoinComponent {
-    private val _state = MutableStateFlow(UserPlaylistState())
-    val state: StateFlow<UserPlaylistState> = _state.asStateFlow()
+class PersonalPlaylistViewModel(): ViewModel(), KoinComponent {
+    private val _state = MutableStateFlow(PersonalPlaylistState())
+    val state: StateFlow<PersonalPlaylistState> = _state.asStateFlow()
     val playlistRepository: PlaylistsRepository by inject()
 
     fun loadPlaylistTracks(playlistId: String) {

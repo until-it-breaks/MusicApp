@@ -81,6 +81,9 @@ fun SearchScreen(mainNavController: NavController, subNavController: NavControll
     }
 }
 
+/*
+* Just an example. Modify as needed.
+* */
 @Composable
 fun GenreItem(title: String, onClick: () -> Unit) {
     Card(

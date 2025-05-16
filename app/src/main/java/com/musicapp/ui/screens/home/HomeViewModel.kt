@@ -7,7 +7,6 @@ import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.ui.models.AlbumModel
 import com.musicapp.ui.models.ArtistModel
 import com.musicapp.ui.models.PlaylistModel
-import com.musicapp.ui.models.UserPlaylistModel
 import com.musicapp.ui.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

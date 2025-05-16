@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens.passwordrecovery
+package com.musicapp.ui.screens.password
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement

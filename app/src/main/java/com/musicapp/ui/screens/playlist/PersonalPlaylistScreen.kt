@@ -1,8 +1,11 @@
 package com.musicapp.ui.screens.playlist
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.exclude
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -11,19 +14,33 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
+import com.musicapp.ui.composables.UserPlaylistTopBar
 import com.musicapp.ui.models.TrackModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun LikedSongsScreen(navController: NavController) {
+fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
+    val viewModel = koinViewModel<PersonalPlaylistViewModel>()
+
+    LaunchedEffect(playlistId) {
+        viewModel.loadPlaylistTracks(playlistId)
+    }
+
     Scaffold(
-        topBar = {
-            TopBarWithBackButton(navController, "Liked tracks")
+        topBar = { UserPlaylistTopBar(
+            navController,
+            "Personal playlist",
+            onAddTrack = {},
+            onEditName = {},
+            onDeletePlaylist = { viewModel.deletePlaylist() })
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
@@ -34,18 +51,26 @@ fun LikedSongsScreen(navController: NavController) {
                 .padding(12.dp)
         ) {
             item {
-                Icon(
-                    imageVector = Icons.Filled.Image,
-                    contentDescription = "Playlist image"
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Image,
+                        contentDescription = "Playlist image",
+                        modifier = Modifier.size(128.dp)
+                    )
+                    Text("Playlist name")
+                }
             }
             var songs = listOf("Song1", "Song2", "Song3")
             items(songs) { song ->
                 TrackCard(
                     TrackModel(1, song),
                     onTrackClick = { /**/ },
-                    onArtistClick = { /**/ }
-                ) { }
+                    onArtistClick = { /**/ },
+                    onAddToLiked = {}
+                )
             }
         }
     }

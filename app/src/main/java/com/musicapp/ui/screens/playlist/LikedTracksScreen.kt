@@ -16,22 +16,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
-import com.musicapp.ui.models.TrackModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun TrackHistoryScreen(navController: NavController) {
+fun LikedTracksScreen(navController: NavController) {
+    val viewModel = koinViewModel<LikedTracksViewModel>()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
-            TopBarWithBackButton(
-                navController,
-                "Track history"
-            )
+            TopBarWithBackButton(navController, "Liked tracks")
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
@@ -51,13 +53,13 @@ fun TrackHistoryScreen(navController: NavController) {
                         contentDescription = "Playlist image",
                         modifier = Modifier.size(128.dp)
                     )
-                    Text("Track history")
+                    Text("Liked tracks")
                 }
             }
-            var songs = listOf("Song1", "Song2", "Song3")
-            items(songs) { song ->
+            items(state.playlist?.tracks.orEmpty()) { track ->
                 TrackCard(
-                    TrackModel(1, song),
+                    track = track,
+                    showPicture = true,
                     onTrackClick = { /**/ },
                     onArtistClick = { /**/ },
                     onAddToLiked = {}
