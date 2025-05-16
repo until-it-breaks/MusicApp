@@ -10,21 +10,21 @@ import androidx.compose.ui.res.stringResource
 import com.musicapp.ui.screens.main.MainCategory
 
 @Composable
-fun MainNavBar(items: List<MainCategory>, selectedItem: MainCategory, modifier: Modifier = Modifier, onItemSelected: (MainCategory) -> Unit) {
+fun MainNavBar(categories: List<MainCategory>, selectedCategory: MainCategory, modifier: Modifier = Modifier, onCategorySelected: (MainCategory) -> Unit) {
     NavigationBar(
         modifier = modifier,
     ) {
-        items.forEach { item ->
+        categories.forEach { item ->
             NavigationBarItem(
-                selected = selectedItem == item,
+                selected = selectedCategory == item,
                 icon = {
                     Icon(
-                        imageVector = if (selectedItem == item) item.primaryIcon else item.secondaryIcon,
+                        imageVector = if (selectedCategory == item) item.primaryIcon else item.secondaryIcon,
                         contentDescription = stringResource(item.stringId)
                     )
                 },
                 label = { Text(stringResource(item.stringId)) },
-                onClick = { onItemSelected(item) }
+                onClick = { onCategorySelected(item) }
             )
         }
     }

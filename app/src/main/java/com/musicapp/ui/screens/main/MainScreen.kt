@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.musicapp.R
 import com.musicapp.ui.HomeNavGraph
 import com.musicapp.ui.LibraryNavGraph
+import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.SearchNavGraph
 import com.musicapp.ui.composables.MainNavBar
 
@@ -63,9 +64,34 @@ fun MainScreen(navController: NavController) {
             }
         }
         MainNavBar(
-            items = MainCategory.entries.toList(),
-            selectedItem = selectedCategory,
-            onItemSelected = { category -> selectedCategory = category }
+            categories = MainCategory.entries.toList(),
+            selectedCategory = selectedCategory,
+            onCategorySelected = { category ->
+                if (selectedCategory == category) {
+                    when (category) {
+                        MainCategory.HOME -> {
+                            homeNavController.popBackStack(
+                                route = MusicAppRoute.Home,
+                                inclusive = false
+                            )
+                        }
+                        MainCategory.SEARCH -> {
+                            searchNavController.popBackStack(
+                                route = MusicAppRoute.Search,
+                                inclusive = false
+                            )
+                        }
+                        MainCategory.LIBRARY -> {
+                            libraryNavController.popBackStack(
+                                route = MusicAppRoute.Library,
+                                inclusive = false
+                            )
+                        }
+                    }
+                } else {
+                    selectedCategory = category
+                }
+            }
         )
     }
 }
