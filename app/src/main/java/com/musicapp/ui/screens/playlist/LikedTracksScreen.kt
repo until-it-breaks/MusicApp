@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.musicapp.ui.composables.PersonalTrackDropDownMenu
+import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
 import org.koin.androidx.compose.koinViewModel
@@ -62,7 +64,7 @@ fun LikedTracksScreen(navController: NavController) {
                     showPicture = true,
                     onTrackClick = { /**/ },
                     onArtistClick = { /**/ },
-                    onAddToLiked = {}
+                    extraMenu = { PersonalTrackDropDownMenu(track) }
                 )
             }
         }

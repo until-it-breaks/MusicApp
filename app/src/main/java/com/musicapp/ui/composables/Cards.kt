@@ -121,7 +121,7 @@ fun TrackCard(
     showPicture: Boolean = false,
     onTrackClick: (TrackModel) -> Unit,
     onArtistClick: (Long) -> Unit,
-    onAddToLiked: (TrackModel) -> Unit
+    extraMenu: @Composable () -> Unit
 ) {
     Card(
         onClick = { onTrackClick(track) }
@@ -170,7 +170,7 @@ fun TrackCard(
                     }
                 }
             }
-            TrackDropdownMenu(track, onAddToLiked = onAddToLiked)
+            extraMenu()
         }
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.musicapp.ui.composables.PersonalTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.models.TrackModel
@@ -60,7 +61,7 @@ fun TrackHistoryScreen(navController: NavController) {
                     TrackModel(1, song),
                     onTrackClick = { /**/ },
                     onArtistClick = { /**/ },
-                    onAddToLiked = {}
+                    extraMenu = { PersonalTrackDropDownMenu(TrackModel(1, song)) }
                 )
             }
         }

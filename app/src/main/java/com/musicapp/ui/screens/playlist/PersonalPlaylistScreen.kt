@@ -21,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.musicapp.data.database.Track
+import com.musicapp.ui.composables.PersonalTrackDropDownMenu
 import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.composables.UserPlaylistTopBar
 import com.musicapp.ui.models.TrackModel
@@ -69,7 +71,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     TrackModel(1, song),
                     onTrackClick = { /**/ },
                     onArtistClick = { /**/ },
-                    onAddToLiked = {}
+                    extraMenu = { PersonalTrackDropDownMenu(TrackModel(1, song)) }
                 )
             }
         }

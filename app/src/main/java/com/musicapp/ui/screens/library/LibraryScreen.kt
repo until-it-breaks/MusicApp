@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.ui.MusicAppRoute
-import com.musicapp.ui.composables.CreatePlaylistModal
+import com.musicapp.ui.composables.PlaylistCreationModal
 import com.musicapp.ui.composables.MainTopBar
 import com.musicapp.ui.composables.UserPlaylistCard
 import org.koin.androidx.compose.koinViewModel
@@ -93,7 +93,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
             }
         }
     }
-    CreatePlaylistModal(
+    PlaylistCreationModal(
         showBottomSheet = showBottomSheet,
         sheetState = sheetState,
         onDismiss = { showBottomSheet = false },

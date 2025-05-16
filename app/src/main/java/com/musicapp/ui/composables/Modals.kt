@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreatePlaylistModal(
+fun PlaylistCreationModal(
     showBottomSheet: Boolean,
     sheetState: SheetState,
     onDismiss: () -> Unit,
@@ -66,6 +66,54 @@ fun CreatePlaylistModal(
                         label = { Text("Playlist name") },
                         modifier = Modifier.fillMaxWidth()
                     )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddTrackToPlaylistModal(
+    showBottomSheet: Boolean,
+    sheetState: SheetState,
+    onDismiss: () -> Unit
+) {
+    var playlistName by remember { mutableStateOf("") }
+
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = onDismiss,
+            sheetState = sheetState
+        ) {
+            Scaffold(
+                topBar = {
+                    CenterAlignedTopAppBar(
+                        title = { Text("Your Playlists") },
+                        navigationIcon = {
+                            TextButton(onClick = onDismiss) {
+                                Text("Cancel")
+                            }
+                        },
+                        actions = {
+                            TextButton(
+                                onClick = {
+                                    onDismiss()
+                                },
+                                enabled = playlistName.isNotBlank()
+                            ) {
+                                Text("Create")
+                            }
+                        }
+                    )
+                }
+            ) { contentPadding ->
+                Column(
+                    modifier = Modifier.padding(contentPadding).padding(12.dp)
+                ) {
+                    Text("Playlist 1")
+                    Text("Playlist 2")
+                    Text("Playlist 3")
                 }
             }
         }
