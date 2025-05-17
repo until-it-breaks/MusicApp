@@ -67,7 +67,7 @@ data class LikedTracksPlaylist(
 )
 
 @Entity(primaryKeys = ["ownerId", "trackId"])
-data class LikedTracksTrackCrossRef(
+data class LikedTracksPlaylistTrackCrossRef(
     val ownerId: String,
     val trackId: Long
 )
@@ -77,7 +77,7 @@ data class LikedTracksPlaylistWithTracks(
     @Relation(
         parentColumn = "ownerId",
         entityColumn = "trackId",
-        associateBy = Junction(LikedTracksTrackCrossRef::class)
+        associateBy = Junction(LikedTracksPlaylistTrackCrossRef::class)
     )
     val tracks: List<Track>
 )

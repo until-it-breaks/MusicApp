@@ -1,56 +1,116 @@
 package com.musicapp.data.repositories
 
-import android.content.ContentResolver
-import com.musicapp.data.database.Playlist
-import com.musicapp.data.database.PlaylistsDAO
 import com.musicapp.data.database.LikedTracksDAO
 import com.musicapp.data.database.LikedTracksPlaylist
-import com.musicapp.data.database.LikedTracksPlaylistWithTracks
-import com.musicapp.data.database.LikedTracksTrackCrossRef
-import com.musicapp.data.database.PlaylistWithTracks
+import com.musicapp.data.database.LikedTracksPlaylistTrackCrossRef
+import com.musicapp.data.database.Playlist
+import com.musicapp.data.database.PlaylistTrackCrossRef
+import com.musicapp.data.database.UserPlaylistDAO
 import com.musicapp.data.database.TrackHistory
 import com.musicapp.data.database.TrackHistoryDAO
-import com.musicapp.data.database.TrackHistoryWithTracks
+import com.musicapp.data.database.TrackHistoryTrackCrossRef
+import com.musicapp.ui.models.LikedTracksPlaylistModel
+import com.musicapp.ui.models.TrackHistoryModel
+import com.musicapp.ui.models.UserPlaylistModel
+import com.musicapp.ui.models.toModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class PlaylistsRepository(
-    private val playlistDAO: PlaylistsDAO,
+    private val playlistDAO: UserPlaylistDAO,
     private val likedTracksDAO: LikedTracksDAO,
-    private val trackHistoryDAO: TrackHistoryDAO,
-
-    private val contentResolver: ContentResolver
+    private val trackHistoryDAO: TrackHistoryDAO
 ) {
     // Normal playlists
 
-    fun getUserPlaylists(userId: String): Flow<List<Playlist>> = playlistDAO.getUserPlaylists(userId)
+    fun getUserPlaylistsWithTracks(userId: String): Flow<List<UserPlaylistModel>> {
+        return playlistDAO.getPlaylistWithTracks(userId).map { it.map { it.toModel() } }
+    }
 
-    suspend fun getUserPlaylistsWithTracks(playlistId: String): PlaylistWithTracks = playlistDAO.getPlaylistWithTracks(playlistId)
+    suspend fun upsertPlaylist(playlist: UserPlaylistModel) {
+        val playlist = Playlist(
+            playlistId = playlist.id,
+            ownerId = playlist.ownerId,
+            name = playlist.name
+        )
+        playlistDAO.upsertPlaylist(playlist)
+    }
 
-    suspend fun upsertPlaylist(playlist: Playlist) = playlistDAO.upsertPlaylist(playlist)
+    suspend fun addTrackToPlaylist(playlistId: String, trackId: Long) {
+        val crossRef = PlaylistTrackCrossRef(playlistId, trackId)
+        playlistDAO.addTrackToPlaylist(crossRef)
+    }
 
-    suspend fun deletePlaylist(playlist: Playlist) = playlistDAO.deletePlaylist(playlist)
+    suspend fun removeTrackFromPlaylist(playlistId: String, trackId: Long) {
+        val crossRef = PlaylistTrackCrossRef(playlistId, trackId)
+        playlistDAO.deleteTrackFromPlaylist(crossRef)
+    }
 
-    suspend fun deletePlaylistById(playlistId: String) = playlistDAO.deletePlaylistById(playlistId)
+    suspend fun clearPlaylist(playlistId: String) {
+        playlistDAO.clearPlaylist(playlistId)
+    }
 
-    // Liked tracks playlist
+    suspend fun deletePlaylist(playlistId: String) {
+        playlistDAO.deletePlaylist(playlistId)
+    }
 
-    suspend fun getLikedTracks(userId: String): LikedTracksPlaylist = likedTracksDAO.getLikedTracksPlaylist(userId)
+    /**
+     * Liked Tracks Playlist
+     */
 
-    suspend fun getLikedTracksWithTracks(userId: String): LikedTracksPlaylistWithTracks = likedTracksDAO.getLikedTracksPlaylistWithTracks(userId)
+    fun getLikedTracksWithTracks(userId: String): Flow<LikedTracksPlaylistModel> {
+        return likedTracksDAO.getLikedTracksPlaylistWithTracks(userId).map { it.toModel() }
+    }
 
-    suspend fun addTrackToLikedTracksPlaylist(crossRef: LikedTracksTrackCrossRef) = likedTracksDAO.addTrackToLikedTracksPlaylist(crossRef)
+    suspend fun upsertLikedTracksPlaylist(playlist: LikedTracksPlaylistModel) {
+        val playlist = LikedTracksPlaylist(
+            ownerId = playlist.ownerId,
+            lastUpdateTime = "2025-01-01" // TODO change to a better date
+        )
+        likedTracksDAO.upsertLikedTracksPlaylist(playlist)
+    }
 
-    suspend fun upsertLikedTracks(likedTracksPlaylist: LikedTracksPlaylist) = likedTracksDAO.upsertLikedTracksPlaylist(likedTracksPlaylist)
+    suspend fun addTrackToLikedTracksPlaylist(ownerId: String, trackId: Long) {
+        val crossRef = LikedTracksPlaylistTrackCrossRef(ownerId, trackId)
+        likedTracksDAO.addTrackToLikedTracksPlaylist(crossRef)
+    }
 
-    suspend fun deletedLikedTracks(likedTracksPlaylist: LikedTracksPlaylist) = likedTracksDAO.deleteLikedTracksPlaylist(likedTracksPlaylist)
+    suspend fun removeTrackFromLikedTracksPlaylist(ownerId: String, trackId: Long) {
+        val crossRef = LikedTracksPlaylistTrackCrossRef(ownerId, trackId)
+        likedTracksDAO.deleteTrackFromLikedTracksPlaylist(crossRef)
+    }
 
-    // History tracks
+    suspend fun clearLikedTracksPlaylist(userId: String) {
+        likedTracksDAO.clearLikedTracksPlaylist(userId)
+    }
 
-    suspend fun getTrackHistory(userId: String): TrackHistory = trackHistoryDAO.getTrackHistory(userId)
+    /**
+     * Track History
+     */
 
-    suspend fun getTrackHistoryWithTracks(userId: String): TrackHistoryWithTracks = trackHistoryDAO.getTrackHistoryWithTracks(userId)
+    fun getTrackHistoryWithTracks(userId: String): Flow<TrackHistoryModel> {
+        return trackHistoryDAO.getTrackHistoryWithTracks(userId).map { it.toModel() }
+    }
 
-    suspend fun upsertTrackHistory(trackHistory: TrackHistory) = trackHistoryDAO.upsertTrackHistory(trackHistory)
+    suspend fun upsertTrackHistory(trackHistory: TrackHistoryModel) {
+        val trackHistory = TrackHistory(
+            ownerId = trackHistory.ownerId,
+            lastUpdateTime = "2025-01-01" // TODO change to a better date
+        )
+        trackHistoryDAO.upsertTrackHistory(trackHistory)
+    }
 
-    suspend fun deleteTrackHistory(trackHistory: TrackHistory) = trackHistoryDAO.deleteTrackHistory(trackHistory)
+    suspend fun addTrackToTrackHistory(ownerId: String, trackId: Long) {
+        val crossRef = TrackHistoryTrackCrossRef(ownerId, trackId)
+        trackHistoryDAO.addTrackToTrackHistory(crossRef)
+    }
+
+    suspend fun removeTrackFromTrackHistory(ownerId: String, trackId: Long) {
+        val crossRef = TrackHistoryTrackCrossRef(ownerId, trackId)
+        trackHistoryDAO.deleteTrackFromTrackHistory(crossRef)
+    }
+
+    suspend fun clearTrackHistory(userId: String) {
+        trackHistoryDAO.clearTrackHistory(userId)
+    }
 }

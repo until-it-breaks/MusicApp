@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.ui.models.AlbumModel
 import com.musicapp.ui.models.ArtistModel
-import com.musicapp.ui.models.PlaylistModel
+import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 
 data class HomeState(
     val isLoading: Boolean = false,
-    val playlists: List<PlaylistModel> = emptyList(),
+    val playlists: List<PublicPlaylistModel> = emptyList(),
     val artists: List<ArtistModel> = emptyList(),
     val albums: List<AlbumModel> = emptyList()
 )

@@ -46,8 +46,7 @@ val appModule = module {
         PlaylistsRepository(
             get<MusicAppDatabase>().playlistDAO(),
             get<MusicAppDatabase>().likedTracksDAO(),
-            get<MusicAppDatabase>().trackHistoryDAO(),
-            get<Context>().contentResolver
+            get<MusicAppDatabase>().trackHistoryDAO()
         )
     }
 

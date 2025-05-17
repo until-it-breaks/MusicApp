@@ -35,7 +35,7 @@ class PersonalPlaylistViewModel(): ViewModel(), KoinComponent {
         viewModelScope.launch {
             val playlistId = state.value.playlistId
             if (playlistId != null) {
-                playlistRepository.deletePlaylistById(playlistId)
+                playlistRepository.deletePlaylist(playlistId)
             }
         }
     }

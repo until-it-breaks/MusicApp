@@ -1,47 +1,91 @@
 package com.musicapp.ui.screens.playlist
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.PlaylistsRepository
 import com.musicapp.ui.models.LikedTracksPlaylistModel
-import com.musicapp.ui.models.toModel
+import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-data class LikedTracksState(
-    val playlist: LikedTracksPlaylistModel? = null,
-    val playlistIsLoading: Boolean = false,
-    val error: String? = null
-)
+data class LikedTracksState(val showAuthError: Boolean = false)
 
 class LikedTracksViewModel(private val auth: FirebaseAuth, private val playlistsRepository: PlaylistsRepository): ViewModel() {
-    private val _state = MutableStateFlow(LikedTracksState())
-    val state: StateFlow<LikedTracksState> = _state.asStateFlow()
+    private val _userId = MutableStateFlow(auth.currentUser?.uid)
+    private val _uiState = MutableStateFlow(LikedTracksState())
+    val uiState: StateFlow<LikedTracksState> = _uiState.asStateFlow()
 
-    init {
-        loadLikedTracks()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val playlist: StateFlow<LikedTracksPlaylistModel?> = _userId
+        .filterNotNull()
+        .flatMapLatest { userId ->
+            playlistsRepository.getLikedTracksWithTracks(userId)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = null
+        )
+
+    fun clearLikedTracks() {
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            _uiState.update { it.copy(showAuthError = true) }
+            return
+        } else {
+            _userId.value = userId
+        }
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    playlistsRepository.clearLikedTracksPlaylist(userId)
+                }
+            } catch (e: Exception) {
+                Log.e("LikedTracksViewModel", "Error clearing liked tracks: ${e.localizedMessage}", e)
+            }
+        }
     }
 
-    private fun loadLikedTracks() {
+    fun removeTrackFromLikedTracks(trackId: Long) {
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            _uiState.update { it.copy(showAuthError = true) }
+            return
+        } else {
+            _userId.value = userId
+        }
         viewModelScope.launch {
-            _state.update { it.copy(playlistIsLoading = true, error = null) }
             try {
-                val userId =  auth.currentUser?.uid
-                val result = withContext(Dispatchers.IO) {
-                    playlistsRepository.getLikedTracksWithTracks(userId!!)
+                withContext(Dispatchers.IO) {
+                    playlistsRepository.removeTrackFromLikedTracksPlaylist(userId, trackId)
                 }
-                _state.update { it.copy(playlist = result.toModel()) }
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error") }
-            } finally {
-                _state.update { it.copy(playlistIsLoading = false) }
+                Log.e("LikedTracksViewModel", "Error removing track from liked tracks: ${e.localizedMessage}", e)
             }
+        }
+    }
+
+    fun addToQueue(track: TrackModel) {
+        viewModelScope.launch {
+            // TODO Enqueue given track
+        }
+    }
+
+    fun playTrack(track: TrackModel) {
+        viewModelScope.launch {
+            // TODO Play given track
         }
     }
 }

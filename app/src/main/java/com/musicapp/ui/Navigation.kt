@@ -147,7 +147,7 @@ fun LibraryNavGraph(mainNavController: NavController, subNavController: NavHostC
             PersonalPlaylistScreen(subNavController, route.uuid)
         }
         composable<MusicAppRoute.LikedSongs> {
-            LikedTracksScreen(subNavController)
+            LikedTracksScreen(mainNavController, subNavController)
         }
         composable<MusicAppRoute.TrackHistory> {
             TrackHistoryScreen(subNavController)

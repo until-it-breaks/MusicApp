@@ -65,15 +65,6 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     Text("Playlist name")
                 }
             }
-            var songs = listOf("Song1", "Song2", "Song3")
-            items(songs) { song ->
-                TrackCard(
-                    TrackModel(1, song),
-                    onTrackClick = { /**/ },
-                    onArtistClick = { /**/ },
-                    extraMenu = { PersonalTrackDropDownMenu(TrackModel(1, song)) }
-                )
-            }
         }
     }
 }

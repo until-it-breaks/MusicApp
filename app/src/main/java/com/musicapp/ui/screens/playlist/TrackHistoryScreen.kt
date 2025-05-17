@@ -20,19 +20,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.musicapp.ui.composables.LikedTracksPlaylistDropDownMenu
 import com.musicapp.ui.composables.PersonalTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
+import com.musicapp.ui.composables.TrackHistoryDropDownMenu
 import com.musicapp.ui.models.TrackModel
 
 @Composable
 fun TrackHistoryScreen(navController: NavController) {
     Scaffold(
         topBar = {
-            TopBarWithBackButton(
-                navController,
-                "Track history"
-            )
+            TopBarWithBackButton(navController, "Track History", action = { TrackHistoryDropDownMenu() })
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
@@ -54,15 +53,6 @@ fun TrackHistoryScreen(navController: NavController) {
                     )
                     Text("Track history")
                 }
-            }
-            var songs = listOf("Song1", "Song2", "Song3")
-            items(songs) { song ->
-                TrackCard(
-                    TrackModel(1, song),
-                    onTrackClick = { /**/ },
-                    onArtistClick = { /**/ },
-                    extraMenu = { PersonalTrackDropDownMenu(TrackModel(1, song)) }
-                )
             }
         }
     }
