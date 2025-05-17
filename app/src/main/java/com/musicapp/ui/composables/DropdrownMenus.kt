@@ -229,7 +229,7 @@ fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier) {
+fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -249,6 +249,7 @@ fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier) {
                 leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
                 onClick = {
                     expanded = !expanded
+                    onClearTracks()
                 }
             )
         }

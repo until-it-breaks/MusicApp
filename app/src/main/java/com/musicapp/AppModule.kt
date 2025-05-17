@@ -18,6 +18,7 @@ import com.musicapp.ui.screens.library.LibraryViewModel
 import com.musicapp.ui.screens.playlist.PersonalPlaylistViewModel
 import com.musicapp.ui.screens.password.PasswordRecoveryViewModel
 import com.musicapp.ui.screens.playlist.LikedTracksViewModel
+import com.musicapp.ui.screens.playlist.TrackHistoryViewModel
 import com.musicapp.ui.screens.profile.ProfileScreenViewModel
 import com.musicapp.ui.screens.signup.SignUpViewModel
 import io.ktor.client.HttpClient
@@ -95,4 +96,6 @@ val appModule = module {
     viewModel { PersonalPlaylistViewModel() }
 
     viewModel { LikedTracksViewModel(get(), get()) }
+
+    viewModel { TrackHistoryViewModel(get(), get()) }
 }

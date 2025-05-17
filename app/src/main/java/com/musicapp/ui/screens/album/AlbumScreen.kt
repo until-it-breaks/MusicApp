@@ -65,7 +65,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, "Album Details") },
+        topBar = { TopBarWithBackButton(navController, title = "Album Details") },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         LazyColumn(

@@ -21,8 +21,8 @@ import com.musicapp.ui.MusicAppRoute
 @Composable
 fun TopBarWithBackButton(
     navController: NavController,
-    title: String,
     modifier: Modifier = Modifier,
+    title: String = "",
     action: (@Composable () -> Unit)? = null
 ) {
     CenterAlignedTopAppBar(

@@ -39,7 +39,7 @@ fun ArtistScreen(navController: NavController, artistId: Long) {
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, stringResource(R.string.artist_details)) },
+        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.artist_details)) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         LazyColumn(

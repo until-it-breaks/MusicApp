@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -40,7 +41,6 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
         topBar = {
             TopBarWithBackButton(
                 navController = subNavController,
-                title = "Liked tracks",
                 action = { LikedTracksPlaylistDropDownMenu(onClearTracks = viewModel::clearLikedTracks) }
             )
         },
@@ -63,7 +63,10 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                             contentDescription = "Playlist image",
                             modifier = Modifier.size(128.dp)
                         )
-                        Text("Liked tracks")
+                        Text(
+                            text = "Liked tracks",
+                            style = MaterialTheme.typography.titleLarge
+                        )
                     }
                 }
                 items(playlist.value?.tracks.orEmpty()) { track ->

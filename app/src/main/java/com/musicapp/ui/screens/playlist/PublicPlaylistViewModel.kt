@@ -3,7 +3,6 @@ package com.musicapp.ui.screens.playlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.musicapp.data.database.LikedTracksPlaylistTrackCrossRef
 import com.musicapp.data.database.Track
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed

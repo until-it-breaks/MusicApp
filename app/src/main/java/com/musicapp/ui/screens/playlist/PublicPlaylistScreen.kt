@@ -29,14 +29,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.LoadableImage
-import com.musicapp.ui.composables.TopBarWithBackButton
-import org.koin.androidx.compose.koinViewModel
-import com.musicapp.R
-import com.musicapp.ui.composables.AddTrackToPlaylistModal
 import com.musicapp.ui.composables.PublicTrackDropDownMenu
+import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +52,7 @@ fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, "Playlist details") },
+        topBar = { TopBarWithBackButton(navController, title = "Playlist details") },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         LazyColumn(
