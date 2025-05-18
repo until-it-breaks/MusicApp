@@ -44,7 +44,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
-import com.musicapp.ui.composables.AddTrackToPlaylistModal
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton

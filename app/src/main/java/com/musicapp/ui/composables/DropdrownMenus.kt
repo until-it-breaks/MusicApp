@@ -26,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import com.musicapp.ui.models.TrackModel
+import com.musicapp.ui.screens.addtoplaylist.AddTrackToPlaylistModal
 
 /**
  * Drop-down menu used for user playlists
@@ -114,6 +115,7 @@ fun PublicTrackDropDownMenu(
         }
     }
     AddTrackToPlaylistModal(
+        trackModel,
         showBottomSheet,
         sheetState,
         onDismiss = {
@@ -177,6 +179,7 @@ fun PersonalTrackDropDownMenu(
         }
     }
     AddTrackToPlaylistModal(
+        trackModel,
         showBottomSheet,
         sheetState,
         onDismiss = {
@@ -215,13 +218,6 @@ fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks
             )
         }
     }
-    AddTrackToPlaylistModal(
-        showBottomSheet,
-        sheetState,
-        onDismiss = {
-            showBottomSheet = !showBottomSheet
-        }
-    )
 }
 
 /**
@@ -254,11 +250,4 @@ fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () ->
             )
         }
     }
-    AddTrackToPlaylistModal(
-        showBottomSheet,
-        sheetState,
-        onDismiss = {
-            showBottomSheet = !showBottomSheet
-        }
-    )
 }

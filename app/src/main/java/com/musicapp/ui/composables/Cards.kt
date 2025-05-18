@@ -14,8 +14,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Explicit
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -171,6 +173,68 @@ fun TrackCard(
                 }
             }
             extraMenu()
+        }
+    }
+}
+
+@Composable
+fun AddTrackToPlaylistPlaylistCard(
+    title: String,
+    onClick: () -> Unit,
+    disabled: Boolean,
+    showCheck: Boolean
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        if (disabled) {
+            Text("I'm disabled") // TODO improve
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Image,
+                contentDescription = "Playlist Picture",
+                modifier = Modifier.size(72.dp)
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            if (showCheck) {
+                Icon(
+                    imageVector = Icons.Outlined.Check,
+                    contentDescription = "Forward",
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AddTrackToPlaylistTrackCard(
+    track: TrackModel
+) {
+    Card {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.padding(8.dp)
+        ) {
+            LoadableImage(track.album?.mediumCover, "Track picture", modifier = Modifier.size(48.dp))
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = track.title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }

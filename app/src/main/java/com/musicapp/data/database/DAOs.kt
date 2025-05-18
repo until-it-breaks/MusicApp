@@ -39,6 +39,9 @@ interface UserPlaylistDAO {
     @Query("SELECT * FROM playlist WHERE ownerId = :ownerId")
     fun getPlaylistWithTracks(ownerId: String): Flow<List<PlaylistWithTracks>>
 
+    @Query("SELECT * FROM playlisttrackcrossref WHERE playlistId = :playlistId AND trackId = :trackId")
+    suspend fun getTrackFromPlaylist(playlistId: String, trackId: Long): PlaylistTrackCrossRef?
+
     /**
      * Creates or updates a playlist (tracks not included).
      */
@@ -77,7 +80,10 @@ interface LikedTracksDAO {
      */
     @Query("SELECT * FROM likedtracksplaylist WHERE ownerId = :userId")
     fun getLikedTracksPlaylistWithTracks(userId: String): Flow<LikedTracksPlaylistWithTracks>
-    // TODO turn into FLOW
+
+    @Query("SELECT * FROM likedtracksplaylisttrackcrossref WHERE ownerId = :userId AND trackId = :trackId")
+    suspend fun getTrackFromLikedTracksPlaylist(userId: String, trackId: Long): LikedTracksPlaylistTrackCrossRef?
+
     /**
      * Creates or updates a liked tracks playlist (tracks not included).
      */

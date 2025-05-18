@@ -5,18 +5,22 @@ import com.musicapp.data.database.LikedTracksPlaylist
 import com.musicapp.data.database.LikedTracksPlaylistTrackCrossRef
 import com.musicapp.data.database.Playlist
 import com.musicapp.data.database.PlaylistTrackCrossRef
+import com.musicapp.data.database.Track
 import com.musicapp.data.database.UserPlaylistDAO
 import com.musicapp.data.database.TrackHistory
 import com.musicapp.data.database.TrackHistoryDAO
 import com.musicapp.data.database.TrackHistoryTrackCrossRef
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackHistoryModel
+import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.UserPlaylistModel
 import com.musicapp.ui.models.toModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class PlaylistsRepository(
+    private val trackRepository: TracksRepository,
+
     private val playlistDAO: UserPlaylistDAO,
     private val likedTracksDAO: LikedTracksDAO,
     private val trackHistoryDAO: TrackHistoryDAO
@@ -25,6 +29,10 @@ class PlaylistsRepository(
 
     fun getUserPlaylistsWithTracks(userId: String): Flow<List<UserPlaylistModel>> {
         return playlistDAO.getPlaylistWithTracks(userId).map { it.map { it.toModel() } }
+    }
+
+    suspend fun isTrackInPlaylist(playlistId: String, track: TrackModel): Boolean {
+        return playlistDAO.getTrackFromPlaylist(playlistId, track.id) != null
     }
 
     suspend fun upsertPlaylist(playlist: UserPlaylistModel) {
@@ -36,8 +44,18 @@ class PlaylistsRepository(
         playlistDAO.upsertPlaylist(playlist)
     }
 
-    suspend fun addTrackToPlaylist(playlistId: String, trackId: Long) {
-        val crossRef = PlaylistTrackCrossRef(playlistId, trackId)
+    suspend fun addTrackToPlaylist(playlistId: String, track: TrackModel) {
+        if (trackRepository.getTrackById(track.id) == null) {
+            val track = Track(
+                trackId = track.id,
+                title = track.title,
+                duration = track.duration,
+                releaseDate = track.releaseDate,
+                isExplicit = track.isExplicit
+            )
+            trackRepository.upsertTrack(track)
+        }
+        val crossRef = PlaylistTrackCrossRef(playlistId, track.id)
         playlistDAO.addTrackToPlaylist(crossRef)
     }
 
@@ -62,6 +80,10 @@ class PlaylistsRepository(
         return likedTracksDAO.getLikedTracksPlaylistWithTracks(userId).map { it.toModel() }
     }
 
+    suspend fun isTrackInLikedTracks(userId: String, track: TrackModel): Boolean {
+        return likedTracksDAO.getTrackFromLikedTracksPlaylist(userId, track.id) != null
+    }
+
     suspend fun upsertLikedTracksPlaylist(playlist: LikedTracksPlaylistModel) {
         val playlist = LikedTracksPlaylist(
             ownerId = playlist.ownerId,
@@ -70,8 +92,19 @@ class PlaylistsRepository(
         likedTracksDAO.upsertLikedTracksPlaylist(playlist)
     }
 
-    suspend fun addTrackToLikedTracksPlaylist(ownerId: String, trackId: Long) {
-        val crossRef = LikedTracksPlaylistTrackCrossRef(ownerId, trackId)
+    suspend fun addTrackToLikedTracksPlaylist(ownerId: String, track: TrackModel) {
+        if (trackRepository.getTrackById(track.id) == null) {
+            val track = Track(
+                trackId = track.id,
+                title = track.title,
+                duration = track.duration,
+                releaseDate = track.releaseDate,
+                isExplicit = track.isExplicit
+            )
+            trackRepository.upsertTrack(track)
+        }
+
+        val crossRef = LikedTracksPlaylistTrackCrossRef(ownerId, track.id)
         likedTracksDAO.addTrackToLikedTracksPlaylist(crossRef)
     }
 
@@ -100,8 +133,18 @@ class PlaylistsRepository(
         trackHistoryDAO.upsertTrackHistory(trackHistory)
     }
 
-    suspend fun addTrackToTrackHistory(ownerId: String, trackId: Long) {
-        val crossRef = TrackHistoryTrackCrossRef(ownerId, trackId)
+    suspend fun addTrackToTrackHistory(ownerId: String, track: TrackModel) {
+        if (trackRepository.getTrackById(track.id) == null) {
+            val track = Track(
+                trackId = track.id,
+                title = track.title,
+                duration = track.duration,
+                releaseDate = track.releaseDate,
+                isExplicit = track.isExplicit
+            )
+            trackRepository.upsertTrack(track)
+        }
+        val crossRef = TrackHistoryTrackCrossRef(ownerId, track.id)
         trackHistoryDAO.addTrackToTrackHistory(crossRef)
     }
 

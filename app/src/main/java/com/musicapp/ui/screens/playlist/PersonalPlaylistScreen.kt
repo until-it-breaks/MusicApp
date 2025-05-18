@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Icon
@@ -19,17 +20,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.musicapp.ui.composables.PersonalTrackDropDownMenu
+import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.composables.UserPlaylistTopBar
 import org.koin.androidx.compose.koinViewModel
+import kotlin.collections.orEmpty
 
 @Composable
 fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
     val viewModel = koinViewModel<PersonalPlaylistViewModel>()
 
+    val playlist = viewModel.playlist.collectAsStateWithLifecycle()
+
+    /*
     LaunchedEffect(playlistId) {
         viewModel.loadPlaylistTracks(playlistId)
     }
+    */
 
     Scaffold(
         topBar = { UserPlaylistTopBar(
@@ -37,7 +46,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
             "Personal playlist",
             onAddTrack = {},
             onEditName = {},
-            onDeletePlaylist = { viewModel.deletePlaylist() })
+            onDeletePlaylist = { /*viewModel.deletePlaylist()*/ })
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
@@ -60,6 +69,24 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     Text("Playlist name")
                 }
             }
+            /*
+            items(playlist.value?.tracks.orEmpty()) { track ->
+                TrackCard(
+                    track = track,
+                    showPicture = true,
+                    onTrackClick = { viewModel.playTrack(track) },
+                    onArtistClick = { /*TODO*/ },
+                    extraMenu = {
+                        PersonalTrackDropDownMenu(
+                            trackModel = track,
+                            onAddToQueue = { viewModel.addToQueue(track) },
+                            onAddToPlaylist = { /*TODO*/ },
+                            onRemoveTrack = { viewModel.removeTrackFromLikedTracks(track.id) }
+                        )
+                    }
+                )
+            }
+             */
         }
     }
 }
