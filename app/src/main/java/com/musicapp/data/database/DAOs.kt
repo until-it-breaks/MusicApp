@@ -37,7 +37,10 @@ interface UserPlaylistDAO {
      * Retrieves a playlist.
      */
     @Query("SELECT * FROM playlist WHERE ownerId = :ownerId")
-    fun getPlaylistWithTracks(ownerId: String): Flow<List<PlaylistWithTracks>>
+    fun getPlaylistsWithTracks(ownerId: String): Flow<List<PlaylistWithTracks>>
+
+    @Query("SELECT * FROM playlist WHERE playlistId = :playlistId")
+    fun getPlaylistWithTracks(playlistId: String): Flow<PlaylistWithTracks>
 
     @Query("SELECT * FROM playlisttrackcrossref WHERE playlistId = :playlistId AND trackId = :trackId")
     suspend fun getTrackFromPlaylist(playlistId: String, trackId: Long): PlaylistTrackCrossRef?

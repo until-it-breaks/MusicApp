@@ -40,7 +40,7 @@ val appModule = module {
             MusicAppDatabase::class.java,
             "music-app"
         )
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(true)
             .build()
     }
 
@@ -87,15 +87,15 @@ val appModule = module {
 
     viewModel { HomeViewModel(get()) }
 
-    viewModel { AlbumViewModel(get(), get(), get(), get()) }
+    viewModel { AlbumViewModel(get(), get(), get()) }
 
-    viewModel { PublicPlaylistViewModel(get(), get(), get(), get()) }
+    viewModel { PublicPlaylistViewModel(get(), get(), get()) }
 
     viewModel { ArtistViewModel(get()) }
 
     viewModel { LibraryViewModel(get(), get()) }
 
-    viewModel { PersonalPlaylistViewModel(get(), get()) }
+    viewModel { PersonalPlaylistViewModel(get()) }
 
     viewModel { LikedTracksViewModel(get(), get()) }
 

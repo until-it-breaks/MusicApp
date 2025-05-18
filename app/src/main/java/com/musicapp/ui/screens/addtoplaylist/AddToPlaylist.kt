@@ -56,7 +56,7 @@ fun AddTrackToPlaylistModal(
             Scaffold(
                 topBar = {
                     CenterAlignedTopAppBar(
-                        title = { Text("Your Playlists") },
+                        title = { Text("Add To Playlist") },
                         navigationIcon = {
                             TextButton(onClick = onDismiss) {
                                 Text("Cancel")
@@ -83,8 +83,8 @@ fun AddTrackToPlaylistModal(
                             if (uiState.likedTracksPlaylist != null) {
                                 AddTrackToPlaylistPlaylistCard(
                                     title = "Liked tracks",
-                                    onClick = { addToLiked = !addToLiked},
-                                    disabled = isInLiked,
+                                    onClick = { addToLiked = !addToLiked },
+                                    enabled = !isInLiked,
                                     showCheck = addToLiked
                                 )
                             }
@@ -106,21 +106,24 @@ fun AddTrackToPlaylistModal(
                                             }
                                         }
                                     },
-                                    disabled = isInPlaylist,
+                                    enabled = !isInPlaylist,
                                     showCheck = clickedPlaylists.value.contains(playlist.id)
                                 )
                             }
                         }
-                        Row(
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Button(onClick = {
-                                if (addToLiked) {
-                                    viewModel.addToLiked(track)
+                        if (addToLiked || !clickedPlaylists.value.isEmpty()) {
+                            Row(
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Button(onClick = {
+                                    if (addToLiked) {
+                                        viewModel.addToLiked(track)
+                                    }
+                                    viewModel.addToPlaylists(track, clickedPlaylists.value)
+                                    onDismiss()
+                                }) {
+                                    Text("Done")
                                 }
-                                viewModel.addToPlaylists(track, clickedPlaylists.value)
-                            }) {
-                                Text("Done")
                             }
                         }
                     }

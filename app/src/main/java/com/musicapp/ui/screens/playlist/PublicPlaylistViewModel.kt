@@ -30,7 +30,6 @@ class PublicPlaylistViewModel(
     private val deezerDataSource: DeezerDataSource,
     private val auth: FirebaseAuth,
     private val playlistsRepository: PlaylistsRepository,
-    private val tracksRepository: TracksRepository
 ): ViewModel() {
     private val _state = MutableStateFlow(PublicPlaylistState())
     val state: StateFlow<PublicPlaylistState> = _state.asStateFlow()

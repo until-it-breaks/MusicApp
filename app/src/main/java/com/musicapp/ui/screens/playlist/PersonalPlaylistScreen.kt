@@ -26,7 +26,6 @@ import com.musicapp.ui.composables.PersonalTrackDropDownMenu
 import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.composables.UserPlaylistTopBar
 import org.koin.androidx.compose.koinViewModel
-import kotlin.collections.orEmpty
 
 @Composable
 fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
@@ -34,20 +33,20 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
 
     val playlist = viewModel.playlist.collectAsStateWithLifecycle()
 
-    /*
     LaunchedEffect(playlistId) {
         viewModel.loadPlaylistTracks(playlistId)
     }
-    */
 
     Scaffold(
-        topBar = { UserPlaylistTopBar(
-            navController,
-            "Personal playlist",
-            onAddTrack = {},
-            onEditName = {},
-            onDeletePlaylist = { /*viewModel.deletePlaylist()*/ })
-        },
+        topBar = {
+            UserPlaylistTopBar(
+                navController = navController,
+                title = "",
+                onAddTrack = { /*TODO*/ },
+                onEditName = { /*TODO*/ },
+                onDeletePlaylist = viewModel::deletePlaylist
+            )
+         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         LazyColumn(
@@ -66,10 +65,9 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                         contentDescription = "Playlist image",
                         modifier = Modifier.size(128.dp)
                     )
-                    Text("Playlist name")
+                    Text(playlist.value?.name ?: "Unknown playlist")
                 }
             }
-            /*
             items(playlist.value?.tracks.orEmpty()) { track ->
                 TrackCard(
                     track = track,
@@ -80,13 +78,11 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                         PersonalTrackDropDownMenu(
                             trackModel = track,
                             onAddToQueue = { viewModel.addToQueue(track) },
-                            onAddToPlaylist = { /*TODO*/ },
-                            onRemoveTrack = { viewModel.removeTrackFromLikedTracks(track.id) }
+                            onRemoveTrack = { viewModel.removeTrackFromPlaylist(track.id) }
                         )
                     }
                 )
             }
-             */
         }
     }
 }

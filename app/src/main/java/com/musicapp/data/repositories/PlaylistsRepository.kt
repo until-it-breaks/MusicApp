@@ -28,7 +28,11 @@ class PlaylistsRepository(
     // Normal playlists
 
     fun getUserPlaylistsWithTracks(userId: String): Flow<List<UserPlaylistModel>> {
-        return playlistDAO.getPlaylistWithTracks(userId).map { it.map { it.toModel() } }
+        return playlistDAO.getPlaylistsWithTracks(userId).map { it.map { it.toModel() } }
+    }
+
+    fun getUserPlaylistWithTracks(playlistId: String): Flow<UserPlaylistModel> {
+        return playlistDAO.getPlaylistWithTracks(playlistId).map { it.toModel() }
     }
 
     suspend fun isTrackInPlaylist(playlistId: String, track: TrackModel): Boolean {
@@ -103,7 +107,6 @@ class PlaylistsRepository(
             )
             trackRepository.upsertTrack(track)
         }
-
         val crossRef = LikedTracksPlaylistTrackCrossRef(ownerId, track.id)
         likedTracksDAO.addTrackToLikedTracksPlaylist(crossRef)
     }

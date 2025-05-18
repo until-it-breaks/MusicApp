@@ -79,7 +79,6 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                             PersonalTrackDropDownMenu(
                                 trackModel = track,
                                 onAddToQueue = { viewModel.addToQueue(track) },
-                                onAddToPlaylist = { /*TODO*/ },
                                 onRemoveTrack = { viewModel.removeTrackFromTrackHistory(track.id) }
                             )
                         }

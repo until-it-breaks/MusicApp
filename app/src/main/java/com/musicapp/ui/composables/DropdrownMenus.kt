@@ -115,12 +115,10 @@ fun PublicTrackDropDownMenu(
         }
     }
     AddTrackToPlaylistModal(
-        trackModel,
-        showBottomSheet,
-        sheetState,
-        onDismiss = {
-            showBottomSheet = !showBottomSheet
-        }
+        track = trackModel,
+        showBottomSheet = showBottomSheet,
+        sheetState = sheetState,
+        onDismiss = { showBottomSheet = !showBottomSheet }
     )
 }
 
@@ -132,7 +130,6 @@ fun PublicTrackDropDownMenu(
 fun PersonalTrackDropDownMenu(
     trackModel: TrackModel,
     onAddToQueue: () -> Unit,
-    onAddToPlaylist: () -> Unit,
     onRemoveTrack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -165,7 +162,6 @@ fun PersonalTrackDropDownMenu(
                 onClick = {
                     showBottomSheet = !showBottomSheet
                     expanded = !expanded
-                    onAddToPlaylist()
                 }
             )
             DropdownMenuItem(
@@ -179,12 +175,10 @@ fun PersonalTrackDropDownMenu(
         }
     }
     AddTrackToPlaylistModal(
-        trackModel,
-        showBottomSheet,
-        sheetState,
-        onDismiss = {
-            showBottomSheet = !showBottomSheet
-        }
+        track = trackModel,
+        showBottomSheet = showBottomSheet,
+        sheetState = sheetState,
+        onDismiss = { showBottomSheet = !showBottomSheet }
     )
 }
 
@@ -195,8 +189,6 @@ fun PersonalTrackDropDownMenu(
 @Composable
 fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -227,8 +219,6 @@ fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks
 @Composable
 fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier

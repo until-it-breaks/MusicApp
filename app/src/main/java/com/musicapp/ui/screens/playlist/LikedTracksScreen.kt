@@ -79,7 +79,6 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                             PersonalTrackDropDownMenu(
                                 trackModel = track,
                                 onAddToQueue = { viewModel.addToQueue(track) },
-                                onAddToPlaylist = { /*TODO*/ },
                                 onRemoveTrack = { viewModel.removeTrackFromLikedTracks(track.id) }
                             )
                         }

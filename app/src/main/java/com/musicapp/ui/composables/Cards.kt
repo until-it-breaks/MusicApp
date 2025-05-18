@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Explicit
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -181,16 +180,14 @@ fun TrackCard(
 fun AddTrackToPlaylistPlaylistCard(
     title: String,
     onClick: () -> Unit,
-    disabled: Boolean,
+    enabled: Boolean,
     showCheck: Boolean
 ) {
     Card(
         onClick = onClick,
+        enabled = enabled,
         modifier = Modifier.fillMaxWidth()
     ) {
-        if (disabled) {
-            Text("I'm disabled") // TODO improve
-        }
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -204,7 +201,7 @@ fun AddTrackToPlaylistPlaylistCard(
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.weight(1f))
-            if (showCheck) {
+            if (showCheck || !enabled) {
                 Icon(
                     imageVector = Icons.Outlined.Check,
                     contentDescription = "Forward",

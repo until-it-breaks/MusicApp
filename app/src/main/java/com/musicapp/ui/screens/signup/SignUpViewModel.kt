@@ -10,8 +10,6 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.musicapp.R
-import com.musicapp.data.database.LikedTracksPlaylist
-import com.musicapp.data.database.TrackHistory
 import com.musicapp.data.database.User
 import com.musicapp.data.repositories.PlaylistsRepository
 import com.musicapp.data.repositories.UsersRepository
