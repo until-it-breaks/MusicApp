@@ -3,8 +3,6 @@ package com.musicapp.ui.screens.album
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.musicapp.data.database.LikedTracksTrackCrossRef
-import com.musicapp.data.database.Track
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
 import com.musicapp.data.repositories.PlaylistsRepository
@@ -73,19 +71,12 @@ class AlbumViewModel(
         }
     }
 
-    fun addToLiked(trackModel: TrackModel) {
+    fun addToLiked(track: TrackModel) {
         viewModelScope.launch {
             val userId = auth.currentUser?.uid
             if (userId != null) {
                 withContext(Dispatchers.IO) {
-                    val track: Track? = tracksRepository.getTrackById(trackModel.id)
-                    if (track != null) {
-                        playlistsRepository.addTrackToLikedTracksPlaylist(LikedTracksTrackCrossRef(userId, trackModel.id))
-                    } else {
-                        val newTrack = Track(trackModel.id, trackModel.title, trackModel.duration, trackModel.releaseDate, trackModel.isExplicit)
-                        tracksRepository.upsertTrack(newTrack)
-                        playlistsRepository.addTrackToLikedTracksPlaylist(LikedTracksTrackCrossRef(userId, newTrack.trackId))
-                    }
+                    playlistsRepository.addTrackToLikedTracksPlaylist(userId, track)
                 }
             }
         }

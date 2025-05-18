@@ -40,7 +40,7 @@ fun SettingsScreen(navController: NavController) {
     var setting1 by remember { mutableStateOf(true) }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, stringResource(R.string.account_settings_screen_name)) }
+        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.account_settings_screen_name)) }
     ) { contentPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),

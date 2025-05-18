@@ -9,6 +9,7 @@ import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.repositories.PlaylistsRepository
 import com.musicapp.data.repositories.TracksRepository
 import com.musicapp.data.repositories.UsersRepository
+import com.musicapp.ui.screens.addtoplaylist.AddToPlaylistViewModel
 import com.musicapp.ui.screens.login.LoginViewModel
 import com.musicapp.ui.screens.album.AlbumViewModel
 import com.musicapp.ui.screens.artist.ArtistViewModel
@@ -18,6 +19,7 @@ import com.musicapp.ui.screens.library.LibraryViewModel
 import com.musicapp.ui.screens.playlist.PersonalPlaylistViewModel
 import com.musicapp.ui.screens.password.PasswordRecoveryViewModel
 import com.musicapp.ui.screens.playlist.LikedTracksViewModel
+import com.musicapp.ui.screens.playlist.TrackHistoryViewModel
 import com.musicapp.ui.screens.profile.ProfileScreenViewModel
 import com.musicapp.ui.screens.search.SearchViewModel
 import com.musicapp.ui.screens.signup.SignUpViewModel
@@ -45,10 +47,10 @@ val appModule = module {
 
     single {
         PlaylistsRepository(
+            get(),
             get<MusicAppDatabase>().playlistDAO(),
             get<MusicAppDatabase>().likedTracksDAO(),
-            get<MusicAppDatabase>().trackHistoryDAO(),
-            get<Context>().contentResolver
+            get<MusicAppDatabase>().trackHistoryDAO()
         )
     }
 
@@ -94,7 +96,7 @@ val appModule = module {
 
     viewModel { LibraryViewModel(get(), get()) }
 
-    viewModel { PersonalPlaylistViewModel() }
+    viewModel { PersonalPlaylistViewModel(get(), get()) }
 
     viewModel { LikedTracksViewModel(get(), get()) }
 

@@ -15,6 +15,8 @@ import com.musicapp.data.database.TrackHistory
 import com.musicapp.data.database.User
 import com.musicapp.data.repositories.PlaylistsRepository
 import com.musicapp.data.repositories.UsersRepository
+import com.musicapp.ui.models.LikedTracksPlaylistModel
+import com.musicapp.ui.models.TrackHistoryModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -105,8 +107,8 @@ class SignUpViewModel(
             val userId = auth.currentUser!!.uid
             val user = User(userId, username, auth.currentUser!!.email!!)
             usersRepository.upsertUser(user)
-            playlistsRepository.upsertTrackHistory(TrackHistory(userId, "Now"))
-            playlistsRepository.upsertLikedTracks(LikedTracksPlaylist(userId, "Now"))
+            playlistsRepository.upsertTrackHistory(TrackHistoryModel(userId, "Now"))
+            playlistsRepository.upsertLikedTracksPlaylist(LikedTracksPlaylistModel(userId, "Now"))
 
         } catch (e: Exception) {
             Log.e("SIGNUP", e.localizedMessage ?: "Unexpected error while trying to save username")

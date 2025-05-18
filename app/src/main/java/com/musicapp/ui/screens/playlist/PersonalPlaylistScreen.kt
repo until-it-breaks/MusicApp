@@ -20,21 +20,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.musicapp.data.database.Track
 import com.musicapp.ui.composables.PersonalTrackDropDownMenu
 import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.composables.UserPlaylistTopBar
-import com.musicapp.ui.models.TrackModel
 import org.koin.androidx.compose.koinViewModel
+import kotlin.collections.orEmpty
 
 @Composable
 fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
     val viewModel = koinViewModel<PersonalPlaylistViewModel>()
 
+    val playlist = viewModel.playlist.collectAsStateWithLifecycle()
+
+    /*
     LaunchedEffect(playlistId) {
         viewModel.loadPlaylistTracks(playlistId)
     }
+    */
 
     Scaffold(
         topBar = { UserPlaylistTopBar(
@@ -42,7 +46,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
             "Personal playlist",
             onAddTrack = {},
             onEditName = {},
-            onDeletePlaylist = { viewModel.deletePlaylist() })
+            onDeletePlaylist = { /*viewModel.deletePlaylist()*/ })
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
@@ -65,15 +69,24 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     Text("Playlist name")
                 }
             }
-            var songs = listOf("Song1", "Song2", "Song3")
-            items(songs) { song ->
+            /*
+            items(playlist.value?.tracks.orEmpty()) { track ->
                 TrackCard(
-                    TrackModel(1, song),
-                    onTrackClick = { /**/ },
-                    onArtistClick = { /**/ },
-                    extraMenu = { PersonalTrackDropDownMenu(TrackModel(1, song)) }
+                    track = track,
+                    showPicture = true,
+                    onTrackClick = { viewModel.playTrack(track) },
+                    onArtistClick = { /*TODO*/ },
+                    extraMenu = {
+                        PersonalTrackDropDownMenu(
+                            trackModel = track,
+                            onAddToQueue = { viewModel.addToQueue(track) },
+                            onAddToPlaylist = { /*TODO*/ },
+                            onRemoveTrack = { viewModel.removeTrackFromLikedTracks(track.id) }
+                        )
+                    }
                 )
             }
+             */
         }
     }
 }

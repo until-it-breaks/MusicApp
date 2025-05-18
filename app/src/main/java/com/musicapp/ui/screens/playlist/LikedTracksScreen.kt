@@ -10,7 +10,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -22,50 +24,84 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.LikedTracksPlaylistDropDownMenu
 import com.musicapp.ui.composables.PersonalTrackDropDownMenu
-import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun LikedTracksScreen(navController: NavController) {
+fun LikedTracksScreen(mainNavController: NavController, subNavController: NavController) {
     val viewModel = koinViewModel<LikedTracksViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val playlist = viewModel.playlist.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
-            TopBarWithBackButton(navController, "Liked tracks")
+            TopBarWithBackButton(
+                navController = subNavController,
+                action = { LikedTracksPlaylistDropDownMenu(onClearTracks = viewModel::clearLikedTracks) }
+            )
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier
-                .padding(contentPadding)
-                .padding(12.dp)
-        ) {
-            item {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Image,
-                        contentDescription = "Playlist image",
-                        modifier = Modifier.size(128.dp)
+        if (!uiState.showAuthError) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .padding(12.dp)
+            ) {
+                item {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Image,
+                            contentDescription = "Playlist image",
+                            modifier = Modifier.size(128.dp)
+                        )
+                        Text(
+                            text = "Liked tracks",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                }
+                items(playlist.value?.tracks.orEmpty()) { track ->
+                    TrackCard(
+                        track = track,
+                        showPicture = true,
+                        onTrackClick = { viewModel.playTrack(track) },
+                        onArtistClick = { /*TODO*/ },
+                        extraMenu = {
+                            PersonalTrackDropDownMenu(
+                                trackModel = track,
+                                onAddToQueue = { viewModel.addToQueue(track) },
+                                onAddToPlaylist = { /*TODO*/ },
+                                onRemoveTrack = { viewModel.removeTrackFromLikedTracks(track.id) }
+                            )
+                        }
                     )
-                    Text("Liked tracks")
                 }
             }
-            items(state.playlist?.tracks.orEmpty()) { track ->
-                TrackCard(
-                    track = track,
-                    showPicture = true,
-                    onTrackClick = { /**/ },
-                    onArtistClick = { /**/ },
-                    extraMenu = { PersonalTrackDropDownMenu(track) }
-                )
+        } else {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Failed to authenticate. Please login again")
+                Button(
+                    onClick = {
+                        mainNavController.navigate(MusicAppRoute.Login) {
+                            popUpTo(mainNavController.graph.id) { inclusive = true }
+                        }
+                    }
+                ) {
+                    Text("Go to login")
+                }
             }
         }
     }

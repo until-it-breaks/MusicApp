@@ -26,8 +26,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import com.musicapp.ui.models.TrackModel
+import com.musicapp.ui.screens.addtoplaylist.AddTrackToPlaylistModal
 
-/*TODO a lot*/
+/**
+ * Drop-down menu used for user playlists
+ */
 @Composable
 fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onDeletePlaylist: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
@@ -61,6 +64,9 @@ fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onD
     }
 }
 
+/**
+ * Drop-down menu used for tracks retrieved via deezer API
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PublicTrackDropDownMenu(
@@ -109,6 +115,7 @@ fun PublicTrackDropDownMenu(
         }
     }
     AddTrackToPlaylistModal(
+        trackModel,
         showBottomSheet,
         sheetState,
         onDismiss = {
@@ -117,10 +124,18 @@ fun PublicTrackDropDownMenu(
     )
 }
 
+/**
+ * Drop-down menu used for tracks that the user saves
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PersonalTrackDropDownMenu(trackModel: TrackModel, modifier: Modifier = Modifier) {
-
+fun PersonalTrackDropDownMenu(
+    trackModel: TrackModel,
+    onAddToQueue: () -> Unit,
+    onAddToPlaylist: () -> Unit,
+    onRemoveTrack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var expanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -141,6 +156,7 @@ fun PersonalTrackDropDownMenu(trackModel: TrackModel, modifier: Modifier = Modif
                 onClick = {
                     /*TODO call to the music player service */
                     expanded = !expanded
+                    onAddToQueue()
                 }
             )
             DropdownMenuItem(
@@ -149,20 +165,89 @@ fun PersonalTrackDropDownMenu(trackModel: TrackModel, modifier: Modifier = Modif
                 onClick = {
                     showBottomSheet = !showBottomSheet
                     expanded = !expanded
+                    onAddToPlaylist()
                 }
             )
             DropdownMenuItem(
                 text = { Text("Remove track") },
                 leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
-                onClick = { /*TODO*/ }
+                onClick = {
+                    expanded = !expanded
+                    onRemoveTrack()
+                }
             )
         }
     }
     AddTrackToPlaylistModal(
+        trackModel,
         showBottomSheet,
         sheetState,
         onDismiss = {
             showBottomSheet = !showBottomSheet
         }
     )
+}
+
+/**
+ * Drop-down menu for liked tracks playlist
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier
+    ) {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Clear Tracks") },
+                leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
+                onClick = {
+                    expanded = !expanded
+                    onClearTracks()
+                }
+            )
+        }
+    }
+}
+
+/**
+ * Drop-down menu for track history
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier
+    ) {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Clear Tracks") },
+                leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
+                onClick = {
+                    expanded = !expanded
+                    onClearTracks()
+                }
+            )
+        }
+    }
 }

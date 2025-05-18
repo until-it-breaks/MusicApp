@@ -5,7 +5,7 @@ import androidx.core.net.toUri
 import com.musicapp.data.remote.deezer.DeezerChartPlaylist
 import com.musicapp.data.remote.deezer.DeezerPlaylistDetailed
 
-data class PlaylistModel(
+data class PublicPlaylistModel(
     val id: Long,
     val title: String,
     val description: String? = null,
@@ -17,16 +17,16 @@ data class PlaylistModel(
     val tracks: List<TrackModel> = emptyList()
 )
 
-fun DeezerChartPlaylist.toModel(): PlaylistModel {
-    return PlaylistModel(
+fun DeezerChartPlaylist.toModel(): PublicPlaylistModel {
+    return PublicPlaylistModel(
         id = id,
         title = title,
         mediumPicture = this@toModel.mediumPicture.toUri()
     )
 }
 
-fun DeezerPlaylistDetailed.toModel(): PlaylistModel {
-    return PlaylistModel(
+fun DeezerPlaylistDetailed.toModel(): PublicPlaylistModel {
+    return PublicPlaylistModel(
         id = id,
         title = title,
         description = description,

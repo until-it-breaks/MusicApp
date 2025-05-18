@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.PlaylistsRepository
-import com.musicapp.ui.models.LikedTracksPlaylistModel
+import com.musicapp.ui.models.TrackHistoryModel
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,18 +20,21 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-data class LikedTracksState(val showAuthError: Boolean = false)
+data class TrackHistoryState(val showAuthError: Boolean = false)
 
-class LikedTracksViewModel(private val auth: FirebaseAuth, private val playlistsRepository: PlaylistsRepository): ViewModel() {
+class TrackHistoryViewModel(
+    private val auth: FirebaseAuth,
+    private val playlistsRepository: PlaylistsRepository
+): ViewModel() {
     private val _userId = MutableStateFlow(auth.currentUser?.uid)
-    private val _uiState = MutableStateFlow(LikedTracksState())
-    val uiState: StateFlow<LikedTracksState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(TrackHistoryState())
+    val uiState: StateFlow<TrackHistoryState> = _uiState.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val playlist: StateFlow<LikedTracksPlaylistModel?> = _userId
+    val playlist: StateFlow<TrackHistoryModel?> = _userId
         .filterNotNull()
         .flatMapLatest { userId ->
-            playlistsRepository.getLikedTracksWithTracks(userId)
+            playlistsRepository.getTrackHistoryWithTracks(userId)
         }
         .stateIn(
             scope = viewModelScope,
@@ -39,7 +42,7 @@ class LikedTracksViewModel(private val auth: FirebaseAuth, private val playlists
             initialValue = null
         )
 
-    fun clearLikedTracks() {
+    fun clearTrackHistory() {
         val userId = auth.currentUser?.uid
         if (userId == null) {
             _uiState.update { it.copy(showAuthError = true) }
@@ -50,15 +53,15 @@ class LikedTracksViewModel(private val auth: FirebaseAuth, private val playlists
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.clearLikedTracksPlaylist(userId)
+                    playlistsRepository.clearTrackHistory(userId)
                 }
             } catch (e: Exception) {
-                Log.e("LikedTracksViewModel", "Error clearing liked tracks: ${e.localizedMessage}", e)
+                Log.e("TrackHistoryViewModel", "Error clearing track history: ${e.localizedMessage}", e)
             }
         }
     }
 
-    fun removeTrackFromLikedTracks(trackId: Long) {
+    fun removeTrackFromTrackHistory(trackId: Long) {
         val userId = auth.currentUser?.uid
         if (userId == null) {
             _uiState.update { it.copy(showAuthError = true) }
@@ -69,10 +72,10 @@ class LikedTracksViewModel(private val auth: FirebaseAuth, private val playlists
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.removeTrackFromLikedTracksPlaylist(userId, trackId)
+                    playlistsRepository.removeTrackFromTrackHistory(userId, trackId)
                 }
             } catch (e: Exception) {
-                Log.e("LikedTracksViewModel", "Error removing track from liked tracks: ${e.localizedMessage}", e)
+                Log.e("TrackHistoryViewModel", "Error removing track from track history: ${e.localizedMessage}", e)
             }
         }
     }

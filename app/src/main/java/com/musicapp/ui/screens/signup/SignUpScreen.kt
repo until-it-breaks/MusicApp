@@ -68,7 +68,7 @@ fun SignUpScreen(navController: NavController) {
     val context = LocalContext.current
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, "") },
+        topBar = { TopBarWithBackButton(navController) },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { contentPadding ->
         Column(
