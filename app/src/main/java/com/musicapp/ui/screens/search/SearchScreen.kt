@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,10 +23,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -34,50 +32,95 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.composables.MainTopBar
+import com.musicapp.ui.composables.TrackCard
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SearchScreen(mainNavController: NavController, subNavController: NavController) {
-    val genres = (1..8).map { "Genre #$it" } // TODO replace with actual content
-    var searchText by remember { mutableStateOf("") }
+fun SearchScreen(
+    mainNavController: NavController,
+    subNavController: NavController,
+) {
+    val searchViewModel: SearchViewModel = koinViewModel()
+    val uiState by searchViewModel.uiState.collectAsState()
+
 
     Scaffold(
         topBar = { MainTopBar(mainNavController, "Search") },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(contentPadding).padding(12.dp)
+            modifier = Modifier
+                .padding(contentPadding)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // TODO consider swapping for a pre-made search composable
+            // Search TextField
             OutlinedTextField(
-                value = searchText,
-                onValueChange = { searchText = it },
+                value = uiState.searchText,
+                onValueChange = searchViewModel::onSearchTextChange,
                 placeholder = { Text(stringResource(R.string.what_to_play)) },
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Outlined.Search, stringResource(R.string.search_description))
+                    IconButton(onClick = searchViewModel::performSearch) {
+                        Icon(
+                            Icons.Outlined.Search,
+                            stringResource(R.string.search_description)
+                        )
                     }
                 }
             )
-            Text(
-                text = stringResource(R.string.discover_new_things),
-                style = MaterialTheme.typography.titleLarge
-            )
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(genres) { genre ->
-                    GenreItem(
-                        genre,
-                        onClick = { /*TODO*/ }
+
+            when {
+                uiState.isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(16.dp)
                     )
+                }
+
+                uiState.error != null -> {
+                    Text(
+                        text = uiState.error!!,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+
+
+                uiState.searchResults.isNotEmpty() -> {
+                    LazyColumn {
+                        item {
+                            Text(
+                                text = "${stringResource(R.string.search_results)} '${uiState.searchText}'",
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        items(uiState.searchResults) { track ->
+                            TrackCard(
+                                track = track,
+                                onTrackClick = { /*TODO*/ },
+                                onArtistClick = { /*TODO*/ },
+                                extraMenu = {}
+                            )
+
+
+                        }
+
+                    }
+                }
+
+
+                else -> {
+                    Text(
+                        text = stringResource(R.string.discover_new_things),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+
                 }
             }
         }
-
     }
 }
 
@@ -93,7 +136,7 @@ fun GenreItem(title: String, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector =  Icons.Outlined.Image,
+                imageVector = Icons.Outlined.Image,
                 contentDescription = "Genre picture",
                 modifier = Modifier.size(72.dp)
             )

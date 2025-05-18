@@ -55,4 +55,6 @@
     <string name="album_picture_description">Album picture</string>
     <string name="artist_details">Artist details</string>
     <string name="playlist_details">Playlist details</string>
+    <string name="search_result">Search result for:</string>
+    <string name="search_results">Search result for:</string>
 </resources>

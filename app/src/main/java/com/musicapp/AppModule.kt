@@ -19,6 +19,7 @@ import com.musicapp.ui.screens.playlist.PersonalPlaylistViewModel
 import com.musicapp.ui.screens.password.PasswordRecoveryViewModel
 import com.musicapp.ui.screens.playlist.LikedTracksViewModel
 import com.musicapp.ui.screens.profile.ProfileScreenViewModel
+import com.musicapp.ui.screens.search.SearchViewModel
 import com.musicapp.ui.screens.signup.SignUpViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -96,4 +97,6 @@ val appModule = module {
     viewModel { PersonalPlaylistViewModel() }
 
     viewModel { LikedTracksViewModel(get(), get()) }
+
+    viewModel { SearchViewModel(get()) }
 }

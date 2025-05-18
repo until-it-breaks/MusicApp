@@ -83,4 +83,15 @@ class DeezerDataSource(private val httpClient: HttpClient) {
             emptyList()
         }
     }
+
+    suspend fun getSearchTracks(track: String, limit: Int = 25): List<DeezerChartTrack> {
+        val url = "$BASE_URL/search?q=track:\"${track}\"&limit=$limit"
+        val responseBody: JsonObject = httpClient.get(url).body()
+        val dataElement = responseBody["data"]
+        return if (dataElement != null) {
+            json.decodeFromJsonElement(ListSerializer(DeezerChartTrack.serializer()), dataElement)
+        } else {
+            emptyList()
+        }
+    }
 }
