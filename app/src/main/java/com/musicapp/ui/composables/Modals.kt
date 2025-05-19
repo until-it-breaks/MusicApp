@@ -1,6 +1,7 @@
 package com.musicapp.ui.composables
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -32,7 +33,8 @@ fun PlaylistCreationModal(
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,
-            sheetState = sheetState
+            sheetState = sheetState,
+            dragHandle = null
         ) {
             Scaffold(
                 topBar = {
@@ -43,6 +45,7 @@ fun PlaylistCreationModal(
                                 Text("Cancel")
                             }
                         },
+                        windowInsets = WindowInsets(0),
                         actions = {
                             TextButton(
                                 onClick = {

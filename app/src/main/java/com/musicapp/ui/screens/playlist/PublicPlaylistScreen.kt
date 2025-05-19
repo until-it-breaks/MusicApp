@@ -94,6 +94,7 @@ fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
             items(state.tracks) { track ->
                 TrackCard(
                     track = track,
+                    showPicture = true,
                     onTrackClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
