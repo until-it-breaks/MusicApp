@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import com.musicapp.ui.composables.PersonalTrackDropDownMenu
 import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.composables.UserPlaylistTopBar
+import com.musicapp.util.convertMillisToDateWithHourAndMinutes
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -66,6 +67,10 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                         modifier = Modifier.size(128.dp)
                     )
                     Text(playlist.value?.name ?: "Unknown playlist")
+                    val timeInMillis = playlist.value?.lastEditTime
+                    timeInMillis?.let {
+                        Text("Last edited: ${convertMillisToDateWithHourAndMinutes(it)}")
+                    }
                 }
             }
             items(playlist.value?.tracks.orEmpty()) { track ->

@@ -3,7 +3,8 @@ package com.musicapp.ui.screens.playlist
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.data.repositories.TrackHistoryRepository
+import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.UserPlaylistModel
 import kotlinx.coroutines.Dispatchers
@@ -17,14 +18,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class PersonalPlaylistViewModel(private val playlistsRepository: PlaylistsRepository): ViewModel() {
+class PersonalPlaylistViewModel(private val userPlaylistRepository: UserPlaylistRepository): ViewModel() {
     private val _selectedPlaylistId = MutableStateFlow<String?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val playlist: StateFlow<UserPlaylistModel?> = _selectedPlaylistId
         .filterNotNull()
         .flatMapLatest { playlistId ->
-            playlistsRepository.getUserPlaylistWithTracks(playlistId)
+            userPlaylistRepository.getUserPlaylistWithTracks(playlistId)
         }
         .stateIn(
             scope = viewModelScope,
@@ -41,7 +42,7 @@ class PersonalPlaylistViewModel(private val playlistsRepository: PlaylistsReposi
             val playlistId = _selectedPlaylistId.value
             playlistId?.let {
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.clearPlaylist(it) // Find way to delete it and navigate away
+                    userPlaylistRepository.clearPlaylist(it) // Find way to delete it and navigate away
                 }
             }
         }
@@ -53,7 +54,7 @@ class PersonalPlaylistViewModel(private val playlistsRepository: PlaylistsReposi
             playlistId?.let {
                 try {
                     withContext(Dispatchers.IO) {
-                        playlistsRepository.removeTrackFromPlaylist(it, trackId)
+                        userPlaylistRepository.removeTrackFromPlaylist(it, trackId)
                     }
                 } catch (e: Exception) {
                     Log.e("LikedTracksViewModel", "Error removing track from liked tracks: ${e.localizedMessage}", e)

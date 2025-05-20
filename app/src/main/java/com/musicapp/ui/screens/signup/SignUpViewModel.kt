@@ -10,11 +10,13 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.musicapp.R
-import com.musicapp.data.database.User
-import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.data.repositories.TrackHistoryRepository
+import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.data.repositories.UsersRepository
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackHistoryModel
+import com.musicapp.ui.models.UserModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,7 +40,8 @@ class SignUpViewModel(
         private val auth: FirebaseAuth,
         private val store: FirebaseFirestore,
         private val usersRepository: UsersRepository,
-        private val playlistsRepository: PlaylistsRepository
+        private val likedTracksRepository: LikedTracksRepository,
+        private val trackHistoryRepository: TrackHistoryRepository
     ): ViewModel() {
 
     private val _state = MutableStateFlow(SignUpState())
@@ -102,12 +105,14 @@ class SignUpViewModel(
             )
             userDocument.set(userData).await()
 
-            val userId = auth.currentUser!!.uid
-            val user = User(userId, username, auth.currentUser!!.email!!)
-            usersRepository.upsertUser(user)
-            playlistsRepository.upsertTrackHistory(TrackHistoryModel(userId, "Now"))
-            playlistsRepository.upsertLikedTracksPlaylist(LikedTracksPlaylistModel(userId, "Now"))
-
+            val userId = auth.currentUser?.uid
+            val userEmail = auth.currentUser?.email
+            if (userId != null && userEmail != null) {
+                val user = UserModel(userId, username, userEmail)
+                usersRepository.upsertUser(user)
+                trackHistoryRepository.upsertTrackHistory(TrackHistoryModel(userId, System.currentTimeMillis()))
+                likedTracksRepository.upsertLikedTracksPlaylist(LikedTracksPlaylistModel(userId, System.currentTimeMillis()))
+            }
         } catch (e: Exception) {
             Log.e("SIGNUP", e.localizedMessage ?: "Unexpected error while trying to save username")
             throw e

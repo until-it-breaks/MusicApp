@@ -5,7 +5,7 @@ import com.musicapp.data.database.User
 data class UserModel(
     val userId: String,
     val username: String,
-    val email: String,
+    val email: String
 )
 
 fun User.toModel(): UserModel {
@@ -13,5 +13,14 @@ fun User.toModel(): UserModel {
         userId = userId,
         username = username,
         email = email
+    )
+}
+
+fun UserModel.toDbEntity(): User {
+    return User(
+        userId = userId,
+        username = username,
+        email = email,
+        lastEditTime = System.currentTimeMillis()
     )
 }

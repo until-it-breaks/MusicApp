@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
-import com.musicapp.data.repositories.PlaylistsRepository
-import com.musicapp.data.repositories.TracksRepository
+import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
@@ -29,7 +29,7 @@ data class PublicPlaylistState(
 class PublicPlaylistViewModel(
     private val deezerDataSource: DeezerDataSource,
     private val auth: FirebaseAuth,
-    private val playlistsRepository: PlaylistsRepository,
+    private val likedTracksRepository: LikedTracksRepository,
 ): ViewModel() {
     private val _state = MutableStateFlow(PublicPlaylistState())
     val state: StateFlow<PublicPlaylistState> = _state.asStateFlow()
@@ -75,7 +75,7 @@ class PublicPlaylistViewModel(
             val userId = auth.currentUser?.uid
             if (userId != null) {
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.addTrackToLikedTracksPlaylist(userId, track)
+                    likedTracksRepository.addTrackToLikedTracksPlaylist(userId, track)
                 }
             }
         }

@@ -29,6 +29,7 @@ import com.musicapp.ui.composables.PersonalTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.composables.TrackHistoryDropDownMenu
+import com.musicapp.util.convertMillisToDateWithHourAndMinutes
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -67,6 +68,10 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                             text = "Track history",
                             style = MaterialTheme.typography.titleLarge
                         )
+                        val timeInMillis = playlist.value?.lastEditTime
+                        timeInMillis?.let {
+                            Text("Last edited: ${convertMillisToDateWithHourAndMinutes(it)}")
+                        }
                     }
                 }
                 items(playlist.value?.tracks.orEmpty()) { track ->

@@ -1,45 +1,68 @@
 package com.musicapp.data.database
 
-import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import java.util.UUID
 
 @Entity
 data class Track(
     @PrimaryKey
     val trackId: Long,
-    @ColumnInfo
     val title: String,
-    @ColumnInfo
     val duration: Long?,
-    @ColumnInfo
     val releaseDate: String?,
-    @ColumnInfo
-    val isExplicit: Boolean?
+    val isExplicit: Boolean?,
+    val previewUri: String?,
+    val storedPreviewUri: String?,
+    val smallPictureUri: String?,
+    val mediumPictureUri: String?,
+    val bigPictureUri: String?
+)
+
+@Entity
+data class Artist(
+    @PrimaryKey
+    val artistId: Long,
+    val name: String,
+    val smallPictureUri: String?,
+    val mediumPictureUri: String?,
+    val bigPictureUri: String?
+)
+
+@Entity(primaryKeys = ["trackId", "artistId"])
+data class TrackArtistCrossRef(
+    val trackId: Long,
+    val artistId: Long
+)
+
+data class TrackWithArtists(
+    @Embedded val track: Track,
+    @Relation(
+        parentColumn = "trackId",
+        entityColumn = "artistId",
+        associateBy = Junction(TrackArtistCrossRef::class)
+    )
+    val tracks: List<Artist>
 )
 
 @Entity
 data class User(
     @PrimaryKey
     val userId: String,
-    @ColumnInfo
     val username: String,
-    @ColumnInfo
-    val email: String
+    val email: String,
+    val lastEditTime: Long
 )
 
-@Entity()
+@Entity
 data class Playlist(
     @PrimaryKey()
-    val playlistId: String = UUID.randomUUID().toString(), // Should be better than a combined primary key, avoids offline to online synchronization issues across multiple devices.
-    @ColumnInfo
+    val playlistId: String,
     val ownerId: String,
-    @ColumnInfo
     val name: String,
+    val lastEditTime: Long
 )
 
 @Entity(primaryKeys = ["playlistId", "trackId"])
@@ -62,8 +85,7 @@ data class PlaylistWithTracks(
 data class LikedTracksPlaylist(
     @PrimaryKey
     val ownerId: String,
-    @ColumnInfo
-    val lastUpdateTime: String
+    val lastEditTime: Long
 )
 
 @Entity(primaryKeys = ["ownerId", "trackId"])
@@ -86,8 +108,7 @@ data class LikedTracksPlaylistWithTracks(
 data class TrackHistory(
     @PrimaryKey
     val ownerId: String,
-    @ColumnInfo
-    val lastUpdateTime: String
+    val lastEditTime: Long
 )
 
 @Entity(primaryKeys = ["ownerId", "trackId"])

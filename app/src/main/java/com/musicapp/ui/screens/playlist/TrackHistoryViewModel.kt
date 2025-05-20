@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.ui.models.TrackHistoryModel
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +24,7 @@ data class TrackHistoryState(val showAuthError: Boolean = false)
 
 class TrackHistoryViewModel(
     private val auth: FirebaseAuth,
-    private val playlistsRepository: PlaylistsRepository
+    private val playlistsRepository: TrackHistoryRepository
 ): ViewModel() {
     private val _userId = MutableStateFlow(auth.currentUser?.uid)
     private val _uiState = MutableStateFlow(TrackHistoryState())

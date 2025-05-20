@@ -1,24 +1,25 @@
 package com.musicapp
 
-import android.content.Context
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.musicapp.data.database.MusicAppDatabase
 import com.musicapp.data.remote.deezer.DeezerDataSource
-import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.data.repositories.TracksRepository
+import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.data.repositories.UsersRepository
 import com.musicapp.ui.screens.addtoplaylist.AddToPlaylistViewModel
-import com.musicapp.ui.screens.login.LoginViewModel
 import com.musicapp.ui.screens.album.AlbumViewModel
 import com.musicapp.ui.screens.artist.ArtistViewModel
-import com.musicapp.ui.screens.playlist.PublicPlaylistViewModel
 import com.musicapp.ui.screens.home.HomeViewModel
 import com.musicapp.ui.screens.library.LibraryViewModel
-import com.musicapp.ui.screens.playlist.PersonalPlaylistViewModel
+import com.musicapp.ui.screens.login.LoginViewModel
 import com.musicapp.ui.screens.password.PasswordRecoveryViewModel
 import com.musicapp.ui.screens.playlist.LikedTracksViewModel
+import com.musicapp.ui.screens.playlist.PersonalPlaylistViewModel
+import com.musicapp.ui.screens.playlist.PublicPlaylistViewModel
 import com.musicapp.ui.screens.playlist.TrackHistoryViewModel
 import com.musicapp.ui.screens.profile.ProfileScreenViewModel
 import com.musicapp.ui.screens.signup.SignUpViewModel
@@ -45,20 +46,32 @@ val appModule = module {
     }
 
     single {
-        PlaylistsRepository(
-            get(),
+        UserPlaylistRepository(
             get<MusicAppDatabase>().playlistDAO(),
+            get()
+        )
+    }
+
+    single {
+        LikedTracksRepository(
             get<MusicAppDatabase>().likedTracksDAO(),
+            get()
+        )
+    }
+
+    single {
+        TrackHistoryRepository(
+            get(),
             get<MusicAppDatabase>().trackHistoryDAO()
         )
     }
 
     single {
-        TracksRepository(get<MusicAppDatabase>().trackDAO(), get<Context>().contentResolver)
+        TracksRepository(get<MusicAppDatabase>().trackDAO())
     }
 
     single {
-        UsersRepository(get<MusicAppDatabase>().userDAO(), get<Context>().contentResolver)
+        UsersRepository(get<MusicAppDatabase>().userDAO(),)
     }
 
     single {
@@ -75,7 +88,7 @@ val appModule = module {
 
     single { DeezerDataSource(get()) }
 
-    viewModel { SignUpViewModel(get(), get(), get(), get()) }
+    viewModel { SignUpViewModel(get(), get(), get(), get(), get()) }
 
     viewModel { LoginViewModel(get()) }
 
@@ -93,7 +106,7 @@ val appModule = module {
 
     viewModel { ArtistViewModel(get()) }
 
-    viewModel { LibraryViewModel(get(), get()) }
+    viewModel { LibraryViewModel(get(), get(), get(), get()) }
 
     viewModel { PersonalPlaylistViewModel(get()) }
 
@@ -101,5 +114,5 @@ val appModule = module {
 
     viewModel { TrackHistoryViewModel(get(), get()) }
 
-    viewModel { AddToPlaylistViewModel(get(), get()) }
+    viewModel { AddToPlaylistViewModel(get(), get(), get()) }
 }

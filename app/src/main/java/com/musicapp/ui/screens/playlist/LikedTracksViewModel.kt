@@ -4,7 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,7 @@ import kotlinx.coroutines.withContext
 
 data class LikedTracksState(val showAuthError: Boolean = false)
 
-class LikedTracksViewModel(private val auth: FirebaseAuth, private val playlistsRepository: PlaylistsRepository): ViewModel() {
+class LikedTracksViewModel(private val auth: FirebaseAuth, private val likedTracksRepository: LikedTracksRepository): ViewModel() {
     private val _userId = MutableStateFlow(auth.currentUser?.uid)
     private val _uiState = MutableStateFlow(LikedTracksState())
     val uiState: StateFlow<LikedTracksState> = _uiState.asStateFlow()
@@ -31,7 +32,7 @@ class LikedTracksViewModel(private val auth: FirebaseAuth, private val playlists
     val playlist: StateFlow<LikedTracksPlaylistModel?> = _userId
         .filterNotNull()
         .flatMapLatest { userId ->
-            playlistsRepository.getLikedTracksWithTracks(userId)
+            likedTracksRepository.getLikedTracksWithTracks(userId)
         }
         .stateIn(
             scope = viewModelScope,
@@ -50,7 +51,7 @@ class LikedTracksViewModel(private val auth: FirebaseAuth, private val playlists
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.clearLikedTracksPlaylist(userId)
+                    likedTracksRepository.clearLikedTracksPlaylist(userId)
                 }
             } catch (e: Exception) {
                 Log.e("LikedTracksViewModel", "Error clearing liked tracks: ${e.localizedMessage}", e)
@@ -69,7 +70,7 @@ class LikedTracksViewModel(private val auth: FirebaseAuth, private val playlists
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.removeTrackFromLikedTracksPlaylist(userId, trackId)
+                    likedTracksRepository.removeTrackFromLikedTracksPlaylist(userId, trackId)
                 }
             } catch (e: Exception) {
                 Log.e("LikedTracksViewModel", "Error removing track from liked tracks: ${e.localizedMessage}", e)

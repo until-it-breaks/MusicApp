@@ -4,7 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.UserPlaylistModel
@@ -25,7 +26,8 @@ data class AddToPlaylistUiState(
 )
 
 class AddToPlaylistViewModel(
-    private val playlistsRepository: PlaylistsRepository,
+    private val likedTracksRepository: LikedTracksRepository,
+    private val userPlaylistRepository: UserPlaylistRepository,
     private val auth: FirebaseAuth
 ): ViewModel() {
     private val _uiState = MutableStateFlow(AddToPlaylistUiState())
@@ -44,8 +46,8 @@ class AddToPlaylistViewModel(
         viewModelScope.launch {
             try {
                 val (likedTracksPlaylist, playlists) = withContext(Dispatchers.IO) {
-                    val likedTracksPlaylist = async { playlistsRepository.getLikedTracksWithTracks(userId)}
-                    val playlists = async { playlistsRepository.getUserPlaylistsWithTracks(userId) }
+                    val likedTracksPlaylist = async { likedTracksRepository.getLikedTracksWithTracks(userId)}
+                    val playlists = async { userPlaylistRepository.getUserPlaylistsWithTracks(userId) }
                     Pair(likedTracksPlaylist.await(), playlists.await())
                 }
                 _uiState.update {
@@ -67,7 +69,7 @@ class AddToPlaylistViewModel(
                 _uiState.update { it.copy(showAuthError = true) }
             } else {
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.addTrackToLikedTracksPlaylist(userId, track)
+                    likedTracksRepository.addTrackToLikedTracksPlaylist(userId, track)
                 }
             }
         }
@@ -79,7 +81,7 @@ class AddToPlaylistViewModel(
             _uiState.update { it.copy(showAuthError = true) }
             return true
         } else {
-            return playlistsRepository.isTrackInLikedTracks(userId, track)
+            return likedTracksRepository.isTrackInLikedTracks(userId, track)
         }
     }
 
@@ -89,7 +91,7 @@ class AddToPlaylistViewModel(
             _uiState.update { it.copy(showAuthError = true) }
             return true
         } else {
-            return playlistsRepository.isTrackInPlaylist(playlistId, track)
+            return userPlaylistRepository.isTrackInPlaylist(playlistId, track)
         }
     }
 
@@ -101,7 +103,7 @@ class AddToPlaylistViewModel(
             } else {
                 for (playlistId in playlistIds) {
                     withContext(Dispatchers.IO) {
-                        playlistsRepository.addTrackToPlaylist(playlistId, track)
+                        userPlaylistRepository.addTrackToPlaylist(playlistId, track)
                     }
                 }
             }

@@ -7,6 +7,8 @@ import androidx.room.RoomDatabase
     entities = [
         User::class,
         Track::class,
+        Artist::class,
+        TrackArtistCrossRef::class,
         Playlist::class,
         PlaylistTrackCrossRef::class,
         LikedTracksPlaylist::class,

@@ -133,7 +133,7 @@ fun TrackCard(
             modifier = Modifier.padding(8.dp)
         ) {
             if (showPicture) {
-                LoadableImage(track.album?.mediumCover, "Track picture", modifier = Modifier.size(48.dp))
+                LoadableImage(track.mediumPicture, "Track picture", modifier = Modifier.size(48.dp))
             }
             Column(
                 modifier = Modifier.weight(1f)

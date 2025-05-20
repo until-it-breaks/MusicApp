@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DeezerChartTrack(
+data class DeezerAlbumTrack(
     @SerialName("id")
     val id: Long,
     @SerialName("title")

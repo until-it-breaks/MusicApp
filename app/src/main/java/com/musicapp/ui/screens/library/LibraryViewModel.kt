@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.data.repositories.TrackHistoryRepository
+import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackHistoryModel
 import com.musicapp.ui.models.UserPlaylistModel
@@ -31,7 +33,9 @@ data class LibraryUiState(
 )
 
 class LibraryViewModel(
-    private val playlistsRepository: PlaylistsRepository,
+    private val userPlaylistRepository: UserPlaylistRepository,
+    private val likedTracksRepository: LikedTracksRepository,
+    private val trackHistoryRepository: TrackHistoryRepository,
     private val auth: FirebaseAuth
 ): ViewModel() {
     private val _userId = MutableStateFlow<String?>(auth.currentUser?.uid)
@@ -43,7 +47,7 @@ class LibraryViewModel(
     val playlists: StateFlow<List<UserPlaylistModel>> = _userId
         .filterNotNull()
         .flatMapLatest { userId ->
-            playlistsRepository.getUserPlaylistsWithTracks(userId)
+            userPlaylistRepository.getUserPlaylistsWithTracks(userId)
         }
         .stateIn(
             scope = viewModelScope,
@@ -66,8 +70,8 @@ class LibraryViewModel(
         viewModelScope.launch {
             try {
                 val (trackHistory, likedTracksPlaylist) = withContext(Dispatchers.IO) {
-                    val trackHistory = async { playlistsRepository.getTrackHistoryWithTracks(userId) }
-                    val likedTracksPlaylist = async { playlistsRepository.getLikedTracksWithTracks(userId)}
+                    val trackHistory = async { trackHistoryRepository.getTrackHistoryWithTracks(userId) }
+                    val likedTracksPlaylist = async { likedTracksRepository.getLikedTracksWithTracks(userId)}
                     Pair(trackHistory.await(), likedTracksPlaylist.await())
                 }
                 _uiState.update {
@@ -93,10 +97,11 @@ class LibraryViewModel(
                 val playlist = UserPlaylistModel(
                     name = name,
                     ownerId = userId,
-                    id = UUID.randomUUID().toString()
+                    id = UUID.randomUUID().toString(),
+                    lastEditTime = System.currentTimeMillis()
                 )
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.upsertPlaylist(playlist)
+                    userPlaylistRepository.upsertPlaylist(playlist)
                 }
             } catch (e: Exception) {
                 Log.e("LibraryViewModel", "Error creating playlist: ${e.localizedMessage}", e)

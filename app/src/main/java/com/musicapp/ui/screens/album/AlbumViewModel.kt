@@ -5,7 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
-import com.musicapp.data.repositories.PlaylistsRepository
+import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.ui.models.AlbumModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
@@ -27,7 +28,7 @@ data class AlbumState(
 
 class AlbumViewModel(
     private val deezerDataSource: DeezerDataSource,
-    private val playlistsRepository: PlaylistsRepository,
+    private val likedTracksRepository: LikedTracksRepository,
     private val auth: FirebaseAuth
 ): ViewModel() {
     private val _state = MutableStateFlow(AlbumState())
@@ -74,7 +75,7 @@ class AlbumViewModel(
             val userId = auth.currentUser?.uid
             if (userId != null) {
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.addTrackToLikedTracksPlaylist(userId, track)
+                    likedTracksRepository.addTrackToLikedTracksPlaylist(userId, track)
                 }
             }
         }

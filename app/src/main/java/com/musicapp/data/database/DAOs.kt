@@ -2,7 +2,6 @@ package com.musicapp.data.database
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
@@ -10,10 +9,19 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TracksDAO {
     @Query("SELECT * FROM track WHERE track.trackId = :trackId")
-    fun getTrackById(trackId: Long): Track?
+    fun getTrackById(trackId: Long): TrackWithArtists?
 
     @Upsert
     suspend fun upsertTrack(track: Track)
+
+    @Query("SELECT a.* FROM Artist AS a, TrackArtistCrossRef AS t WHERE a.artistId = t.artistId AND t.trackId = :trackId")
+    suspend fun getTrackArtists(trackId: Long): List<Artist>
+
+    @Upsert
+    suspend fun upsertArtist(artist: Artist)
+
+    @Upsert
+    suspend fun addArtistToTrack(crossRef: TrackArtistCrossRef)
 
     @Delete
     suspend fun deleteTrack(track: Track)
@@ -54,8 +62,11 @@ interface UserPlaylistDAO {
     /**
      * Adds a track to a playlist
      */
-    @Insert
+    @Upsert
     suspend fun addTrackToPlaylist(crossRef: PlaylistTrackCrossRef)
+
+    @Query("UPDATE playlist SET lastEditTime = :lastEditTime WHERE playlistId = :playlistId")
+    suspend fun updateEditTime(playlistId: String, lastEditTime: Long = System.currentTimeMillis())
 
     /**
      * Deletes a single track from a playlist
@@ -96,8 +107,11 @@ interface LikedTracksDAO {
     /**
      * Adds a track to the user's liked tracks playlist.
      */
-    @Insert
+    @Upsert
     suspend fun addTrackToLikedTracksPlaylist(crossRef: LikedTracksPlaylistTrackCrossRef)
+
+    @Query("UPDATE likedtracksplaylist SET lastEditTime = :lastEditTime WHERE ownerId = :playlistId")
+    suspend fun updateEditTime(playlistId: String, lastEditTime: Long = System.currentTimeMillis())
 
     /**
      * Deletes a single track from a user's liked tracks playlist
@@ -129,8 +143,11 @@ interface TrackHistoryDAO {
     /**
      * Adds a track to the user's track history.
      */
-    @Insert
+    @Upsert
     suspend fun addTrackToTrackHistory(crossRef: TrackHistoryTrackCrossRef)
+
+    @Query("UPDATE trackhistory SET lastEditTime = :lastEditTime WHERE ownerId = :playlistId")
+    suspend fun updateEditTime(playlistId: String, lastEditTime: Long = System.currentTimeMillis())
 
     /**
      * Deletes a single track from a user's track history.

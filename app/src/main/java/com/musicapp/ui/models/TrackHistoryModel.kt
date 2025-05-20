@@ -5,21 +5,21 @@ import com.musicapp.data.database.TrackHistoryWithTracks
 
 data class TrackHistoryModel(
     val ownerId: String,
-    val lastUpdateTime: String,
+    val lastEditTime: Long,
     val tracks: List<TrackModel> = emptyList()
 )
 
 fun TrackHistory.toModel(): TrackHistoryModel {
     return TrackHistoryModel(
         ownerId = ownerId,
-        lastUpdateTime = lastUpdateTime
+        lastEditTime = this@toModel.lastEditTime
     )
 }
 
 fun TrackHistoryWithTracks.toModel(): TrackHistoryModel {
     return TrackHistoryModel(
         ownerId = playlist.ownerId,
-        lastUpdateTime = playlist.lastUpdateTime,
+        lastEditTime = playlist.lastEditTime,
         tracks = tracks.map { it.toModel() }
     )
 }
