@@ -2,12 +2,25 @@ package com.musicapp.data.repositories
 
 import com.musicapp.data.database.Playlist
 import com.musicapp.data.database.PlaylistTrackCrossRef
+import com.musicapp.data.database.Track
 import com.musicapp.data.database.UserPlaylistDAO
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.UserPlaylistModel
-import com.musicapp.ui.models.toModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+
+data class PlaylistWithTracks(
+    val playlist: Playlist,
+    val tracks: List<Track>
+)
+
+data class PlaylistWithTracksAndArtists(
+    val playlist: Playlist,
+    val tracks: List<TrackWithArtists>
+)
 
 /**
  *  Repository for normal playlists
@@ -16,13 +29,41 @@ class UserPlaylistRepository(
     private val playlistDAO: UserPlaylistDAO,
     private val trackRepository: TracksRepository
 ) {
-    fun getUserPlaylistsWithTracks(userId: String): Flow<List<UserPlaylistModel>> {
-        return playlistDAO.getPlaylistsWithTracks(userId).map { it.map { it.toModel() } }
+    fun getPlaylists(playlistId: String): Flow<List<Playlist>> {
+        return playlistDAO.getPlaylists(playlistId)
     }
 
-    fun getUserPlaylistWithTracks(playlistId: String): Flow<UserPlaylistModel> {
-        return playlistDAO.getPlaylistWithTracks(playlistId).map {
-            it.toModel()
+    fun getPlaylistWithTracksFlow(playlistId: String): Flow<PlaylistWithTracks> {
+        val playlistFlow = playlistDAO.getPlaylist(playlistId)
+        val tracksFlow = playlistDAO.getTracksOfPlaylist(playlistId)
+
+        return combine(playlistFlow, tracksFlow) { playlist, tracks ->
+            PlaylistWithTracks(playlist, tracks)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getPlaylistWithTracksAndArtists(playlistId: String): Flow<PlaylistWithTracksAndArtists> {
+        val playlistFlow = playlistDAO.getPlaylist(playlistId)
+        val tracksFlow = playlistDAO.getTracksOfPlaylist(playlistId)
+
+        return combine(playlistFlow, tracksFlow) { playlist, tracks ->
+            playlist to tracks
+        }.flatMapLatest { (playlist, tracks) ->
+            val trackWithArtistFlows = tracks.map { track ->
+                trackRepository.getTrackWithArtists(track.trackId)
+            }
+
+            if (trackWithArtistFlows.isEmpty()) {
+                flowOf(PlaylistWithTracksAndArtists(playlist, emptyList()))
+            } else {
+                combine(trackWithArtistFlows) { trackWithArtistsArray ->
+                    PlaylistWithTracksAndArtists(
+                        playlist = playlist,
+                        tracks = trackWithArtistsArray.toList()
+                    )
+                }
+            }
         }
     }
 

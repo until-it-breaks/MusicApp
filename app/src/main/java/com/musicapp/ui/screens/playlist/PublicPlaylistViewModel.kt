@@ -6,7 +6,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
 import com.musicapp.data.repositories.LikedTracksRepository
-import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel

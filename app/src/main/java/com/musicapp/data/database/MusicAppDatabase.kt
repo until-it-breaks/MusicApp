@@ -11,8 +11,8 @@ import androidx.room.RoomDatabase
         TrackArtistCrossRef::class,
         Playlist::class,
         PlaylistTrackCrossRef::class,
-        LikedTracksPlaylist::class,
-        LikedTracksPlaylistTrackCrossRef::class,
+        LikedPlaylist::class,
+        LikedPlaylistTrackCrossRef::class,
         TrackHistory::class,
         TrackHistoryTrackCrossRef::class
     ],
@@ -21,6 +21,6 @@ abstract class MusicAppDatabase: RoomDatabase() {
     abstract fun userDAO(): UsersDAO
     abstract fun playlistDAO(): UserPlaylistDAO
     abstract fun trackDAO(): TracksDAO
-    abstract fun likedTracksDAO(): LikedTracksDAO
+    abstract fun likedTracksDAO(): LikedPlaylistDAO
     abstract fun trackHistoryDAO(): TrackHistoryDAO
 }

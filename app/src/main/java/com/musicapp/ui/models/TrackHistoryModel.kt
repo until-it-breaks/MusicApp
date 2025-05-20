@@ -1,7 +1,7 @@
 package com.musicapp.ui.models
 
 import com.musicapp.data.database.TrackHistory
-import com.musicapp.data.database.TrackHistoryWithTracks
+import com.musicapp.data.repositories.TrackHistoryWithTracks
 
 data class TrackHistoryModel(
     val ownerId: String,

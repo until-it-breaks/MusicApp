@@ -3,10 +3,10 @@ package com.musicapp.ui.screens.playlist
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.UserPlaylistModel
+import com.musicapp.ui.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,7 +26,7 @@ class PersonalPlaylistViewModel(private val userPlaylistRepository: UserPlaylist
     val playlist: StateFlow<UserPlaylistModel?> = _selectedPlaylistId
         .filterNotNull()
         .flatMapLatest { playlistId ->
-            userPlaylistRepository.getUserPlaylistWithTracks(playlistId)
+            userPlaylistRepository.getPlaylistWithTracksAndArtists(playlistId).map { it.toModel() }
         }
         .stateIn(
             scope = viewModelScope,

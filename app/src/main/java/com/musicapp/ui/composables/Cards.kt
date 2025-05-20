@@ -222,7 +222,7 @@ fun AddTrackToPlaylistTrackCard(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.padding(8.dp)
         ) {
-            LoadableImage(track.album?.mediumCover, "Track picture", modifier = Modifier.size(48.dp))
+            LoadableImage(track.mediumPicture, "Track picture", modifier = Modifier.size(48.dp))
             Column(
                 modifier = Modifier.weight(1f)
             ) {

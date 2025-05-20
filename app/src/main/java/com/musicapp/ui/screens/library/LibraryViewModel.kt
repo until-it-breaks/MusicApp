@@ -10,6 +10,7 @@ import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackHistoryModel
 import com.musicapp.ui.models.UserPlaylistModel
+import com.musicapp.ui.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -47,7 +49,7 @@ class LibraryViewModel(
     val playlists: StateFlow<List<UserPlaylistModel>> = _userId
         .filterNotNull()
         .flatMapLatest { userId ->
-            userPlaylistRepository.getUserPlaylistsWithTracks(userId)
+            userPlaylistRepository.getPlaylists(userId).map { it.map { it.toModel() } }
         }
         .stateIn(
             scope = viewModelScope,
@@ -71,13 +73,13 @@ class LibraryViewModel(
             try {
                 val (trackHistory, likedTracksPlaylist) = withContext(Dispatchers.IO) {
                     val trackHistory = async { trackHistoryRepository.getTrackHistoryWithTracks(userId) }
-                    val likedTracksPlaylist = async { likedTracksRepository.getLikedTracksWithTracks(userId)}
+                    val likedTracksPlaylist = async { likedTracksRepository.getLikedPlaylistWithTracksFlow(userId)}
                     Pair(trackHistory.await(), likedTracksPlaylist.await())
                 }
                 _uiState.update {
                     it.copy(
-                        trackHistory = trackHistory.first(),
-                        likedTracksPlaylist = likedTracksPlaylist.first()
+                        trackHistory = trackHistory.first().toModel(),
+                        likedTracksPlaylist = likedTracksPlaylist.first().toModel()
                     )
                 }
             } catch (e: Exception) {

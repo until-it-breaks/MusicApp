@@ -10,7 +10,7 @@ data class DeezerChartAlbum(
     @SerialName("title")
     val title: String,
     @SerialName("cover_medium")
-    val mediumCover: String,
+    val mediumCover: String?,
     @SerialName("explicit_lyrics")
     val isExplicit: Boolean
 )

@@ -24,7 +24,7 @@ fun DeezerChartAlbum.toModel(): AlbumModel {
     return AlbumModel(
         id = id,
         title = title,
-        mediumCover = mediumCover.toUri(),
+        mediumCover = mediumCover?.toUri(),
         isExplicit = isExplicit
     )
 }

@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.ui.models.TrackHistoryModel
 import com.musicapp.ui.models.TrackModel
+import com.musicapp.ui.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,7 +36,7 @@ class TrackHistoryViewModel(
     val playlist: StateFlow<TrackHistoryModel?> = _userId
         .filterNotNull()
         .flatMapLatest { userId ->
-            playlistsRepository.getTrackHistoryWithTracks(userId)
+            playlistsRepository.getTrackHistoryWithTracks(userId).map { it.toModel() }
         }
         .stateIn(
             scope = viewModelScope,

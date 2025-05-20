@@ -9,13 +9,16 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TracksDAO {
     @Query("SELECT * FROM track WHERE track.trackId = :trackId")
-    fun getTrackById(trackId: Long): TrackWithArtists?
+    fun getTrackFlow(trackId: Long): Flow<Track>
+
+    @Query("""
+    SELECT Artist.* FROM Artist, TrackArtistCrossRef WHERE Artist.artistId = TrackArtistCrossRef.artistId
+    AND TrackArtistCrossRef.trackId = :trackId
+    """)
+    fun getTrackArtistsFlow(trackId: Long): Flow<List<Artist>>
 
     @Upsert
     suspend fun upsertTrack(track: Track)
-
-    @Query("SELECT a.* FROM Artist AS a, TrackArtistCrossRef AS t WHERE a.artistId = t.artistId AND t.trackId = :trackId")
-    suspend fun getTrackArtists(trackId: Long): List<Artist>
 
     @Upsert
     suspend fun upsertArtist(artist: Artist)
@@ -23,8 +26,8 @@ interface TracksDAO {
     @Upsert
     suspend fun addArtistToTrack(crossRef: TrackArtistCrossRef)
 
-    @Delete
-    suspend fun deleteTrack(track: Track)
+    @Query("DELETE FROM track WHERE trackId = :trackId")
+    suspend fun deleteTrack(trackId: Long)
 }
 
 @Dao
@@ -41,14 +44,25 @@ interface UsersDAO {
 
 @Dao
 interface UserPlaylistDAO {
+
     /**
-     * Retrieves a playlist.
+     * Retrieves a playlist given an id.
+     */
+    @Query("SELECT * FROM playlist WHERE playlistId = :playlistId")
+    fun getPlaylist(playlistId: String): Flow<Playlist>
+
+    /**
+     * Retrieves the playlists of a given user
      */
     @Query("SELECT * FROM playlist WHERE ownerId = :ownerId")
-    fun getPlaylistsWithTracks(ownerId: String): Flow<List<PlaylistWithTracks>>
+    fun getPlaylists(ownerId: String): Flow<List<Playlist>>
 
-    @Query("SELECT * FROM playlist WHERE playlistId = :playlistId")
-    fun getPlaylistWithTracks(playlistId: String): Flow<PlaylistWithTracks>
+    @Query("""
+    SELECT Track.* FROM Track
+    INNER JOIN PlaylistTrackCrossRef ON Track.trackId = PlaylistTrackCrossRef.trackId
+    WHERE PlaylistTrackCrossRef.playlistId = :playlistId
+    """)
+    fun getTracksOfPlaylist(playlistId: String): Flow<List<Track>>
 
     @Query("SELECT * FROM playlisttrackcrossref WHERE playlistId = :playlistId AND trackId = :trackId")
     suspend fun getTrackFromPlaylist(playlistId: String, trackId: Long): PlaylistTrackCrossRef?
@@ -88,51 +102,66 @@ interface UserPlaylistDAO {
 }
 
 @Dao
-interface LikedTracksDAO {
-    /**
-     * Retrieves the liked tracks playlist of a given user.
-     */
-    @Query("SELECT * FROM likedtracksplaylist WHERE ownerId = :userId")
-    fun getLikedTracksPlaylistWithTracks(userId: String): Flow<LikedTracksPlaylistWithTracks>
+interface LikedPlaylistDAO {
 
-    @Query("SELECT * FROM likedtracksplaylisttrackcrossref WHERE ownerId = :userId AND trackId = :trackId")
-    suspend fun getTrackFromLikedTracksPlaylist(userId: String, trackId: Long): LikedTracksPlaylistTrackCrossRef?
+    /**
+     * Retrieves a playlist given an id.
+     */
+    @Query("SELECT * FROM likedplaylist WHERE ownerId = :userId")
+    fun getLikedPlaylist(userId: String): Flow<LikedPlaylist>
+
+    @Query("SELECT * FROM likedplaylisttrackcrossref WHERE ownerId = :userId AND trackId = :trackId")
+    suspend fun getTrackFromLikedTracksPlaylist(userId: String, trackId: Long): LikedPlaylistTrackCrossRef?
+
+    @Query(
+        """
+    SELECT Track.* FROM Track
+    INNER JOIN LikedPlaylistTrackCrossRef ON Track.trackId = LikedPlaylistTrackCrossRef.trackId
+    WHERE LikedPlaylistTrackCrossRef.ownerId = :userId
+    """)
+    fun getTracksOfPlaylist(userId: String): Flow<List<Track>>
 
     /**
      * Creates or updates a liked tracks playlist (tracks not included).
      */
     @Upsert
-    suspend fun upsertLikedTracksPlaylist(likedTracksPlaylist: LikedTracksPlaylist)
+    suspend fun upsertLikedTracksPlaylist(likedTracksPlaylist: LikedPlaylist)
 
     /**
      * Adds a track to the user's liked tracks playlist.
      */
     @Upsert
-    suspend fun addTrackToLikedTracksPlaylist(crossRef: LikedTracksPlaylistTrackCrossRef)
+    suspend fun addTrackToLikedTracksPlaylist(crossRef: LikedPlaylistTrackCrossRef)
 
-    @Query("UPDATE likedtracksplaylist SET lastEditTime = :lastEditTime WHERE ownerId = :playlistId")
+    @Query("UPDATE likedplaylist SET lastEditTime = :lastEditTime WHERE ownerId = :playlistId")
     suspend fun updateEditTime(playlistId: String, lastEditTime: Long = System.currentTimeMillis())
 
     /**
      * Deletes a single track from a user's liked tracks playlist
      */
     @Delete
-    suspend fun deleteTrackFromLikedTracksPlaylist(crossRef: LikedTracksPlaylistTrackCrossRef)
+    suspend fun deleteTrackFromLikedTracksPlaylist(crossRef: LikedPlaylistTrackCrossRef)
 
     /**
      * Deletes all tracks in a user's liked tracks playlist
      */
-    @Query("DELETE FROM likedtracksplaylisttrackcrossref WHERE ownerId = :ownerId")
+    @Query("DELETE FROM likedplaylisttrackcrossref WHERE ownerId = :ownerId")
     suspend fun clearLikedTracksPlaylist(ownerId: String)
 }
 
 @Dao
 interface TrackHistoryDAO {
-    /**
-     * Retrieves the track history of a given user.
-     */
+
     @Query("SELECT * FROM trackhistory WHERE ownerId = :userId")
-    fun getTrackHistoryWithTracks(userId: String): Flow<TrackHistoryWithTracks>
+    fun getTrackHistory(userId: String): Flow<TrackHistory>
+
+    @Query(
+        """
+    SELECT Track.* FROM Track
+    INNER JOIN TrackHistoryTrackCrossRef ON Track.trackId = TrackHistoryTrackCrossRef.trackId
+    WHERE TrackHistoryTrackCrossRef.ownerId = :userId
+    """)
+    fun getTracksOfPlaylist(userId: String): Flow<List<Track>>
 
     /**
      * Creates or updates a track history (tracks not included).

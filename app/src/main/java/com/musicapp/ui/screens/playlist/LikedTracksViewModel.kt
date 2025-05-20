@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.LikedTracksRepository
-import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackModel
+import com.musicapp.ui.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,7 +33,7 @@ class LikedTracksViewModel(private val auth: FirebaseAuth, private val likedTrac
     val playlist: StateFlow<LikedTracksPlaylistModel?> = _userId
         .filterNotNull()
         .flatMapLatest { userId ->
-            likedTracksRepository.getLikedTracksWithTracks(userId)
+            likedTracksRepository.getPlaylistWithTracksAndArtists(userId).map { it.toModel() }
         }
         .stateIn(
             scope = viewModelScope,

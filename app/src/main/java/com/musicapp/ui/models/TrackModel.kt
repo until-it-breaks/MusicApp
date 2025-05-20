@@ -5,6 +5,7 @@ import androidx.core.net.toUri
 import com.musicapp.data.database.Track
 import com.musicapp.data.remote.deezer.DeezerAlbumTrack
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
+import com.musicapp.data.repositories.TrackWithArtists
 
 data class TrackModel(
     val id: Long,
@@ -16,7 +17,6 @@ data class TrackModel(
     val mediumPicture: Uri? = null,
     val bigPicture: Uri? = null,
     val contributors: List<ArtistModel> = emptyList(),
-    val album: AlbumModel? = null,
     val previewUri: Uri? = null,
 )
 
@@ -39,8 +39,7 @@ fun DeezerTrackDetailed.toModel(): TrackModel {
         isExplicit = isExplicit,
         mediumPicture = album.mediumCover.toUri(),
         previewUri = preview.toUri(),
-        contributors = contributors.map { it.toModel() },
-        album = album.toModel()
+        contributors = contributors.map { it.toModel() }
     )
 }
 
@@ -54,9 +53,23 @@ fun Track.toModel(): TrackModel {
         smallPicture = smallPictureUri?.toUri(),
         mediumPicture = mediumPictureUri?.toUri(),
         bigPicture = bigPictureUri?.toUri(),
-        contributors = emptyList(), // TODO implement later
-        album = null, // TODO implement later
+        contributors = emptyList(),
         previewUri = previewUri?.toUri()
+    )
+}
+
+fun TrackWithArtists.toModel(): TrackModel {
+    return TrackModel(
+        id = track.trackId,
+        title = track.title,
+        duration = track.duration,
+        releaseDate = track.releaseDate,
+        isExplicit = track.isExplicit,
+        smallPicture = track.smallPictureUri?.toUri(),
+        mediumPicture = track.mediumPictureUri?.toUri(),
+        bigPicture = track.bigPictureUri?.toUri(),
+        contributors = artists.map { it.toModel() },
+        previewUri = track.previewUri?.toUri()
     )
 }
 
@@ -69,8 +82,8 @@ fun TrackModel.toDbEntity(): Track {
         isExplicit = isExplicit,
         previewUri = previewUri.toString(),
         storedPreviewUri = null, // TODO
-        smallPictureUri = null, // TODO
-        mediumPictureUri = album?.mediumCover.toString(),
-        bigPictureUri = album?.bigCover.toString()
+        smallPictureUri = smallPicture.toString(),
+        mediumPictureUri = mediumPicture.toString(),
+        bigPictureUri = bigPicture.toString()
     )
 }

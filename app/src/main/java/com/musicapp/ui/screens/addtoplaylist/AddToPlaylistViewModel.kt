@@ -9,6 +9,7 @@ import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.UserPlaylistModel
+import com.musicapp.ui.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,15 +46,15 @@ class AddToPlaylistViewModel(
         }
         viewModelScope.launch {
             try {
-                val (likedTracksPlaylist, playlists) = withContext(Dispatchers.IO) {
-                    val likedTracksPlaylist = async { likedTracksRepository.getLikedTracksWithTracks(userId)}
-                    val playlists = async { userPlaylistRepository.getUserPlaylistsWithTracks(userId) }
+                val (likedPlaylist, playlists) = withContext(Dispatchers.IO) {
+                    val likedTracksPlaylist = async { likedTracksRepository.getPlaylistWithTracksAndArtists(userId)}
+                    val playlists = async { userPlaylistRepository.getPlaylists(userId) }
                     Pair(likedTracksPlaylist.await(), playlists.await())
                 }
                 _uiState.update {
                     it.copy(
-                        likedTracksPlaylist = likedTracksPlaylist.first(),
-                        playlists = playlists.first()
+                        likedTracksPlaylist = likedPlaylist.first().toModel(),
+                        playlists = playlists.first().map { it.toModel() }
                     )
                 }
             } catch (e: Exception) {
