@@ -63,7 +63,8 @@ data class Playlist(
 @Entity(primaryKeys = ["playlistId", "trackId"])
 data class PlaylistTrackCrossRef(
     val playlistId: String,
-    val trackId: Long
+    val trackId: Long,
+    val timeOfAddition: Long
 )
 
 // Liked Tracks
@@ -78,7 +79,8 @@ data class LikedPlaylist(
 @Entity(primaryKeys = ["ownerId", "trackId"])
 data class LikedPlaylistTrackCrossRef(
     val ownerId: String,
-    val trackId: Long
+    val trackId: Long,
+    val timeOfAddition: Long
 )
 
 // Track history
@@ -93,5 +95,6 @@ data class TrackHistory(
 @Entity(primaryKeys = ["ownerId", "trackId"])
 data class TrackHistoryTrackCrossRef(
     val ownerId: String,
-    val trackId: Long
+    val trackId: Long,
+    val timeOfAddition: Long
 )

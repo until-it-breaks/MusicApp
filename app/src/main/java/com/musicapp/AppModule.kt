@@ -54,6 +54,7 @@ val appModule = module {
 
     single {
         LikedTracksRepository(
+            get(),
             get<MusicAppDatabase>().likedTracksDAO(),
             get()
         )

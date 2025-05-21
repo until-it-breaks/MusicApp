@@ -77,12 +77,12 @@ class TrackHistoryRepository(
 
     suspend fun addTrackToTrackHistory(ownerId: String, track: TrackModel) {
         trackRepository.upsertTrack(track)
-        trackHistoryDAO.addTrackToTrackHistory(TrackHistoryTrackCrossRef(ownerId, track.id))
+        trackHistoryDAO.addTrackToTrackHistory(TrackHistoryTrackCrossRef(ownerId, track.id, System.currentTimeMillis()))
         trackHistoryDAO.updateEditTime(ownerId)
     }
 
     suspend fun removeTrackFromTrackHistory(ownerId: String, trackId: Long) {
-        trackHistoryDAO.deleteTrackFromTrackHistory(TrackHistoryTrackCrossRef(ownerId, trackId))
+        trackHistoryDAO.deleteTrackFromTrackHistory(ownerId, trackId)
     }
 
     suspend fun clearTrackHistory(userId: String) {

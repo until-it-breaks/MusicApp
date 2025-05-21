@@ -60,7 +60,7 @@ interface UserPlaylistDAO {
     @Query("""
     SELECT Track.* FROM Track
     INNER JOIN PlaylistTrackCrossRef ON Track.trackId = PlaylistTrackCrossRef.trackId
-    WHERE PlaylistTrackCrossRef.playlistId = :playlistId
+    WHERE PlaylistTrackCrossRef.playlistId = :playlistId ORDER BY PlaylistTrackCrossRef.timeOfAddition
     """)
     fun getTracksOfPlaylist(playlistId: String): Flow<List<Track>>
 
@@ -85,8 +85,8 @@ interface UserPlaylistDAO {
     /**
      * Deletes a single track from a playlist
      */
-    @Delete
-    suspend fun deleteTrackFromPlaylist(crossRef: PlaylistTrackCrossRef)
+    @Query("DELETE FROM playlisttrackcrossref WHERE playlisttrackcrossref.playlistId = :playlistId AND playlisttrackcrossref.trackId = :trackId")
+    suspend fun deleteTrackFromPlaylist(playlistId: String, trackId: Long)
 
     /**
      * Deletes all tracks in a playlist
@@ -117,7 +117,7 @@ interface LikedPlaylistDAO {
         """
     SELECT Track.* FROM Track
     INNER JOIN LikedPlaylistTrackCrossRef ON Track.trackId = LikedPlaylistTrackCrossRef.trackId
-    WHERE LikedPlaylistTrackCrossRef.ownerId = :userId
+    WHERE LikedPlaylistTrackCrossRef.ownerId = :userId ORDER BY LikedPlaylistTrackCrossRef.timeOfAddition
     """)
     fun getTracksOfPlaylist(userId: String): Flow<List<Track>>
 
@@ -139,8 +139,8 @@ interface LikedPlaylistDAO {
     /**
      * Deletes a single track from a user's liked tracks playlist
      */
-    @Delete
-    suspend fun deleteTrackFromLikedTracksPlaylist(crossRef: LikedPlaylistTrackCrossRef)
+    @Query("DELETE FROM likedplaylisttrackcrossref WHERE likedplaylisttrackcrossref.ownerId = :ownerId AND likedplaylisttrackcrossref.trackId = :trackId")
+    suspend fun deleteTrackFromLikedTracksPlaylist(ownerId: String, trackId: Long)
 
     /**
      * Deletes all tracks in a user's liked tracks playlist
@@ -159,7 +159,7 @@ interface TrackHistoryDAO {
         """
     SELECT Track.* FROM Track
     INNER JOIN TrackHistoryTrackCrossRef ON Track.trackId = TrackHistoryTrackCrossRef.trackId
-    WHERE TrackHistoryTrackCrossRef.ownerId = :userId
+    WHERE TrackHistoryTrackCrossRef.ownerId = :userId ORDER BY TrackHistoryTrackCrossRef.timeOfAddition
     """)
     fun getTracksOfPlaylist(userId: String): Flow<List<Track>>
 
@@ -181,8 +181,8 @@ interface TrackHistoryDAO {
     /**
      * Deletes a single track from a user's track history.
      */
-    @Delete
-    suspend fun deleteTrackFromTrackHistory(crossRef: TrackHistoryTrackCrossRef)
+    @Query("DELETE FROM trackhistorytrackcrossref WHERE trackhistorytrackcrossref.ownerId = :ownerId AND trackhistorytrackcrossref.trackId = :trackId")
+    suspend fun deleteTrackFromTrackHistory(ownerId: String, trackId: Long)
 
     /**
      * Deletes all tracks in a user's track history.

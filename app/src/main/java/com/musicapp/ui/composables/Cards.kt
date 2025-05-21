@@ -147,10 +147,12 @@ fun TrackCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     track.isExplicit?.let {
-                        Icon(
-                            imageVector = Icons.Filled.Explicit,
-                            contentDescription = stringResource(R.string.explicit_description)
-                        )
+                        if (it) {
+                            Icon(
+                                imageVector = Icons.Filled.Explicit,
+                                contentDescription = stringResource(R.string.explicit_description)
+                            )
+                        }
                     }
 
                     track.contributors.forEachIndexed { index, contributor ->

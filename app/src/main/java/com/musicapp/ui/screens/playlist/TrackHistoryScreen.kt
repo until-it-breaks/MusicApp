@@ -59,11 +59,6 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Image,
-                            contentDescription = "Playlist image",
-                            modifier = Modifier.size(128.dp)
-                        )
                         Text(
                             text = "Track history",
                             style = MaterialTheme.typography.titleLarge

@@ -33,7 +33,7 @@ fun TopBarWithBackButton(
                 style = MaterialTheme.typography.headlineMedium
             )
         },
-        expandedHeight = 40.dp,
+        expandedHeight = 48.dp,
         navigationIcon = {
             if (navController.previousBackStackEntry != null) {
                 IconButton(onClick = {navController.navigateUp() }) {

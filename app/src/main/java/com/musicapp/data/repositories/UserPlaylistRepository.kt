@@ -83,12 +83,12 @@ class UserPlaylistRepository(
 
     suspend fun addTrackToPlaylist(playlistId: String, track: TrackModel) {
         trackRepository.upsertTrack(track)
-        playlistDAO.addTrackToPlaylist(PlaylistTrackCrossRef(playlistId, track.id))
+        playlistDAO.addTrackToPlaylist(PlaylistTrackCrossRef(playlistId, track.id, System.currentTimeMillis()))
         playlistDAO.updateEditTime(playlistId)
     }
 
     suspend fun removeTrackFromPlaylist(playlistId: String, trackId: Long) {
-        playlistDAO.deleteTrackFromPlaylist(PlaylistTrackCrossRef(playlistId, trackId))
+        playlistDAO.deleteTrackFromPlaylist(playlistId, trackId)
     }
 
     suspend fun clearPlaylist(playlistId: String) {

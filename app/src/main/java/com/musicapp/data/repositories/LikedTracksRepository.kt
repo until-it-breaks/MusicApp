@@ -3,6 +3,7 @@ package com.musicapp.data.repositories
 import com.musicapp.data.database.LikedPlaylistDAO
 import com.musicapp.data.database.LikedPlaylist
 import com.musicapp.data.database.LikedPlaylistTrackCrossRef
+import com.musicapp.data.database.MusicAppDatabase
 import com.musicapp.data.database.Track
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackModel
@@ -27,6 +28,7 @@ data class LikedPlaylistWithTracksAndArtists(
  *  Repository for liked tracks
  */
 class LikedTracksRepository(
+    private val db: MusicAppDatabase,
     private val likedPlaylistDAO: LikedPlaylistDAO,
     private val trackRepository: TracksRepository
 ) {
@@ -82,17 +84,19 @@ class LikedTracksRepository(
         likedPlaylistDAO.upsertLikedTracksPlaylist(playlist)
     }
 
-    suspend fun addTrackToLikedTracksPlaylist(ownerId: String, track: TrackModel) {
+    suspend fun addTrackToLikedTracksPlaylist(userId: String, track: TrackModel) {
         trackRepository.upsertTrack(track)
-        likedPlaylistDAO.addTrackToLikedTracksPlaylist(LikedPlaylistTrackCrossRef(ownerId, track.id))
-        likedPlaylistDAO.updateEditTime(ownerId)
+        likedPlaylistDAO.addTrackToLikedTracksPlaylist(LikedPlaylistTrackCrossRef(userId, track.id, System.currentTimeMillis()))
+        likedPlaylistDAO.updateEditTime(userId)
     }
 
-    suspend fun removeTrackFromLikedTracksPlaylist(ownerId: String, trackId: Long) {
-        likedPlaylistDAO.deleteTrackFromLikedTracksPlaylist(LikedPlaylistTrackCrossRef(ownerId, trackId))
+    suspend fun removeTrackFromLikedTracksPlaylist(userId: String, trackId: Long) {
+        likedPlaylistDAO.deleteTrackFromLikedTracksPlaylist(userId, trackId)
+        likedPlaylistDAO.updateEditTime(userId)
     }
 
     suspend fun clearLikedTracksPlaylist(userId: String) {
         likedPlaylistDAO.clearLikedTracksPlaylist(userId)
+        likedPlaylistDAO.updateEditTime(userId)
     }
 }

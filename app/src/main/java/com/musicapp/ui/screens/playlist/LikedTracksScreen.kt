@@ -2,16 +2,14 @@ package com.musicapp.ui.screens.playlist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
@@ -59,18 +57,15 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Image,
-                            contentDescription = "Playlist image",
-                            modifier = Modifier.size(128.dp)
-                        )
                         Text(
-                            text = "Liked tracks",
+                            text = "Liked Tracks",
                             style = MaterialTheme.typography.titleLarge
                         )
                         val timeInMillis = playlist.value?.lastEditTime
                         timeInMillis?.let {
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text("Last edited: ${convertMillisToDateWithHourAndMinutes(it)}")
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
@@ -79,7 +74,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                         track = track,
                         showPicture = true,
                         onTrackClick = { viewModel.playTrack(track) },
-                        onArtistClick = { /*TODO*/ },
+                        onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                         extraMenu = {
                             PersonalTrackDropDownMenu(
                                 trackModel = track,
