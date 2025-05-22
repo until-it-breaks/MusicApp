@@ -90,4 +90,8 @@ class LikedTracksViewModel(private val auth: FirebaseAuth, private val likedTrac
             // TODO Play given track
         }
     }
+
+    fun logout() {
+        auth.signOut()
+    }
 }

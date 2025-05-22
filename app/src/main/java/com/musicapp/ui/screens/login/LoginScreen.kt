@@ -1,6 +1,6 @@
 package com.musicapp.ui.screens.login
 
-import androidx.compose.foundation.Image
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -8,24 +8,28 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -41,7 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -58,12 +62,13 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    val loginViewModel: LoginViewModel = koinViewModel()
-    val state by loginViewModel.state.collectAsStateWithLifecycle()
+    val viewModel: LoginViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -76,18 +81,18 @@ fun LoginScreen(navController: NavController) {
                 .fillMaxSize()
                 .imePadding()
                 .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
+                .verticalScroll(rememberScrollState())
         ) {
+            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                Spacer(modifier = Modifier.height(48.dp))
+            }
             Row(
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(3f)
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
+                Icon(
                     imageVector = Icons.Outlined.MusicNote,
                     contentDescription = stringResource(R.string.app_logo_description),
-                    contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(96.dp)
                         .clip(CircleShape)
@@ -97,12 +102,16 @@ fun LoginScreen(navController: NavController) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.headlineLarge
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
+            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                Spacer(modifier = Modifier.height(48.dp))
+            }
             OutlinedTextField(
-                value = state.email,
-                onValueChange = loginViewModel::onEmailChanged,
+                value = uiState.email,
+                onValueChange = viewModel::onEmailChanged,
                 label = { Text(stringResource(R.string.email_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
@@ -110,80 +119,99 @@ fun LoginScreen(navController: NavController) {
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
                 ),
-                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
+                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary
+                )
             )
             OutlinedTextField(
-                value = state.password,
-                onValueChange = loginViewModel::onPasswordChanged,
+                value = uiState.password,
+                onValueChange = viewModel::onPasswordChanged,
                 label = { Text(stringResource(R.string.password_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
-                visualTransformation = if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done),
+                    imeAction = ImeAction.Done
+                ),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 trailingIcon = {
-                    val image = if (state.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (state.isPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
-                    IconButton(onClick = loginViewModel::togglePasswordVisibility) {
+                    IconButton(onClick = viewModel::onTogglePasswordVisibility) {
                         Icon(
-                            imageVector = image,
-                            contentDescription = description
+                            imageVector = if (uiState.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            contentDescription = if (uiState.isPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
                         )
                     }
-                }
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary
+                )
             )
             TextButton(
                 onClick = {
-                    loginViewModel.resetState()
+                    viewModel.resetUiState()
                     navController.navigate(MusicAppRoute.PasswordRecovery)
-                }
+                },
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(stringResource(R.string.forgot_password))
+                Text(text = stringResource(R.string.forgot_password))
             }
             Button(
-                enabled = state.canSubmit,
                 onClick = {
                     focusManager.clearFocus()
-                    loginViewModel.login()
-                }
+                    viewModel.login()
+                },
+                enabled = uiState.canSubmit,
+                shape = MaterialTheme.shapes.medium,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
             ) {
-                Text(stringResource(R.string.login))
+                Text(text = stringResource(R.string.login))
             }
 
-            if (state.isLoading) {
-                Spacer(modifier = Modifier.weight(0.25f))
-                CircularProgressIndicator()
-                Spacer(modifier = Modifier.weight(0.25f))
+            if (uiState.isLoading) {
+                Spacer(modifier = Modifier.height(24.dp))
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.height(24.dp))
             }
 
-            if (state.errorMessageId != null) {
-                LaunchedEffect(state.errorMessageId) {
-                    val errorMessage = context.getString(state.errorMessageId!!)
+            uiState.errorMessageId?.let {
+                LaunchedEffect(it) {
+                    val message = context.getString(it)
                     snackbarHostState.showSnackbar(
-                        message = errorMessage,
+                        message = message,
                         duration = SnackbarDuration.Long,
                         withDismissAction = true
                     )
                 }
             }
 
-            if (state.navigateToMain) {
-                LaunchedEffect(Unit) {
+            LaunchedEffect(uiState.navigateToMain) {
+                if (uiState.navigateToMain) {
                     navController.navigate(MusicAppRoute.Main) {
                         popUpTo(navController.graph.id) { inclusive = true }
                     }
                 }
             }
 
-            TextButton(onClick = {
-                loginViewModel.resetState()
-                navController.navigate(MusicAppRoute.SignUp)
-            }) {
+            TextButton(
+                onClick = {
+                    viewModel.resetUiState()
+                    navController.navigate(MusicAppRoute.SignUp)
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
                 Text(stringResource(R.string.sign_up_now))
             }
-            Spacer(modifier = Modifier.weight(2f))
         }
     }
 }

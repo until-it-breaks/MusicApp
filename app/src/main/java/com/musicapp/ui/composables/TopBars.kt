@@ -36,7 +36,7 @@ fun TopBarWithBackButton(
         expandedHeight = 48.dp,
         navigationIcon = {
             if (navController.previousBackStackEntry != null) {
-                IconButton(onClick = {navController.navigateUp() }) {
+                IconButton(onClick = { navController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = stringResource(R.string.back_description)

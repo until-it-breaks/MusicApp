@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
@@ -23,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.AuthErrorMessage
 import com.musicapp.ui.composables.LikedTracksPlaylistDropDownMenu
 import com.musicapp.ui.composables.PersonalTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
@@ -86,22 +86,18 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                 }
             }
         } else {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Failed to authenticate. Please login again")
-                Button(
-                    onClick = {
-                        mainNavController.navigate(MusicAppRoute.Login) {
-                            popUpTo(mainNavController.graph.id) { inclusive = true }
-                        }
+            AuthErrorMessage(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .padding(12.dp)
+                    .fillMaxWidth(),
+                onClick = {
+                    viewModel.logout()
+                    mainNavController.navigate(MusicAppRoute.Login) {
+                        popUpTo(mainNavController.graph.id) { inclusive = true }
                     }
-                ) {
-                    Text("Go to login")
                 }
-            }
+            )
         }
     }
 }
