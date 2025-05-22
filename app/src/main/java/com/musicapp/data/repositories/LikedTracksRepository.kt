@@ -81,7 +81,7 @@ class LikedTracksRepository(
             ownerId = playlist.ownerId,
             lastEditTime = System.currentTimeMillis()
         )
-        likedPlaylistDAO.upsertLikedTracksPlaylist(playlist)
+        likedPlaylistDAO.insertLikedTracksPlaylist(playlist)
     }
 
     suspend fun addTrackToLikedTracksPlaylist(userId: String, track: TrackModel) {

@@ -72,7 +72,7 @@ class TrackHistoryRepository(
             ownerId = trackHistory.ownerId,
             lastEditTime = System.currentTimeMillis()
         )
-        trackHistoryDAO.upsertTrackHistory(trackHistory)
+        trackHistoryDAO.insertTrackHistory(trackHistory)
     }
 
     suspend fun addTrackToTrackHistory(ownerId: String, track: TrackModel) {

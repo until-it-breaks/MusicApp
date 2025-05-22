@@ -1,6 +1,7 @@
 package com.musicapp.ui.screens.login
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -90,7 +91,7 @@ fun LoginScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
+                Image(
                     imageVector = Icons.Outlined.MusicNote,
                     contentDescription = stringResource(R.string.app_logo_description),
                     modifier = Modifier
@@ -115,10 +116,7 @@ fun LoginScreen(navController: NavController) {
                 label = { Text(stringResource(R.string.email_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
-                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -133,10 +131,7 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
                 visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 trailingIcon = {
                     IconButton(onClick = viewModel::onTogglePasswordVisibility) {
@@ -171,15 +166,13 @@ fun LoginScreen(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
+                )
             ) {
                 Text(text = stringResource(R.string.login))
             }
 
             if (uiState.isLoading) {
-                Spacer(modifier = Modifier.height(24.dp))
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                Spacer(modifier = Modifier.height(24.dp))
             }
 
             uiState.errorMessageId?.let {

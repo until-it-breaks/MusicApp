@@ -3,7 +3,7 @@ package com.musicapp.data.repositories
 import com.musicapp.data.database.Artist
 import com.musicapp.data.database.Track
 import com.musicapp.data.database.TrackArtistCrossRef
-import com.musicapp.data.database.TracksDAO
+import com.musicapp.data.database.TrackDAO
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toDbEntity
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +15,7 @@ data class TrackWithArtists(
 )
 
 class TracksRepository(
-    private val dao: TracksDAO,
+    private val dao: TrackDAO,
 ) {
 
     fun getTrackWithArtists(trackId: Long): Flow<TrackWithArtists> {

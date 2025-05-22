@@ -55,7 +55,7 @@
     <string name="album_picture_description">Album picture</string>
     <string name="artist_details">Artist details</string>
     <string name="playlist_details">Playlist details</string>
-    <string name="go_to_login">Go to login</string>
-    <string name="failed_to_authenticate_login_again">Failed to authenticate. Please login again.</string>
-    <string name="warning_description">Warning</string>
+    <string name="go_to_login" translatable="false">Go to login</string>
+    <string name="failed_to_authenticate_login_again" translatable="false">Failed to authenticate. Please login again.</string>
+    <string name="warning_description" translatable="false">Warning</string>
 </resources>

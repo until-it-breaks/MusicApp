@@ -1,5 +1,6 @@
 package com.musicapp.ui.screens.signup
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -8,25 +9,28 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -41,7 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -60,12 +64,13 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SignUpScreen(navController: NavController) {
-    val signUpViewModel: SignUpViewModel = koinViewModel()
-    val state by signUpViewModel.state.collectAsStateWithLifecycle()
+    val viewModel: SignUpViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
 
     Scaffold(
         topBar = { TopBarWithBackButton(navController) },
@@ -78,20 +83,19 @@ fun SignUpScreen(navController: NavController) {
                 .padding(contentPadding)
                 .fillMaxSize()
                 .imePadding()
-                .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() }
-            }
+                .verticalScroll(rememberScrollState())
+                .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
         ) {
+            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                Spacer(modifier = Modifier.height(48.dp))
+            }
             Row(
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(2f)
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
                     imageVector = Icons.Outlined.MusicNote,
                     contentDescription = stringResource(R.string.app_logo_description),
-                    contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(96.dp)
                         .clip(CircleShape)
@@ -104,12 +108,15 @@ fun SignUpScreen(navController: NavController) {
                     style = MaterialTheme.typography.headlineLarge
                 )
             }
+            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                Spacer(modifier = Modifier.height(48.dp))
+            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = stringResource(R.string.sign_up),
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
@@ -119,77 +126,94 @@ fun SignUpScreen(navController: NavController) {
             }
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = state.username,
-                onValueChange = signUpViewModel::onUsernameChanged,
+                value = uiState.username,
+                onValueChange = viewModel::onUsernameChanged,
                 label = { Text(stringResource(R.string.username_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
-                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
+                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary
+                )
             )
             OutlinedTextField(
-                value = state.email,
-                onValueChange = signUpViewModel::onEmailChanged,
+                value = uiState.email,
+                onValueChange = viewModel::onEmailChanged,
                 label = { Text(stringResource(R.string.email_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
+                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary
+                )
             )
             OutlinedTextField(
-                value = state.password,
-                onValueChange = signUpViewModel::onPasswordChanged,
+                value = uiState.password,
+                onValueChange = viewModel::onPasswordChanged,
                 label = { Text(stringResource(R.string.password_label)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
-                visualTransformation = if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 trailingIcon = {
-                    val image = if (state.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (state.isPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
-                    IconButton(onClick = signUpViewModel::togglePasswordVisibility) {
+                    IconButton(onClick = viewModel::togglePasswordVisibility) {
                         Icon(
-                            imageVector = image,
-                            contentDescription = description
+                            imageVector = if (uiState.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            contentDescription = if (uiState.isPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
                         )
                     }
-                }
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary
+                )
             )
             Spacer(modifier = Modifier.height(8.dp))
             Button(
-                enabled = state.canSubmit,
+                enabled = uiState.canSubmit,
                 onClick = {
                     focusManager.clearFocus()
-                    signUpViewModel.signUp()
-                }
+                    viewModel.signUp()
+                },
+                shape = MaterialTheme.shapes.medium,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
                 Text(stringResource(R.string.create_account))
             }
 
-            if (state.isLoading) {
-                CircularProgressIndicator()
+            if (uiState.isLoading) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
 
-            if (state.errorMessageId != null) {
-                LaunchedEffect(state.errorMessageId) {
-                    val errorMessage = context.getString(state.errorMessageId!!)
+            uiState.errorMessageId?.let {
+                LaunchedEffect(it) {
+                    val message = context.getString(it)
                     snackbarHostState.showSnackbar(
-                        message = errorMessage,
+                        message = message,
                         duration = SnackbarDuration.Long,
                         withDismissAction = true
                     )
                 }
             }
 
-            if (state.navigateToMain) {
-                LaunchedEffect(Unit) {
+            LaunchedEffect(uiState.navigateToMain) {
+                if (uiState.navigateToMain) {
                     navController.navigate(MusicAppRoute.Main) {
-                        popUpTo(navController.graph.id) { inclusive = true} // Prevents going back to this screen
+                        popUpTo(navController.graph.id) { inclusive = true }
                     }
                 }
             }
-            Spacer(modifier = Modifier.weight(2f))
         }
     }
 }

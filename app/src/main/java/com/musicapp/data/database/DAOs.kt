@@ -2,12 +2,13 @@ package com.musicapp.data.database
 
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface TracksDAO {
+interface TrackDAO {
     @Query("SELECT * FROM track WHERE track.trackId = :trackId")
     fun getTrackFlow(trackId: Long): Flow<Track>
 
@@ -31,12 +32,12 @@ interface TracksDAO {
 }
 
 @Dao
-interface UsersDAO {
+interface UserDAO {
     @Query("SELECT * FROM user")
     suspend fun getUsers(): List<User>
 
-    @Upsert
-    suspend fun upsertUser(user: User)
+    @Insert
+    suspend fun insertUser(user: User)
 
     @Delete
     suspend fun deleteUser(user: User)
@@ -124,8 +125,8 @@ interface LikedPlaylistDAO {
     /**
      * Creates or updates a liked tracks playlist (tracks not included).
      */
-    @Upsert
-    suspend fun upsertLikedTracksPlaylist(likedTracksPlaylist: LikedPlaylist)
+    @Insert
+    suspend fun insertLikedTracksPlaylist(likedTracksPlaylist: LikedPlaylist)
 
     /**
      * Adds a track to the user's liked tracks playlist.
@@ -166,8 +167,8 @@ interface TrackHistoryDAO {
     /**
      * Creates or updates a track history (tracks not included).
      */
-    @Upsert
-    suspend fun upsertTrackHistory(trackHistory: TrackHistory)
+    @Insert
+    suspend fun insertTrackHistory(trackHistory: TrackHistory)
 
     /**
      * Adds a track to the user's track history.

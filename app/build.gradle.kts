@@ -61,7 +61,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(platform(libs.firebase.bom))
     implementation(libs.com.google.firebase.firebase.analytics)
-    implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
     implementation(libs.koin.androidx.compose)
     implementation(libs.ktor.client.core)

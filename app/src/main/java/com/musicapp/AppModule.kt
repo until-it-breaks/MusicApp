@@ -2,14 +2,13 @@ package com.musicapp
 
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.musicapp.data.database.MusicAppDatabase
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.repositories.LikedTracksRepository
 import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.data.repositories.TracksRepository
 import com.musicapp.data.repositories.UserPlaylistRepository
-import com.musicapp.data.repositories.UsersRepository
+import com.musicapp.data.repositories.UserRepository
 import com.musicapp.ui.screens.addtoplaylist.AddToPlaylistViewModel
 import com.musicapp.ui.screens.album.AlbumViewModel
 import com.musicapp.ui.screens.artist.ArtistViewModel
@@ -33,16 +32,14 @@ import org.koin.dsl.module
 val appModule = module {
     single { FirebaseAuth.getInstance() }
 
-    single { FirebaseFirestore.getInstance() }
-
     single {
         Room.databaseBuilder(
             get(),
             MusicAppDatabase::class.java,
             "music-app"
         )
-            .fallbackToDestructiveMigration(true)
-            .build()
+        .fallbackToDestructiveMigration(true)
+        .build()
     }
 
     single {
@@ -55,14 +52,14 @@ val appModule = module {
     single {
         LikedTracksRepository(
             get(),
-            get<MusicAppDatabase>().likedTracksDAO(),
+            get<MusicAppDatabase>().likedPlaylistDAO(),
             get()
         )
     }
 
     single {
         TrackHistoryRepository(
-            get(),
+            get<TracksRepository>(),
             get<MusicAppDatabase>().trackHistoryDAO()
         )
     }
@@ -72,7 +69,12 @@ val appModule = module {
     }
 
     single {
-        UsersRepository(get<MusicAppDatabase>().userDAO(),)
+        UserRepository(
+            get<MusicAppDatabase>().userDAO(),
+            get<MusicAppDatabase>().likedPlaylistDAO(),
+            get<MusicAppDatabase>().trackHistoryDAO(),
+            get()
+        )
     }
 
     single {
@@ -89,7 +91,7 @@ val appModule = module {
 
     single { DeezerDataSource(get()) }
 
-    viewModel { SignUpViewModel(get(), get(), get(), get(), get()) }
+    viewModel { SignUpViewModel(get(), get()) }
 
     viewModel { LoginViewModel(get()) }
 
