@@ -5,13 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
@@ -42,7 +38,7 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
         topBar = {
             TopBarWithBackButton(
                 navController = subNavController,
-                action = { TrackHistoryDropDownMenu(onClearTracks = viewModel::clearTrackHistory) }
+                content = { TrackHistoryDropDownMenu(onClearTracks = viewModel::clearTrackHistory) }
             )
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)

@@ -40,7 +40,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
         topBar = {
             TopBarWithBackButton(
                 navController = subNavController,
-                action = { LikedTracksPlaylistDropDownMenu(onClearTracks = viewModel::clearLikedTracks) }
+                content = { LikedTracksPlaylistDropDownMenu(onClearTracks = viewModel::clearLikedTracks) }
             )
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)

@@ -23,7 +23,7 @@ fun TopBarWithBackButton(
     navController: NavController,
     modifier: Modifier = Modifier,
     title: String = "",
-    action: (@Composable () -> Unit)? = null
+    content: (@Composable () -> Unit)? = null
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
@@ -44,11 +44,7 @@ fun TopBarWithBackButton(
                 }
             }
         },
-        actions = {
-            if (action != null) {
-                action()
-            }
-        }
+        actions = { if (content != null) content() }
     )
 }
 

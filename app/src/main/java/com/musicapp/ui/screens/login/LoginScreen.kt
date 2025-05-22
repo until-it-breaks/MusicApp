@@ -80,8 +80,8 @@ fun LoginScreen(navController: NavController) {
                 .padding(contentPadding)
                 .fillMaxSize()
                 .imePadding()
-                .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
                 .verticalScroll(rememberScrollState())
+                .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
         ) {
             if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 Spacer(modifier = Modifier.height(48.dp))

@@ -2,7 +2,7 @@
 <resources>
     <string name="password_reset_email_sent">L\'email per il reset della password è stata inviata</string>
     <string name="send_password_reset_email">Invia email</string>
-    <string name="enter_instructions_to_reset_password">Indicaci l\'email alla quale invieremo le istruzioni per il ripristino della password</string>
+    <string name="password_reset_instructions">Indicaci l\'email alla quale invieremo le istruzioni per il ripristino della password</string>
     <string name="password_recovery_screen_name">Ripristino Password</string>
     <string name="account_description">Account</string>
     <string name="home_screen_name">Home</string>
