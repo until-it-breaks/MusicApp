@@ -13,7 +13,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Add
@@ -25,11 +24,13 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.ui.res.stringResource
+import com.musicapp.R
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.screens.addtoplaylist.AddTrackToPlaylistModal
 
 /**
- * Drop-down menu used for user playlists
+ * Drop-down menu for user playlists
  */
 @Composable
 fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onDeletePlaylist: () -> Unit) {
@@ -39,24 +40,19 @@ fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onD
         modifier = Modifier.padding(16.dp)
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = !expanded }
         ) {
             DropdownMenuItem(
-                text = { Text("Add song") },
-                leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                onClick = onAddTrack
-            )
-            DropdownMenuItem(
-                text = { Text("Edit name") },
+                text = { Text(stringResource(R.string.edit_playlist_name)) },
                 leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
                 onClick = onEditName
             )
             DropdownMenuItem(
-                text = { Text("Delete playlist") },
+                text = { Text(stringResource(R.string.delete_playlist)) },
                 leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null) },
                 onClick = onDeletePlaylist
             )
@@ -65,14 +61,15 @@ fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onD
 }
 
 /**
- * Drop-down menu used for tracks retrieved via deezer API
+ * Drop-down menu for tracks retrieved via deezer API
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PublicTrackDropDownMenu(
     trackModel: TrackModel,
     modifier: Modifier = Modifier,
-    onLiked: (track: TrackModel) -> Unit,
+    onAddToQueue: (track: TrackModel) -> Unit,
+    onLiked: (track: TrackModel) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -82,30 +79,30 @@ fun PublicTrackDropDownMenu(
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = !expanded }
         ) {
             DropdownMenuItem(
-                text = { Text("Add to queue") },
+                text = { Text(stringResource(R.string.add_to_queue)) },
                 leadingIcon = { Icon(Icons.Outlined.QueuePlayNext, contentDescription = null)},
                 onClick = {
-                    /*TODO call to the music player service */
                     expanded = !expanded
+                    onAddToQueue(trackModel)
                 }
             )
             DropdownMenuItem(
-                text = { Text("Add to Liked") },
+                text = { Text(stringResource(R.string.add_to_liked)) },
                 leadingIcon = { Icon(Icons.Outlined.Favorite, contentDescription = null)},
                 onClick = {
-                    onLiked(trackModel)
                     expanded = !expanded
+                    onLiked(trackModel)
                 }
             )
             DropdownMenuItem(
-                text = { Text("Add to playlist") },
+                text = { Text(stringResource(R.string.add_to_playlist)) },
                 leadingIcon = { Icon(Icons.Outlined.Add, contentDescription = null)},
                 onClick = {
                     showBottomSheet = !showBottomSheet
@@ -123,14 +120,14 @@ fun PublicTrackDropDownMenu(
 }
 
 /**
- * Drop-down menu used for tracks that the user saves
+ * Drop-down menu used for tracks that the user has saved
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SavedTrackDropDownMenu(
-    trackModel: TrackModel,
-    onAddToQueue: () -> Unit,
-    onRemoveTrack: () -> Unit,
+    track: TrackModel,
+    onAddToQueue: (track: TrackModel) -> Unit,
+    onRemoveTrack: (track: TrackModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -141,23 +138,22 @@ fun SavedTrackDropDownMenu(
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("Add to queue") },
+                text = { Text(stringResource(R.string.add_to_queue)) },
                 leadingIcon = { Icon(Icons.Outlined.QueuePlayNext, contentDescription = null)},
                 onClick = {
-                    /*TODO call to the music player service */
                     expanded = !expanded
-                    onAddToQueue()
+                    onAddToQueue(track)
                 }
             )
             DropdownMenuItem(
-                text = { Text("Add to playlist") },
+                text = { Text(stringResource(R.string.add_to_playlist)) },
                 leadingIcon = { Icon(Icons.Outlined.Add, contentDescription = null)},
                 onClick = {
                     showBottomSheet = !showBottomSheet
@@ -165,17 +161,17 @@ fun SavedTrackDropDownMenu(
                 }
             )
             DropdownMenuItem(
-                text = { Text("Remove track") },
+                text = { Text(stringResource(R.string.remove_track)) },
                 leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
                 onClick = {
                     expanded = !expanded
-                    onRemoveTrack()
+                    onRemoveTrack(track)
                 }
             )
         }
     }
     AddTrackToPlaylistModal(
-        track = trackModel,
+        track = track,
         showBottomSheet = showBottomSheet,
         sheetState = sheetState,
         onDismiss = { showBottomSheet = !showBottomSheet }
@@ -194,14 +190,14 @@ fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("Clear Tracks") },
+                text = { Text(stringResource(R.string.clear_tracks)) },
                 leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
                 onClick = {
                     expanded = !expanded
@@ -224,14 +220,14 @@ fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () ->
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("Clear Tracks") },
+                text = { Text(stringResource(R.string.clear_tracks)) },
                 leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
                 onClick = {
                     expanded = !expanded

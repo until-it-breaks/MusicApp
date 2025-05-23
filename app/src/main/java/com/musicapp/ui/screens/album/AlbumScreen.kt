@@ -1,6 +1,5 @@
 package com.musicapp.ui.screens.album
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -53,8 +51,6 @@ import java.time.LocalDate
 fun AlbumScreen(navController: NavController, albumId: Long) {
     val viewModel = koinViewModel<AlbumViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val context = LocalContext.current
 
     LaunchedEffect(albumId) {
         viewModel.loadAlbum(albumId)
@@ -134,11 +130,12 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
             items(uiState.tracks) { track ->
                 TrackCard(
                     track = track,
-                    onTrackClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
+                    onTrackClick = viewModel::playTrack,
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
                         PublicTrackDropDownMenu(
                             trackModel = track,
+                            onAddToQueue = viewModel::addToQueue,
                             onLiked = viewModel::addToLiked
                         )
                     },
@@ -148,13 +145,13 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 val albumDetails = uiState.albumDetails
                 if (albumDetails != null) {
                     Row {
-                        Text("${albumDetails.trackCount} songs")
+                        Text("${albumDetails.trackCount} ${stringResource(R.string.tracks)}")
                         albumDetails.duration?.let {
                             Text(" · ")
                             Text(convertDurationInSecondsToString(it))
                         }
                     }
-                    Text("Label: ${albumDetails.label}")
+                    Text("${stringResource(R.string.album_label)}: ${albumDetails.label}")
                 }
             }
         }

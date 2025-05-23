@@ -79,7 +79,7 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                         onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                         extraMenu = {
                             SavedTrackDropDownMenu(
-                                trackModel = track,
+                                track = track,
                                 onAddToQueue = { viewModel.addToQueue(track) },
                                 onRemoveTrack = { viewModel.removeTrackFromTrackHistory(track.id) }
                             )

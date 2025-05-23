@@ -81,7 +81,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     onArtistClick = { /*TODO*/ },
                     extraMenu = {
                         SavedTrackDropDownMenu(
-                            trackModel = track,
+                            track = track,
                             onAddToQueue = { viewModel.addToQueue(track) },
                             onRemoveTrack = { viewModel.removeTrackFromPlaylist(track.id) }
                         )

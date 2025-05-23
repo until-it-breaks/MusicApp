@@ -79,7 +79,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                         onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                         extraMenu = {
                             SavedTrackDropDownMenu(
-                                trackModel = track,
+                                track = track,
                                 onAddToQueue = { viewModel.addToQueue(track) },
                                 onRemoveTrack = { viewModel.removeTrackFromLikedTracks(track.id) }
                             )

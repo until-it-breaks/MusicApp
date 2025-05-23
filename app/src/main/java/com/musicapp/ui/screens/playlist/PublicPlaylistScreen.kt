@@ -1,6 +1,5 @@
 package com.musicapp.ui.screens.playlist
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,9 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -37,15 +34,14 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
     val viewModel = koinViewModel<PublicPlaylistViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(playlistId) {
         viewModel.loadPlaylist(playlistId)
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, title = "Playlist details") },
+        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.playlist_details)) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         LazyColumn(
@@ -55,12 +51,7 @@ fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
                 .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
         ) {
             item {
-                if (state.error != null) {
-                    Text("Error: ${state.error}")
-                }
-            }
-            item {
-                state.playlistDetails?.let { playlist ->
+                uiState.playlistDetails?.let { playlist ->
                     Column(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
@@ -70,39 +61,41 @@ fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
                         ) {
                             LoadableImage(
                                 imageUri = playlist.bigPicture,
-                                stringResource(R.string.playlist_picture_description)
+                                contentDescription = stringResource(R.string.playlist_picture_description)
                             )
                         }
                         Text(
                             text = playlist.title,
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.headlineMedium
                         )
                         playlist.description?.let {
                             Text(
-                                text = it
+                                text = it,
+                                style = MaterialTheme.typography.bodyLarge
                             )
                         }
                         playlist.creator?.name?.let {
                             Text(
-                                text = it
+                                text = it,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
                 }
             }
-            items(state.tracks) { track ->
+            items(uiState.tracks) { track ->
                 TrackCard(
                     track = track,
                     showPicture = true,
-                    onTrackClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
+                    onTrackClick = viewModel::playTrack,
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
                         PublicTrackDropDownMenu(
                             trackModel = track,
-                            onLiked = viewModel::addToLiked
+                            onLiked = viewModel::addToLiked,
+                            onAddToQueue = viewModel::addToQueue
                         )
-                    },
+                    }
                 )
             }
         }

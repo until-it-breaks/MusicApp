@@ -80,4 +80,16 @@ class AlbumViewModel(
             }
         }
     }
+
+    fun addToQueue(track: TrackModel) {
+        viewModelScope.launch {
+            // TODO Enqueue given track
+        }
+    }
+
+    fun playTrack(track: TrackModel) {
+        viewModelScope.launch {
+            // TODO Play given track
+        }
+    }
 }
