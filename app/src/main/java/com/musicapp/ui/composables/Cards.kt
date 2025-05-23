@@ -42,11 +42,15 @@ enum class PlaylistType {
     HISTORY
 }
 
+/**
+ * Simple card for playlist/album home representation
+ */
 @Composable
 fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = null, onClick: () -> Unit) {
     Card(
         onClick = onClick,
-        modifier = modifier
+        modifier = modifier,
+        shape = MaterialTheme.shapes.medium,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -58,7 +62,7 @@ fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = 
             )
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(horizontal = 8.dp)
@@ -123,6 +127,9 @@ fun UserPlaylistCard(
     }
 }
 
+/**
+ * Simple card for artist home representation
+ */
 @Composable
 fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: Uri? = null, onClick: () -> Unit) {
     Card(
@@ -144,7 +151,7 @@ fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: Uri? = nu
             )
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center

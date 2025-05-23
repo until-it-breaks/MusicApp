@@ -28,6 +28,7 @@ import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import org.koin.androidx.compose.koinViewModel
 import com.musicapp.ui.composables.ArtistCard
+import com.musicapp.ui.composables.CenteredCircularProgressIndicator
 import com.musicapp.ui.composables.MainTopBar
 import com.musicapp.ui.composables.PlayListCard
 
@@ -40,7 +41,7 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
     val pullToRefreshState = rememberPullToRefreshState()
 
     Scaffold(
-        topBar = { MainTopBar(mainNavController, "Home") },
+        topBar = { MainTopBar(mainNavController, stringResource(R.string.home)) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         PullToRefreshBox(
@@ -51,13 +52,20 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
         ) {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(12.dp).fillMaxSize()
+                modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxSize()
             ) {
                 item {
                     Text(
                         text = stringResource(R.string.top_playlists),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.headlineSmall
                     )
+                }
+                item {
+                    if (state.showPlaylistLoading) {
+                        CenteredCircularProgressIndicator()
+                    }
                 }
                 items(state.playlists.chunked(2)) { rowItems ->
                     Row(
@@ -79,8 +87,13 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                 item {
                     Text(
                         text = stringResource(R.string.top_artists),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.headlineSmall
                     )
+                }
+                item {
+                    if (state.showArtistsLoading) {
+                        CenteredCircularProgressIndicator()
+                    }
                 }
                 item {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -96,8 +109,13 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                 item {
                     Text(
                         text = stringResource(R.string.top_albums),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.headlineSmall
                     )
+                }
+                item {
+                    if (state.showAlbumsLoading) {
+                        CenteredCircularProgressIndicator()
+                    }
                 }
                 items(state.albums.chunked(2)) { rowItems ->
                     Row(

@@ -9,6 +9,8 @@ import com.musicapp.ui.models.ArtistModel
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.toModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,8 +19,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+private const val TAG = "HomeViewModel"
+
 data class HomeState(
     val isLoading: Boolean = false,
+    val showPlaylistLoading: Boolean = false,
+    val showArtistsLoading: Boolean = false,
+    val showAlbumsLoading: Boolean = false,
     val playlists: List<PublicPlaylistModel> = emptyList(),
     val artists: List<ArtistModel> = emptyList(),
     val albums: List<AlbumModel> = emptyList()
@@ -34,39 +41,48 @@ class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel(
 
     private fun loadTopPlaylist() {
         viewModelScope.launch {
+            _state.update { it.copy(showPlaylistLoading = true) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopPlaylists()
                 }
                 _state.update { it.copy(playlists = result.map { it.toModel() }) }
             } catch (e: Exception) {
-                Log.e("API", e.localizedMessage ?: "Unexpected playlist error")
+                Log.e(TAG, e.localizedMessage, e)
+            } finally {
+                _state.update { it.copy(showPlaylistLoading = false) }
             }
         }
     }
 
     private fun loadTopArtists() {
         viewModelScope.launch {
+            _state.update { it.copy(showArtistsLoading = true) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopArtists()
                 }
                 _state.update { it.copy(artists = result.map { it.toModel() }) }
             } catch (e: Exception) {
-                Log.e("API", e.localizedMessage ?: "Unexpected artists error")
+                Log.e(TAG, e.localizedMessage, e)
+            } finally {
+                _state.update { it.copy(showArtistsLoading = false) }
             }
         }
     }
 
     private fun loadTopAlbums() {
         viewModelScope.launch {
+            _state.update { it.copy(showAlbumsLoading = true) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopAlbums()
                 }
                 _state.update { it.copy(albums = result.map { it.toModel() }) }
             } catch (e: Exception) {
-                Log.e("API", e.localizedMessage ?: "Unexpected albums error")
+                Log.e(TAG, e.localizedMessage, e)
+            } finally {
+                _state.update { it.copy(showAlbumsLoading = false) }
             }
         }
     }
@@ -74,10 +90,13 @@ class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel(
     fun loadContent() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, playlists = emptyList(), artists = emptyList(), albums = emptyList()) }
-            delay(20) // Fixes stuck spinner for some reason
-            loadTopPlaylist()
-            loadTopArtists()
-            loadTopAlbums()
+            val jobs = listOf(
+                async { loadTopPlaylist() },
+                async { loadTopArtists() },
+                async { loadTopAlbums() }
+            )
+            jobs.awaitAll()
+            delay(20) // Fixes stuck spinner
             _state.update { it.copy(isLoading = false) }
         }
     }
