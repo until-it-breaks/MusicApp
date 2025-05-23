@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.musicapp.ui.composables.PersonalTrackDropDownMenu
+import com.musicapp.ui.composables.SavedTrackDropDownMenu
 import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.composables.UserPlaylistTopBar
 import com.musicapp.util.convertMillisToDateWithHourAndMinutes
@@ -80,7 +80,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     onTrackClick = { viewModel.playTrack(track) },
                     onArtistClick = { /*TODO*/ },
                     extraMenu = {
-                        PersonalTrackDropDownMenu(
+                        SavedTrackDropDownMenu(
                             trackModel = track,
                             onAddToQueue = { viewModel.addToQueue(track) },
                             onRemoveTrack = { viewModel.removeTrackFromPlaylist(track.id) }

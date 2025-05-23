@@ -2,6 +2,7 @@ package com.musicapp.ui.models
 
 import com.musicapp.data.database.TrackHistory
 import com.musicapp.data.repositories.TrackHistoryWithTracks
+import com.musicapp.data.repositories.TrackHistoryWithTracksAndArtists
 
 data class TrackHistoryModel(
     val ownerId: String,
@@ -12,11 +13,19 @@ data class TrackHistoryModel(
 fun TrackHistory.toModel(): TrackHistoryModel {
     return TrackHistoryModel(
         ownerId = ownerId,
-        lastEditTime = this@toModel.lastEditTime
+        lastEditTime = lastEditTime
     )
 }
 
 fun TrackHistoryWithTracks.toModel(): TrackHistoryModel {
+    return TrackHistoryModel(
+        ownerId = playlist.ownerId,
+        lastEditTime = playlist.lastEditTime,
+        tracks = tracks.map { it.toModel() }
+    )
+}
+
+fun TrackHistoryWithTracksAndArtists.toModel(): TrackHistoryModel {
     return TrackHistoryModel(
         ownerId = playlist.ownerId,
         lastEditTime = playlist.lastEditTime,

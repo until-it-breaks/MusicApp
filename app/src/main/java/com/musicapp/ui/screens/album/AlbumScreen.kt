@@ -52,7 +52,8 @@ import java.time.LocalDate
 @Composable
 fun AlbumScreen(navController: NavController, albumId: Long) {
     val viewModel = koinViewModel<AlbumViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
 
     LaunchedEffect(albumId) {
@@ -60,7 +61,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, title = "Album Details") },
+        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.album_details)) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         LazyColumn(
@@ -70,12 +71,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
         ) {
             item {
-                if (state.error != null) {
-                    Text("Error: ${state.error}")
-                }
-            }
-            item {
-                state.albumDetails?.let { album ->
+                uiState.albumDetails?.let { album ->
                     Column(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
@@ -104,7 +100,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                                 album.contributors.forEachIndexed { index, contributor ->
                                     LoadableImage(
                                         imageUri = contributor.smallPicture,
-                                        contentDescription = "Artist picture",
+                                        contentDescription = stringResource(R.string.artist_picture_description),
                                         modifier = Modifier
                                             .size(36.dp)
                                             .offset(x = (index * 24).dp)
@@ -135,7 +131,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                     }
                 }
             }
-            items(state.tracks) { track ->
+            items(uiState.tracks) { track ->
                 TrackCard(
                     track = track,
                     onTrackClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
@@ -149,7 +145,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 )
             }
             item {
-                val albumDetails = state.albumDetails
+                val albumDetails = uiState.albumDetails
                 if (albumDetails != null) {
                     Row {
                         Text("${albumDetails.trackCount} songs")

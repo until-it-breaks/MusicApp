@@ -22,11 +22,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+private const val TAG = "TrackHistoryViewModel"
+
 data class TrackHistoryState(val showAuthError: Boolean = false)
 
 class TrackHistoryViewModel(
     private val auth: FirebaseAuth,
-    private val playlistsRepository: TrackHistoryRepository
+    private val trackHistoryRepository: TrackHistoryRepository
 ): ViewModel() {
     private val _userId = MutableStateFlow(auth.currentUser?.uid)
     private val _uiState = MutableStateFlow(TrackHistoryState())
@@ -36,7 +38,7 @@ class TrackHistoryViewModel(
     val playlist: StateFlow<TrackHistoryModel?> = _userId
         .filterNotNull()
         .flatMapLatest { userId ->
-            playlistsRepository.getTrackHistoryWithTracks(userId).map { it.toModel() }
+            trackHistoryRepository.getTrackHistoryWithTracksAndArtists(userId).map { it.toModel() }
         }
         .stateIn(
             scope = viewModelScope,
@@ -55,10 +57,10 @@ class TrackHistoryViewModel(
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.clearTrackHistory(userId)
+                    trackHistoryRepository.clearTrackHistory(userId)
                 }
             } catch (e: Exception) {
-                Log.e("TrackHistoryViewModel", "Error clearing track history: ${e.localizedMessage}", e)
+                Log.e(TAG, e.localizedMessage, e)
             }
         }
     }
@@ -74,10 +76,10 @@ class TrackHistoryViewModel(
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.removeTrackFromTrackHistory(userId, trackId)
+                    trackHistoryRepository.removeTrackFromTrackHistory(userId, trackId)
                 }
             } catch (e: Exception) {
-                Log.e("TrackHistoryViewModel", "Error removing track from track history: ${e.localizedMessage}", e)
+                Log.e(TAG, e.localizedMessage, e)
             }
         }
     }
@@ -92,5 +94,9 @@ class TrackHistoryViewModel(
         viewModelScope.launch {
             // TODO Play given track
         }
+    }
+
+    fun logout() {
+        auth.signOut()
     }
 }

@@ -22,9 +22,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+private const val TAG = "LikedTracksViewModel"
+
 data class LikedTracksState(val showAuthError: Boolean = false)
 
-class LikedTracksViewModel(private val auth: FirebaseAuth, private val likedTracksRepository: LikedTracksRepository): ViewModel() {
+class LikedTracksViewModel(
+    private val auth: FirebaseAuth,
+    private val likedTracksRepository: LikedTracksRepository
+): ViewModel() {
     private val _userId = MutableStateFlow(auth.currentUser?.uid)
     private val _uiState = MutableStateFlow(LikedTracksState())
     val uiState: StateFlow<LikedTracksState> = _uiState.asStateFlow()
@@ -52,10 +57,10 @@ class LikedTracksViewModel(private val auth: FirebaseAuth, private val likedTrac
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    likedTracksRepository.clearLikedTracksPlaylist(userId)
+                    likedTracksRepository.clearLikedTracks(userId)
                 }
             } catch (e: Exception) {
-                Log.e("LikedTracksViewModel", "Error clearing liked tracks: ${e.localizedMessage}", e)
+                Log.e(TAG, e.localizedMessage, e)
             }
         }
     }
@@ -71,10 +76,10 @@ class LikedTracksViewModel(private val auth: FirebaseAuth, private val likedTrac
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    likedTracksRepository.removeTrackFromLikedTracksPlaylist(userId, trackId)
+                    likedTracksRepository.removeTrackFromLikedTracks(userId, trackId)
                 }
             } catch (e: Exception) {
-                Log.e("LikedTracksViewModel", "Error removing track from liked tracks: ${e.localizedMessage}", e)
+                Log.e(TAG, e.localizedMessage, e)
             }
         }
     }

@@ -70,7 +70,7 @@ class AddToPlaylistViewModel(
                 _uiState.update { it.copy(showAuthError = true) }
             } else {
                 withContext(Dispatchers.IO) {
-                    likedTracksRepository.addTrackToLikedTracksPlaylist(userId, track)
+                    likedTracksRepository.addTrackToLikedTracks(userId, track)
                 }
             }
         }

@@ -112,10 +112,9 @@ interface LikedPlaylistDAO {
     fun getLikedPlaylist(userId: String): Flow<LikedPlaylist>
 
     @Query("SELECT * FROM likedplaylisttrackcrossref WHERE ownerId = :userId AND trackId = :trackId")
-    suspend fun getTrackFromLikedTracksPlaylist(userId: String, trackId: Long): LikedPlaylistTrackCrossRef?
+    suspend fun getTrackFromLikedTracks(userId: String, trackId: Long): LikedPlaylistTrackCrossRef?
 
-    @Query(
-        """
+    @Query("""
     SELECT Track.* FROM Track
     INNER JOIN LikedPlaylistTrackCrossRef ON Track.trackId = LikedPlaylistTrackCrossRef.trackId
     WHERE LikedPlaylistTrackCrossRef.ownerId = :userId ORDER BY LikedPlaylistTrackCrossRef.timeOfAddition
@@ -132,7 +131,7 @@ interface LikedPlaylistDAO {
      * Adds a track to the user's liked tracks playlist.
      */
     @Upsert
-    suspend fun addTrackToLikedTracksPlaylist(crossRef: LikedPlaylistTrackCrossRef)
+    suspend fun addTrackToLikedTracks(crossRef: LikedPlaylistTrackCrossRef)
 
     @Query("UPDATE likedplaylist SET lastEditTime = :lastEditTime WHERE ownerId = :playlistId")
     suspend fun updateEditTime(playlistId: String, lastEditTime: Long = System.currentTimeMillis())
@@ -141,13 +140,13 @@ interface LikedPlaylistDAO {
      * Deletes a single track from a user's liked tracks playlist
      */
     @Query("DELETE FROM likedplaylisttrackcrossref WHERE likedplaylisttrackcrossref.ownerId = :ownerId AND likedplaylisttrackcrossref.trackId = :trackId")
-    suspend fun deleteTrackFromLikedTracksPlaylist(ownerId: String, trackId: Long)
+    suspend fun deleteTrackFromLikedTracks(ownerId: String, trackId: Long)
 
     /**
      * Deletes all tracks in a user's liked tracks playlist
      */
     @Query("DELETE FROM likedplaylisttrackcrossref WHERE ownerId = :ownerId")
-    suspend fun clearLikedTracksPlaylist(ownerId: String)
+    suspend fun clearLikedTracks(ownerId: String)
 }
 
 @Dao
@@ -156,8 +155,7 @@ interface TrackHistoryDAO {
     @Query("SELECT * FROM trackhistory WHERE ownerId = :userId")
     fun getTrackHistory(userId: String): Flow<TrackHistory>
 
-    @Query(
-        """
+    @Query("""
     SELECT Track.* FROM Track
     INNER JOIN TrackHistoryTrackCrossRef ON Track.trackId = TrackHistoryTrackCrossRef.trackId
     WHERE TrackHistoryTrackCrossRef.ownerId = :userId ORDER BY TrackHistoryTrackCrossRef.timeOfAddition

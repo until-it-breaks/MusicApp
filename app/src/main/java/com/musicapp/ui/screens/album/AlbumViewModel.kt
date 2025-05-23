@@ -1,5 +1,6 @@
 package com.musicapp.ui.screens.album
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -17,12 +18,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+private const val TAG = "AlbumViewModel"
+
 data class AlbumState(
     val albumDetails: AlbumModel? = null,
     val tracks: List<TrackModel> = emptyList(),
     val albumDetailsAreLoading: Boolean = false,
-    val tracksAreLoading: Boolean = false,
-    val error: String? = null
+    val tracksAreLoading: Boolean = false
 )
 
 class AlbumViewModel(
@@ -30,42 +32,41 @@ class AlbumViewModel(
     private val likedTracksRepository: LikedTracksRepository,
     private val auth: FirebaseAuth
 ): ViewModel() {
-    private val _state = MutableStateFlow(AlbumState())
-    val state: StateFlow<AlbumState> = _state.asStateFlow()
+    private val _uiState = MutableStateFlow(AlbumState())
+    val uiState: StateFlow<AlbumState> = _uiState.asStateFlow()
 
     fun loadAlbum(albumId: Long) {
         viewModelScope.launch {
-            _state.update { it.copy(albumDetailsAreLoading = true, error = null) }
+            _uiState.update { it.copy(albumDetailsAreLoading = true) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getAlbumDetails(albumId)
                 }
-                _state.update { it.copy(albumDetails = result.toModel()) }
+                _uiState.update { it.copy(albumDetails = result.toModel()) }
                 loadTracks()
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error") }
+                Log.e(TAG, e.localizedMessage, e)
             } finally {
-                _state.update { it.copy(albumDetailsAreLoading = false) }
+                _uiState.update { it.copy(albumDetailsAreLoading = false) }
             }
         }
     }
 
     private fun loadTracks() {
         viewModelScope.launch {
-            val tracks = state.value.albumDetails?.tracks.orEmpty()
-            _state.update { it.copy(tracks = emptyList(), tracksAreLoading = true, error = null) }
+            val tracks = uiState.value.albumDetails?.tracks.orEmpty()
+            _uiState.update { it.copy(tracks = emptyList(), tracksAreLoading = true) }
             for (track in tracks) {
                 try {
                     val detailedTrack: DeezerTrackDetailed = withContext(Dispatchers.IO) {
                         deezerDataSource.getTrackDetails(track.id)
                     }
-                    _state.update { it.copy(tracks = it.tracks + detailedTrack.toModel()) }
+                    _uiState.update { it.copy(tracks = it.tracks + detailedTrack.toModel()) }
                 } catch (e: Exception) {
-                    _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error") }
-                } finally {
-                    _state.update { it.copy(tracksAreLoading = false) }
+                    Log.e(TAG, e.localizedMessage, e)
                 }
             }
+            _uiState.update { it.copy(tracksAreLoading = false) }
         }
     }
 
@@ -74,7 +75,7 @@ class AlbumViewModel(
             val userId = auth.currentUser?.uid
             if (userId != null) {
                 withContext(Dispatchers.IO) {
-                    likedTracksRepository.addTrackToLikedTracksPlaylist(userId, track)
+                    likedTracksRepository.addTrackToLikedTracks(userId, track)
                 }
             }
         }

@@ -127,7 +127,7 @@ fun PublicTrackDropDownMenu(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PersonalTrackDropDownMenu(
+fun SavedTrackDropDownMenu(
     trackModel: TrackModel,
     onAddToQueue: () -> Unit,
     onRemoveTrack: () -> Unit,

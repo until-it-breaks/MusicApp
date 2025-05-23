@@ -18,13 +18,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.AuthErrorMessage
 import com.musicapp.ui.composables.LikedTracksPlaylistDropDownMenu
-import com.musicapp.ui.composables.PersonalTrackDropDownMenu
+import com.musicapp.ui.composables.SavedTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
 import com.musicapp.util.convertMillisToDateWithHourAndMinutes
@@ -58,13 +60,13 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "Liked Tracks",
+                            text = stringResource(R.string.liked_tracks),
                             style = MaterialTheme.typography.titleLarge
                         )
                         val timeInMillis = playlist.value?.lastEditTime
                         timeInMillis?.let {
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text("Last edited: ${convertMillisToDateWithHourAndMinutes(it)}")
+                            Text("${stringResource(R.string.last_edited)}: ${convertMillisToDateWithHourAndMinutes(it)}")
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
@@ -76,7 +78,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                         onTrackClick = { viewModel.playTrack(track) },
                         onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                         extraMenu = {
-                            PersonalTrackDropDownMenu(
+                            SavedTrackDropDownMenu(
                                 trackModel = track,
                                 onAddToQueue = { viewModel.addToQueue(track) },
                                 onRemoveTrack = { viewModel.removeTrackFromLikedTracks(track.id) }

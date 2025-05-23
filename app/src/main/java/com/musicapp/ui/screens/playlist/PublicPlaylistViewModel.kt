@@ -74,7 +74,7 @@ class PublicPlaylistViewModel(
             val userId = auth.currentUser?.uid
             if (userId != null) {
                 withContext(Dispatchers.IO) {
-                    likedTracksRepository.addTrackToLikedTracksPlaylist(userId, track)
+                    likedTracksRepository.addTrackToLikedTracks(userId, track)
                 }
             }
         }

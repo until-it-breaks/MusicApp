@@ -59,6 +59,7 @@ val appModule = module {
 
     single {
         TrackHistoryRepository(
+            get(),
             get<TracksRepository>(),
             get<MusicAppDatabase>().trackHistoryDAO()
         )

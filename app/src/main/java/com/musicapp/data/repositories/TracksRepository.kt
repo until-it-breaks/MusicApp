@@ -34,6 +34,4 @@ class TracksRepository(
             dao.addArtistToTrack(TrackArtistCrossRef(track.id, contributor.id))
         }
     }
-
-    suspend fun deleteTrack(trackId: Long) = dao.deleteTrack(trackId)
 }

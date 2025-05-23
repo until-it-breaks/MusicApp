@@ -1,10 +1,11 @@
 package com.musicapp.data.repositories
 
+import androidx.room.withTransaction
+import com.musicapp.data.database.MusicAppDatabase
 import com.musicapp.data.database.Track
 import com.musicapp.data.database.TrackHistory
 import com.musicapp.data.database.TrackHistoryDAO
 import com.musicapp.data.database.TrackHistoryTrackCrossRef
-import com.musicapp.ui.models.TrackHistoryModel
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -23,29 +24,33 @@ data class TrackHistoryWithTracksAndArtists(
 )
 
 /**
- *  Repository for track history
+ *  Repository for track history.
  */
 class TrackHistoryRepository(
+    private val db: MusicAppDatabase,
     private val trackRepository: TracksRepository,
     private val trackHistoryDAO: TrackHistoryDAO
 ) {
-    fun getTrackHistory(userId: String): Flow<TrackHistory> {
-        return trackHistoryDAO.getTrackHistory(userId)
-    }
 
-    fun getTrackHistoryWithTracks(userId: String): Flow<TrackHistoryWithTracks> {
-        val playlistFlow = trackHistoryDAO.getTrackHistory(userId)
-        val tracksFlow = trackHistoryDAO.getTracksOfPlaylist(userId)
+    /**
+     * Returns a flow of track history with tracks.
+     */
+    fun getTrackHistoryWithTracks(playlistId: String): Flow<TrackHistoryWithTracks> {
+        val playlistFlow = trackHistoryDAO.getTrackHistory(playlistId)
+        val tracksFlow = trackHistoryDAO.getTracksOfPlaylist(playlistId)
 
         return combine(playlistFlow, tracksFlow) { playlist, tracks ->
             TrackHistoryWithTracks(playlist, tracks)
         }
     }
 
+    /**
+     * Returns a flow of track history with tracks and contributors.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getPlaylistWithTracksAndArtists(userId: String): Flow<TrackHistoryWithTracksAndArtists> {
-        val playlistFlow = trackHistoryDAO.getTrackHistory(userId)
-        val tracksFlow = trackHistoryDAO.getTracksOfPlaylist(userId)
+    fun getTrackHistoryWithTracksAndArtists(playlistId: String): Flow<TrackHistoryWithTracksAndArtists> {
+        val playlistFlow = trackHistoryDAO.getTrackHistory(playlistId)
+        val tracksFlow = trackHistoryDAO.getTracksOfPlaylist(playlistId)
 
         return combine(playlistFlow, tracksFlow) { playlist, tracks ->
             playlist to tracks
@@ -67,25 +72,34 @@ class TrackHistoryRepository(
         }
     }
 
-    suspend fun upsertTrackHistory(trackHistory: TrackHistoryModel) {
-        val trackHistory = TrackHistory(
-            ownerId = trackHistory.ownerId,
-            lastEditTime = System.currentTimeMillis()
-        )
-        trackHistoryDAO.insertTrackHistory(trackHistory)
+    /**
+     * Adds a track to a given user's track history.
+     */
+    suspend fun addTrackToTrackHistory(playlistId: String, track: TrackModel) {
+        db.withTransaction {
+            trackRepository.upsertTrack(track)
+            trackHistoryDAO.addTrackToTrackHistory(TrackHistoryTrackCrossRef(playlistId, track.id, System.currentTimeMillis()))
+            trackHistoryDAO.updateEditTime(playlistId)
+        }
     }
 
-    suspend fun addTrackToTrackHistory(ownerId: String, track: TrackModel) {
-        trackRepository.upsertTrack(track)
-        trackHistoryDAO.addTrackToTrackHistory(TrackHistoryTrackCrossRef(ownerId, track.id, System.currentTimeMillis()))
-        trackHistoryDAO.updateEditTime(ownerId)
+    /**
+     * Removes a track from a given user's track history.
+     */
+    suspend fun removeTrackFromTrackHistory(playlistId: String, trackId: Long) {
+        db.withTransaction {
+            trackHistoryDAO.deleteTrackFromTrackHistory(playlistId, trackId)
+            trackHistoryDAO.updateEditTime(playlistId)
+        }
     }
 
-    suspend fun removeTrackFromTrackHistory(ownerId: String, trackId: Long) {
-        trackHistoryDAO.deleteTrackFromTrackHistory(ownerId, trackId)
-    }
-
-    suspend fun clearTrackHistory(userId: String) {
-        trackHistoryDAO.clearTrackHistory(userId)
+    /**
+     * Clears the track history of a given user.
+     */
+    suspend fun clearTrackHistory(playlistId: String) {
+        db.withTransaction {
+            trackHistoryDAO.clearTrackHistory(playlistId)
+            trackHistoryDAO.updateEditTime(playlistId)
+        }
     }
 }

@@ -184,6 +184,7 @@ fun TrackCard(
             ) {
                 Text(
                     text = track.title,
+                    style = MaterialTheme.typography.titleLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

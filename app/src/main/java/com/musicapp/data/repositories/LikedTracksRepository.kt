@@ -1,18 +1,17 @@
 package com.musicapp.data.repositories
 
-import com.musicapp.data.database.LikedPlaylistDAO
+import androidx.room.withTransaction
 import com.musicapp.data.database.LikedPlaylist
+import com.musicapp.data.database.LikedPlaylistDAO
 import com.musicapp.data.database.LikedPlaylistTrackCrossRef
 import com.musicapp.data.database.MusicAppDatabase
 import com.musicapp.data.database.Track
-import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 
 data class LikedPlaylistWithTracks(
     val playlist: LikedPlaylist,
@@ -25,7 +24,7 @@ data class LikedPlaylistWithTracksAndArtists(
 )
 
 /**
- *  Repository for liked tracks
+ *  Repository for liked tracks.
  */
 class LikedTracksRepository(
     private val db: MusicAppDatabase,
@@ -33,24 +32,25 @@ class LikedTracksRepository(
     private val trackRepository: TracksRepository
 ) {
 
-    fun getLikedTracksPlaylist(userId: String): Flow<LikedPlaylist> {
-        return likedPlaylistDAO.getLikedPlaylist(userId)
-    }
+    /**
+     * Returns a flow of liked playlist with tracks.
+     */
+    fun getPlaylistWithTracks(playlistId: String): Flow<LikedPlaylistWithTracks> {
+        val playlistFlow = likedPlaylistDAO.getLikedPlaylist(playlistId)
+        val tracksFlow = likedPlaylistDAO.getTracksOfPlaylist(playlistId)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun getLikedPlaylistWithTracksFlow(userId: String): Flow<LikedPlaylistWithTracks> {
-        val playlistFlow = likedPlaylistDAO.getLikedPlaylist(userId)
-        return playlistFlow.flatMapLatest { playlist ->
-            likedPlaylistDAO.getTracksOfPlaylist(userId).map { tracks ->
-                LikedPlaylistWithTracks(playlist, tracks)
-            }
+        return combine(playlistFlow, tracksFlow) { playlist, tracks ->
+            LikedPlaylistWithTracks(playlist, tracks)
         }
     }
 
+    /**
+     * Returns a flow of liked playlist with tracks and contributors.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getPlaylistWithTracksAndArtists(userId: String): Flow<LikedPlaylistWithTracksAndArtists> {
-        val playlistFlow = likedPlaylistDAO.getLikedPlaylist(userId)
-        val tracksFlow = likedPlaylistDAO.getTracksOfPlaylist(userId)
+    fun getPlaylistWithTracksAndArtists(playlistId: String): Flow<LikedPlaylistWithTracksAndArtists> {
+        val playlistFlow = likedPlaylistDAO.getLikedPlaylist(playlistId)
+        val tracksFlow = likedPlaylistDAO.getTracksOfPlaylist(playlistId)
 
         return combine(playlistFlow, tracksFlow) { playlist, tracks ->
             playlist to tracks
@@ -72,31 +72,41 @@ class LikedTracksRepository(
         }
     }
 
-    suspend fun isTrackInLikedTracks(userId: String, track: TrackModel): Boolean {
-        return likedPlaylistDAO.getTrackFromLikedTracksPlaylist(userId, track.id) != null
+    /**
+     * Returns true if a given track is in the liked tracks of a given user, false otherwise.
+     */
+    suspend fun isTrackInLikedTracks(playlistId: String, track: TrackModel): Boolean {
+        return likedPlaylistDAO.getTrackFromLikedTracks(playlistId, track.id) != null
     }
 
-    suspend fun upsertLikedTracksPlaylist(playlist: LikedTracksPlaylistModel) {
-        val playlist = LikedPlaylist(
-            ownerId = playlist.ownerId,
-            lastEditTime = System.currentTimeMillis()
-        )
-        likedPlaylistDAO.insertLikedTracksPlaylist(playlist)
+    /**
+     * Adds a track to a given user's liked tracks.
+     */
+    suspend fun addTrackToLikedTracks(playlistId: String, track: TrackModel) {
+        db.withTransaction {
+            trackRepository.upsertTrack(track)
+            likedPlaylistDAO.addTrackToLikedTracks(LikedPlaylistTrackCrossRef(playlistId, track.id, System.currentTimeMillis()))
+            likedPlaylistDAO.updateEditTime(playlistId)
+        }
     }
 
-    suspend fun addTrackToLikedTracksPlaylist(userId: String, track: TrackModel) {
-        trackRepository.upsertTrack(track)
-        likedPlaylistDAO.addTrackToLikedTracksPlaylist(LikedPlaylistTrackCrossRef(userId, track.id, System.currentTimeMillis()))
-        likedPlaylistDAO.updateEditTime(userId)
+    /**
+     * Removes a track from a given user's liked tracks.
+     */
+    suspend fun removeTrackFromLikedTracks(playlistId: String, trackId: Long) {
+        db.withTransaction {
+            likedPlaylistDAO.deleteTrackFromLikedTracks(playlistId, trackId)
+            likedPlaylistDAO.updateEditTime(playlistId)
+        }
     }
 
-    suspend fun removeTrackFromLikedTracksPlaylist(userId: String, trackId: Long) {
-        likedPlaylistDAO.deleteTrackFromLikedTracksPlaylist(userId, trackId)
-        likedPlaylistDAO.updateEditTime(userId)
-    }
-
-    suspend fun clearLikedTracksPlaylist(userId: String) {
-        likedPlaylistDAO.clearLikedTracksPlaylist(userId)
-        likedPlaylistDAO.updateEditTime(userId)
+    /**
+     * Clears the liked tracks of a given user.
+     */
+    suspend fun clearLikedTracks(playlistId: String) {
+        db.withTransaction {
+            likedPlaylistDAO.clearLikedTracks(playlistId)
+            likedPlaylistDAO.updateEditTime(playlistId)
+        }
     }
 }
