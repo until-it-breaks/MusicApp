@@ -25,7 +25,7 @@ fun AuthErrorMessage(modifier: Modifier = Modifier, onClick: () -> Unit) {
     ) {
         Icon(
             imageVector = Icons.Filled.Warning,
-            contentDescription = stringResource(R.string.warning_description),
+            contentDescription = null,
             modifier = Modifier.size(96.dp),
             tint = MaterialTheme.colorScheme.error
         )

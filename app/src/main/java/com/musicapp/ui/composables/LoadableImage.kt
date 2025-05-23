@@ -8,13 +8,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.musicapp.R
 
 @Composable
 fun LoadableImage(
     imageUri: Uri?,
-    contentDescription: String,
+    contentDescription: String?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit
 ) {
@@ -31,7 +33,7 @@ fun LoadableImage(
     } else {
         Icon(
             imageVector = Icons.Outlined.Image,
-            contentDescription = "Image placeholder",
+            contentDescription = null,
             modifier = modifier
         )
     }

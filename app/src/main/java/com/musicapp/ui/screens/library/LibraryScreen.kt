@@ -58,7 +58,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(R.string.create_new_playlist_description)
+                    contentDescription = null
                 )
             }
         },

@@ -1,6 +1,5 @@
 package com.musicapp.ui.screens.login
 
-import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -46,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -69,7 +67,6 @@ fun LoginScreen(navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val configuration = LocalConfiguration.current
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -84,16 +81,14 @@ fun LoginScreen(navController: NavController) {
                 .verticalScroll(rememberScrollState())
                 .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
         ) {
-            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                Spacer(modifier = Modifier.height(48.dp))
-            }
+            Spacer(modifier = Modifier.height(48.dp))
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
                     imageVector = Icons.Outlined.MusicNote,
-                    contentDescription = stringResource(R.string.app_logo_description),
+                    contentDescription = null,
                     modifier = Modifier
                         .size(96.dp)
                         .clip(CircleShape)
@@ -107,13 +102,11 @@ fun LoginScreen(navController: NavController) {
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
-            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                Spacer(modifier = Modifier.height(48.dp))
-            }
+            Spacer(modifier = Modifier.height(48.dp))
             OutlinedTextField(
                 value = uiState.email,
                 onValueChange = viewModel::onEmailChanged,
-                label = { Text(stringResource(R.string.email_label)) },
+                label = { Text(stringResource(R.string.email)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
@@ -127,7 +120,7 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChanged,
-                label = { Text(stringResource(R.string.password_label)) },
+                label = { Text(stringResource(R.string.password)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
                 visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),

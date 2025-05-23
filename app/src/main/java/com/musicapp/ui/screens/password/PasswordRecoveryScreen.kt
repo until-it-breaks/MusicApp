@@ -55,7 +55,7 @@ fun PasswordRecoveryScreen(navController: NavController) {
         topBar = {
             TopBarWithBackButton(
                 navController = navController,
-                title = stringResource(R.string.password_recovery_screen_name)
+                title = stringResource(R.string.password_recovery)
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -79,7 +79,7 @@ fun PasswordRecoveryScreen(navController: NavController) {
             OutlinedTextField(
                 value = uiState.email,
                 onValueChange = viewModel::onEmailChanged,
-                label = { Text(stringResource(R.string.email_label)) },
+                label = { Text(stringResource(R.string.email)) },
                 modifier = Modifier.width(300.dp),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Go),

@@ -56,7 +56,7 @@ fun SearchScreen(mainNavController: NavController, subNavController: NavControll
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
                     IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Outlined.Search, stringResource(R.string.search_description))
+                        Icon(Icons.Outlined.Search, null)
                     }
                 }
             )

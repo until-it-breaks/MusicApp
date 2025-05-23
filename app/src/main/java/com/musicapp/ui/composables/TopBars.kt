@@ -12,10 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 
 /**
@@ -44,7 +42,7 @@ fun TopBarWithBackButton(
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = stringResource(R.string.back_description)
+                        contentDescription = null
                     )
                 }
             }
@@ -80,7 +78,7 @@ fun UserPlaylistTopBar(
                 IconButton(onClick = {navController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = stringResource(R.string.back_description)
+                        contentDescription = null
                     )
                 }
             }
@@ -114,7 +112,7 @@ fun MainTopBar(
             IconButton(onClick = { navController.navigate(MusicAppRoute.Settings) }) {
                 Icon(
                     imageVector = Icons.Outlined.Settings,
-                    contentDescription = stringResource(R.string.settings_description)
+                    contentDescription = null
                 )
             }
         },

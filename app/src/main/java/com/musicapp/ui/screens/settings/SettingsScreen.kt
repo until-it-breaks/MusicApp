@@ -40,7 +40,7 @@ fun SettingsScreen(navController: NavController) {
     var setting1 by remember { mutableStateOf(true) }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.account_settings_screen_name)) }
+        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.account_and_settings)) }
     ) { contentPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -58,7 +58,7 @@ fun SettingsScreen(navController: NavController) {
                 ) {
                     Image(
                         imageVector = Icons.Filled.Image,
-                        contentDescription = stringResource(R.string.profile_picture_description),
+                        contentDescription = null,
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.size(72.dp)
                     )
@@ -73,7 +73,7 @@ fun SettingsScreen(navController: NavController) {
                     Spacer(modifier = Modifier.weight(1f))
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
-                        contentDescription = stringResource(R.string.forward_description),
+                        contentDescription = null,
                         modifier = Modifier.padding(8.dp)
                     )
                 }

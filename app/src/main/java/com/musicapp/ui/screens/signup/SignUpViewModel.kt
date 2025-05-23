@@ -85,7 +85,7 @@ class SignUpViewModel(
                 _uiState.update { it.copy(errorMessageId = R.string.email_already_in_use) }
             } catch (e: FirebaseAuthInvalidCredentialsException) {
                 Log.e(TAG, e.localizedMessage, e)
-                _uiState.update { it.copy(errorMessageId = R.string.malformed_email) }
+                _uiState.update { it.copy(errorMessageId = R.string.invalid_email) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
                 _uiState.update { it.copy(errorMessageId = R.string.unexpected_error) }

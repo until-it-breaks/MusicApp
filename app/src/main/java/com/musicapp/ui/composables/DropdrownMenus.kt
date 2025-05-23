@@ -40,7 +40,10 @@ fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onD
         modifier = Modifier.padding(16.dp)
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = null
+            )
         }
         DropdownMenu(
             expanded = expanded,
@@ -79,7 +82,10 @@ fun PublicTrackDropDownMenu(
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = null
+            )
         }
         DropdownMenu(
             expanded = expanded,
@@ -138,7 +144,10 @@ fun SavedTrackDropDownMenu(
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = null
+            )
         }
         DropdownMenu(
             expanded = expanded,
@@ -190,7 +199,10 @@ fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = null
+            )
         }
         DropdownMenu(
             expanded = expanded,
@@ -220,7 +232,10 @@ fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () ->
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = null
+            )
         }
         DropdownMenu(
             expanded = expanded,

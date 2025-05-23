@@ -55,7 +55,7 @@ fun ArtistScreen(navController: NavController, artistId: Long) {
                     ) {
                         LoadableImage(
                             imageUri = artist.bigPicture,
-                            contentDescription = stringResource(R.string.artist_picture_description)
+                            contentDescription = null
                         )
                     }
                 }

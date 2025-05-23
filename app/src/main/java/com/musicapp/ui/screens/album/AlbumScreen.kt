@@ -77,7 +77,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                         ) {
                             LoadableImage(
                                 imageUri = album.bigCover,
-                                contentDescription = stringResource(R.string.album_picture_description)
+                                contentDescription = null
                             )
                         }
                         Text(
@@ -96,7 +96,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                                 album.contributors.forEachIndexed { index, contributor ->
                                     LoadableImage(
                                         imageUri = contributor.smallPicture,
-                                        contentDescription = stringResource(R.string.artist_picture_description),
+                                        contentDescription = null,
                                         modifier = Modifier
                                             .size(36.dp)
                                             .offset(x = (index * 24).dp)

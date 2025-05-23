@@ -61,7 +61,7 @@ fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
                         ) {
                             LoadableImage(
                                 imageUri = playlist.bigPicture,
-                                contentDescription = stringResource(R.string.playlist_picture_description)
+                                contentDescription = null
                             )
                         }
                         Text(

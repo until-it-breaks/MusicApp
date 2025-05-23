@@ -28,12 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.musicapp.R
 import com.musicapp.ui.models.TrackModel
 
 enum class PlaylistType {
@@ -57,7 +55,7 @@ fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = 
         ) {
             LoadableImage(
                 imageUri = imageUri,
-                contentDescription = stringResource(R.string.playlist_picture_description),
+                contentDescription = null,
                 modifier = Modifier.size(72.dp)
             )
             Text(
@@ -143,7 +141,7 @@ fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: Uri? = nu
         ) {
             LoadableImage(
                 imageUri = imageUrl,
-                contentDescription = stringResource(R.string.artist_picture_description),
+                contentDescription = null,
                 modifier = Modifier
                     .size(96.dp)
                     .clip(CircleShape),
@@ -195,7 +193,7 @@ fun TrackCard(
                         if (it) {
                             Icon(
                                 imageVector = Icons.Filled.Explicit,
-                                contentDescription = stringResource(R.string.explicit_description)
+                                contentDescription = null
                             )
                         }
                     }
