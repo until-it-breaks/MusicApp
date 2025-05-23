@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -26,12 +25,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
-import com.musicapp.ui.composables.PlaylistCreationModal
+import com.musicapp.ui.composables.AuthErrorMessage
 import com.musicapp.ui.composables.MainTopBar
+import com.musicapp.ui.composables.PlaylistCreationModal
+import com.musicapp.ui.composables.PlaylistType
 import com.musicapp.ui.composables.UserPlaylistCard
 import org.koin.androidx.compose.koinViewModel
 
@@ -46,12 +49,17 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
     var showBottomSheet by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = { MainTopBar(mainNavController, "Library") },
+        topBar = { MainTopBar(mainNavController, stringResource(R.string.library)) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showBottomSheet = true }
+                onClick = { showBottomSheet = true },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
-                Icon(Icons.Filled.Add, "Create new playlist")
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.create_new_playlist_description)
+                )
             }
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
@@ -59,66 +67,70 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
         if (!uiState.showAuthError) {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(contentPadding).padding(12.dp)
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .padding(12.dp)
             ) {
                 item {
-                    if (uiState.likedTracksPlaylist != null) {
-                        UserPlaylistCard(
-                            title = "Liked songs",
-                            onClick = { subNavController.navigate(MusicAppRoute.LikedSongs) }
-                        )
-                    }
-                }
-                item {
-                    if (uiState.trackHistory != null) {
-                        UserPlaylistCard(
-                            title = "Track history",
-                            onClick = { subNavController.navigate(MusicAppRoute.TrackHistory) }
-                        )
-                    }
-                }
-                item {
-                    Text(
-                        text = "Your playlists",
-                        style = MaterialTheme.typography.titleLarge,
+                    UserPlaylistCard(
+                        title = stringResource(R.string.liked_tracks),
+                        playlistType = PlaylistType.LIKED,
+                        onClick = { subNavController.navigate(MusicAppRoute.LikedSongs) }
                     )
                 }
-                if (playlists.value.isEmpty()) {
-                    item {
-                        Text("No playlists founds")
-                    }
-                } else {
-                    items(playlists.value) { playlist ->
-                        UserPlaylistCard(
-                            title = playlist.name,
-                            onClick = { subNavController.navigate(MusicAppRoute.UserPlaylist(playlist.id)) }
-                        )
-                    }
+                item {
+                    UserPlaylistCard(
+                        title = stringResource(R.string.track_history),
+                        playlistType = PlaylistType.HISTORY,
+                        onClick = { subNavController.navigate(MusicAppRoute.TrackHistory) }
+                    )
                 }
-            }
-        } else {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Failed to authenticate. Please login again")
-                Button(
-                    onClick = {
-                        mainNavController.navigate(MusicAppRoute.Login) {
-                            popUpTo(mainNavController.graph.id) { inclusive = true }
+                item {
+                    Column (
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.your_playlists),
+                            style = MaterialTheme.typography.headlineSmall,
+                        )
+                        if (playlists.value.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.no_playlists_found),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
-                ) {
-                    Text("Go to login")
+                }
+                items(playlists.value) { playlist ->
+                    UserPlaylistCard(
+                        title = playlist.name,
+                        onClick = { subNavController.navigate(MusicAppRoute.UserPlaylist(playlist.id)) }
+                    )
                 }
             }
+            PlaylistCreationModal(
+                showBottomSheet = showBottomSheet,
+                sheetState = sheetState,
+                onDismiss = { showBottomSheet = false },
+                onCreatePlaylist = { name -> viewModel.createPlaylist(name) }
+            )
+        } else {
+            AuthErrorMessage(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .padding(12.dp)
+                    .fillMaxWidth(),
+                onClick = {
+                    viewModel.logout()
+                    mainNavController.navigate(MusicAppRoute.Login) {
+                        popUpTo(mainNavController.graph.id) { inclusive = true }
+                    }
+                }
+            )
         }
     }
-    PlaylistCreationModal(
-        showBottomSheet = showBottomSheet,
-        sheetState = sheetState,
-        onDismiss = { showBottomSheet = false },
-        onCreatePlaylist = { name -> viewModel.createPlaylist(name) }
-    )
 }

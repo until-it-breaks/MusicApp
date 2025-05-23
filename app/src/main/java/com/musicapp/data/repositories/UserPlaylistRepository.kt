@@ -71,14 +71,14 @@ class UserPlaylistRepository(
         return playlistDAO.getTrackFromPlaylist(playlistId, track.id) != null
     }
 
-    suspend fun upsertPlaylist(playlist: UserPlaylistModel) {
+    suspend fun insertPlaylist(playlist: UserPlaylistModel) {
         val playlist = Playlist(
             playlistId = playlist.id,
             ownerId = playlist.ownerId,
             name = playlist.name,
             lastEditTime = System.currentTimeMillis()
         )
-        playlistDAO.upsertPlaylist(playlist)
+        playlistDAO.insertPlaylist(playlist)
     }
 
     suspend fun addTrackToPlaylist(playlistId: String, track: TrackModel) {

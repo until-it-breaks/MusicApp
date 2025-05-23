@@ -58,4 +58,13 @@
     <string name="go_to_login" translatable="false">Go to login</string>
     <string name="failed_to_authenticate_login_again" translatable="false">Failed to authenticate. Please login again.</string>
     <string name="warning_description" translatable="false">Warning</string>
+    <string name="library">Library</string>
+    <string name="create_new_playlist_description">Create new playlist</string>
+    <string name="track_history">Track History</string>
+    <string name="your_playlists">Your playlists</string>
+    <string name="no_playlists_found">No playlists found</string>
+    <string name="liked_tracks">Liked Tracks</string>
+    <string name="new_playlist">New Playlist</string>
+    <string name="cancel">Cancel</string>
+    <string name="playlist_name">Playlist name</string>
 </resources>

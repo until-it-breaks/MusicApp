@@ -71,8 +71,8 @@ interface UserPlaylistDAO {
     /**
      * Creates or updates a playlist (tracks not included).
      */
-    @Upsert()
-    suspend fun upsertPlaylist(playlist: Playlist)
+    @Insert()
+    suspend fun insertPlaylist(playlist: Playlist)
 
     /**
      * Adds a track to a playlist

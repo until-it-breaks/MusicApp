@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,6 +18,10 @@ import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 
+/**
+ * General purpose top bar that has a go back feature given the appropriate NavController
+ * and allows an optional composable at the far right.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarWithBackButton(
@@ -44,6 +49,11 @@ fun TopBarWithBackButton(
                 }
             }
         },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface
+        ),
         actions = { if (content != null) content() }
     )
 }
@@ -81,6 +91,9 @@ fun UserPlaylistTopBar(
     )
 }
 
+/**
+ * Top bar for the screen that are part of the main screen. It features a settings route.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopBar(
@@ -93,10 +106,10 @@ fun MainTopBar(
         title = {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.headlineMedium
             )
         },
-        expandedHeight = 40.dp,
+        expandedHeight = 48.dp,
         actions = {
             IconButton(onClick = { navController.navigate(MusicAppRoute.Settings) }) {
                 Icon(
@@ -104,6 +117,11 @@ fun MainTopBar(
                     contentDescription = stringResource(R.string.settings_description)
                 )
             }
-        }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface
+        ),
     )
 }

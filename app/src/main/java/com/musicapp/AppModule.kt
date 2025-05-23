@@ -109,7 +109,7 @@ val appModule = module {
 
     viewModel { ArtistViewModel(get()) }
 
-    viewModel { LibraryViewModel(get(), get(), get(), get()) }
+    viewModel { LibraryViewModel(get(), get()) }
 
     viewModel { PersonalPlaylistViewModel(get()) }
 

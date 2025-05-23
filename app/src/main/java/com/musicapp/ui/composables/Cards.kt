@@ -15,8 +15,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Explicit
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,6 +35,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.musicapp.R
 import com.musicapp.ui.models.TrackModel
+
+enum class PlaylistType {
+    DEFAULT,
+    LIKED,
+    HISTORY
+}
 
 @Composable
 fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = null, onClick: () -> Unit) {
@@ -58,25 +67,53 @@ fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = 
     }
 }
 
+/**
+ * Card for a given user's personal playlist (liked, history or generic playlist)
+ */
 @Composable
-fun UserPlaylistCard(title: String, onClick: () -> Unit) {
+fun UserPlaylistCard(
+    title: String,
+    modifier: Modifier = Modifier,
+    imageUri: Uri? = null,
+    playlistType: PlaylistType = PlaylistType.DEFAULT,
+    onClick: () -> Unit
+) {
     Card(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Image,
-                contentDescription = "Playlist Picture",
-                modifier = Modifier.size(72.dp)
-            )
+            when(playlistType) {
+                PlaylistType.DEFAULT -> LoadableImage(
+                    imageUri = imageUri,
+                    contentDescription = "Playlist picture",
+                    modifier = Modifier.size(72.dp).padding(8.dp)
+                )
+                PlaylistType.LIKED -> Icon(
+                    imageVector = Icons.Outlined.Favorite,
+                    contentDescription = "Liked tracks",
+                    modifier = Modifier.size(72.dp).padding(8.dp)
+                )
+                PlaylistType.HISTORY -> Icon(
+                    imageVector = Icons.Outlined.History,
+                    contentDescription = "Track history",
+                    modifier = Modifier.size(72.dp).padding(8.dp)
+                )
+            }
+
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
             )
-            Spacer(modifier = Modifier.weight(1f))
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
                 contentDescription = "Forward",
