@@ -32,8 +32,8 @@ data class HomeState(
 )
 
 class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel() {
-    private val _state = MutableStateFlow(HomeState())
-    val state: StateFlow<HomeState> = _state.asStateFlow()
+    private val _uiState = MutableStateFlow(HomeState())
+    val uiState: StateFlow<HomeState> = _uiState.asStateFlow()
 
     init {
         loadContent()
@@ -41,55 +41,55 @@ class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel(
 
     private fun loadTopPlaylist() {
         viewModelScope.launch {
-            _state.update { it.copy(showPlaylistLoading = true) }
+            _uiState.update { it.copy(showPlaylistLoading = true) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopPlaylists()
                 }
-                _state.update { it.copy(playlists = result.map { it.toModel() }) }
+                _uiState.update { it.copy(playlists = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
             } finally {
-                _state.update { it.copy(showPlaylistLoading = false) }
+                _uiState.update { it.copy(showPlaylistLoading = false) }
             }
         }
     }
 
     private fun loadTopArtists() {
         viewModelScope.launch {
-            _state.update { it.copy(showArtistsLoading = true) }
+            _uiState.update { it.copy(showArtistsLoading = true) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopArtists()
                 }
-                _state.update { it.copy(artists = result.map { it.toModel() }) }
+                _uiState.update { it.copy(artists = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
             } finally {
-                _state.update { it.copy(showArtistsLoading = false) }
+                _uiState.update { it.copy(showArtistsLoading = false) }
             }
         }
     }
 
     private fun loadTopAlbums() {
         viewModelScope.launch {
-            _state.update { it.copy(showAlbumsLoading = true) }
+            _uiState.update { it.copy(showAlbumsLoading = true) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopAlbums()
                 }
-                _state.update { it.copy(albums = result.map { it.toModel() }) }
+                _uiState.update { it.copy(albums = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
             } finally {
-                _state.update { it.copy(showAlbumsLoading = false) }
+                _uiState.update { it.copy(showAlbumsLoading = false) }
             }
         }
     }
 
     fun loadContent() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, playlists = emptyList(), artists = emptyList(), albums = emptyList()) }
+            _uiState.update { it.copy(isLoading = true, playlists = emptyList(), artists = emptyList(), albums = emptyList()) }
             val jobs = listOf(
                 async { loadTopPlaylist() },
                 async { loadTopArtists() },
@@ -97,7 +97,7 @@ class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel(
             )
             jobs.awaitAll()
             delay(20) // Fixes stuck spinner
-            _state.update { it.copy(isLoading = false) }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 }

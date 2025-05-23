@@ -36,7 +36,7 @@ import com.musicapp.ui.composables.PlayListCard
 @Composable
 fun HomeScreen(mainNavController: NavController, subNavController: NavController) {
     val viewModel = koinViewModel<HomeViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val pullToRefreshState = rememberPullToRefreshState()
 
@@ -45,7 +45,7 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         PullToRefreshBox(
-            isRefreshing = state.isLoading,
+            isRefreshing = uiState.isLoading,
             onRefresh = viewModel::loadContent,
             state = pullToRefreshState,
             modifier = Modifier.padding(contentPadding)
@@ -63,11 +63,11 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                     )
                 }
                 item {
-                    if (state.showPlaylistLoading) {
+                    if (uiState.showPlaylistLoading) {
                         CenteredCircularProgressIndicator()
                     }
                 }
-                items(state.playlists.chunked(2)) { rowItems ->
+                items(uiState.playlists.chunked(2)) { rowItems ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -91,13 +91,13 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                     )
                 }
                 item {
-                    if (state.showArtistsLoading) {
+                    if (uiState.showArtistsLoading) {
                         CenteredCircularProgressIndicator()
                     }
                 }
                 item {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(state.artists) { artist ->
+                        items(uiState.artists) { artist ->
                             ArtistCard(
                                 title = artist.name,
                                 imageUrl = artist.mediumPicture,
@@ -113,11 +113,11 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                     )
                 }
                 item {
-                    if (state.showAlbumsLoading) {
+                    if (uiState.showAlbumsLoading) {
                         CenteredCircularProgressIndicator()
                     }
                 }
-                items(state.albums.chunked(2)) { rowItems ->
+                items(uiState.albums.chunked(2)) { rowItems ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
