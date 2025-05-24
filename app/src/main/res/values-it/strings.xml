@@ -105,4 +105,7 @@
     <string name="what_to_play">Cosa vuoi ascoltare?</string>
 
     <string name="your_playlists">Le tue playlist</string>
+    <string name="unknown_playlist">Playlist sconosciuta</string>
+    <string name="change">Modifica</string>
+    <string name="new_playlist_name">Nuovo nome playlist</string>
 </resources>

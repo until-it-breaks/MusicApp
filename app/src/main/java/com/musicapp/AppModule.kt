@@ -44,6 +44,7 @@ val appModule = module {
 
     single {
         UserPlaylistRepository(
+            get(),
             get<MusicAppDatabase>().playlistDAO(),
             get()
         )

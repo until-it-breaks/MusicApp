@@ -42,6 +42,7 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
         topBar = {
             TopBarWithBackButton(
                 navController = subNavController,
+                title = stringResource(R.string.track_history),
                 content = { TrackHistoryDropDownMenu(onClearTracks = viewModel::clearTrackHistory) }
             )
         },
@@ -59,10 +60,6 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = stringResource(R.string.track_history),
-                            style = MaterialTheme.typography.titleLarge
-                        )
                         val timeInMillis = playlist.value?.lastEditTime
                         timeInMillis?.let {
                             Spacer(modifier = Modifier.height(8.dp))

@@ -1,5 +1,7 @@
 package com.musicapp.data.repositories
 
+import androidx.room.withTransaction
+import com.musicapp.data.database.MusicAppDatabase
 import com.musicapp.data.database.Playlist
 import com.musicapp.data.database.PlaylistTrackCrossRef
 import com.musicapp.data.database.Track
@@ -26,6 +28,7 @@ data class PlaylistWithTracksAndArtists(
  *  Repository for normal playlists
  */
 class UserPlaylistRepository(
+    private val db: MusicAppDatabase,
     private val playlistDAO: UserPlaylistDAO,
     private val trackRepository: TracksRepository
 ) {
@@ -33,37 +36,52 @@ class UserPlaylistRepository(
         return playlistDAO.getPlaylists(playlistId)
     }
 
-    fun getPlaylistWithTracksFlow(playlistId: String): Flow<PlaylistWithTracks> {
+    fun getPlaylistWithTracksFlow(playlistId: String): Flow<PlaylistWithTracks?> {
         val playlistFlow = playlistDAO.getPlaylist(playlistId)
         val tracksFlow = playlistDAO.getTracksOfPlaylist(playlistId)
 
         return combine(playlistFlow, tracksFlow) { playlist, tracks ->
-            PlaylistWithTracks(playlist, tracks)
+            if (playlist != null) {
+                PlaylistWithTracks(playlist, tracks)
+            } else {
+                null
+            }
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getPlaylistWithTracksAndArtists(playlistId: String): Flow<PlaylistWithTracksAndArtists> {
+    fun getPlaylistWithTracksAndArtists(playlistId: String): Flow<PlaylistWithTracksAndArtists?> {
         val playlistFlow = playlistDAO.getPlaylist(playlistId)
         val tracksFlow = playlistDAO.getTracksOfPlaylist(playlistId)
 
         return combine(playlistFlow, tracksFlow) { playlist, tracks ->
             playlist to tracks
         }.flatMapLatest { (playlist, tracks) ->
-            val trackWithArtistFlows = tracks.map { track ->
-                trackRepository.getTrackWithArtists(track.trackId)
-            }
-
-            if (trackWithArtistFlows.isEmpty()) {
-                flowOf(PlaylistWithTracksAndArtists(playlist, emptyList()))
+            if (playlist == null) {
+                flowOf(null)
             } else {
-                combine(trackWithArtistFlows) { trackWithArtistsArray ->
-                    PlaylistWithTracksAndArtists(
-                        playlist = playlist,
-                        tracks = trackWithArtistsArray.toList()
-                    )
+                val trackWithArtistFlows = tracks.map { track ->
+                    trackRepository.getTrackWithArtists(track.trackId) // Flow<TrackWithArtists>
+                }
+
+                if (trackWithArtistFlows.isEmpty()) {
+                    flowOf(PlaylistWithTracksAndArtists(playlist, emptyList()))
+                } else {
+                    combine(trackWithArtistFlows) { trackWithArtistsArray ->
+                        PlaylistWithTracksAndArtists(
+                            playlist = playlist,
+                            tracks = trackWithArtistsArray.toList()
+                        )
+                    }
                 }
             }
+        }
+    }
+
+    suspend fun editPlaylistName(playlistId: String, name: String) {
+        db.withTransaction {
+            playlistDAO.editName(playlistId, name)
+            playlistDAO.updateEditTime(playlistId)
         }
     }
 
@@ -82,9 +100,11 @@ class UserPlaylistRepository(
     }
 
     suspend fun addTrackToPlaylist(playlistId: String, track: TrackModel) {
-        trackRepository.upsertTrack(track)
-        playlistDAO.addTrackToPlaylist(PlaylistTrackCrossRef(playlistId, track.id, System.currentTimeMillis()))
-        playlistDAO.updateEditTime(playlistId)
+        db.withTransaction {
+            trackRepository.upsertTrack(track)
+            playlistDAO.addTrackToPlaylist(PlaylistTrackCrossRef(playlistId, track.id, System.currentTimeMillis()))
+            playlistDAO.updateEditTime(playlistId)
+        }
     }
 
     suspend fun removeTrackFromPlaylist(playlistId: String, trackId: Long) {
@@ -92,7 +112,10 @@ class UserPlaylistRepository(
     }
 
     suspend fun clearPlaylist(playlistId: String) {
-        playlistDAO.clearPlaylist(playlistId)
+        db.withTransaction {
+            playlistDAO.clearPlaylist(playlistId)
+            playlistDAO.updateEditTime(playlistId)
+        }
     }
 
     suspend fun deletePlaylist(playlistId: String) {

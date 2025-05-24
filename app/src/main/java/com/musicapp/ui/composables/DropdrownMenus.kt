@@ -1,20 +1,10 @@
 package com.musicapp.ui.composables
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Favorite
@@ -22,8 +12,16 @@ import androidx.compose.material.icons.outlined.QueuePlayNext
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.musicapp.R
 import com.musicapp.ui.models.TrackModel
@@ -32,12 +30,13 @@ import com.musicapp.ui.screens.addtoplaylist.AddTrackToPlaylistModal
 /**
  * Drop-down menu for user playlists
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onDeletePlaylist: () -> Unit) {
+fun UserPlaylistDropDownMenu(onDeletePlaylist: () -> Unit, onEditPlaylistName: () -> Unit, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier.padding(16.dp)
+        modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(
@@ -52,12 +51,18 @@ fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onD
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.edit_playlist_name)) },
                 leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
-                onClick = onEditName
+                onClick = {
+                    expanded = !expanded
+                    onEditPlaylistName()
+                }
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.delete_playlist)) },
                 leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null) },
-                onClick = onDeletePlaylist
+                onClick = {
+                    expanded = !expanded
+                    onDeletePlaylist()
+                }
             )
         }
     }
@@ -70,9 +75,9 @@ fun UserPlaylistDropDownMenu(onAddTrack: () -> Unit, onEditName: () -> Unit, onD
 @Composable
 fun PublicTrackDropDownMenu(
     trackModel: TrackModel,
-    modifier: Modifier = Modifier,
     onAddToQueue: (track: TrackModel) -> Unit,
-    onLiked: (track: TrackModel) -> Unit
+    onLiked: (track: TrackModel) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -145,8 +150,8 @@ fun SavedTrackDropDownMenu(
     ) {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = null
+                imageVector = Icons.Filled.MoreVert,
+                contentDescription = null,
             )
         }
         DropdownMenu(
@@ -200,8 +205,8 @@ fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks
     ) {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = null
+                imageVector = Icons.Filled.MoreVert,
+                contentDescription = null,
             )
         }
         DropdownMenu(

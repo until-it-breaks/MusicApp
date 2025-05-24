@@ -50,8 +50,7 @@ fun AddTrackToPlaylistModal(
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,
-            sheetState = sheetState,
-            dragHandle = null
+            sheetState = sheetState
         ) {
             Scaffold(
                 topBar = {

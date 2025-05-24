@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
@@ -50,7 +51,7 @@ interface UserPlaylistDAO {
      * Retrieves a playlist given an id.
      */
     @Query("SELECT * FROM playlist WHERE playlistId = :playlistId")
-    fun getPlaylist(playlistId: String): Flow<Playlist>
+    fun getPlaylist(playlistId: String): Flow<Playlist?>
 
     /**
      * Retrieves the playlists of a given user
@@ -79,6 +80,12 @@ interface UserPlaylistDAO {
      */
     @Upsert
     suspend fun addTrackToPlaylist(crossRef: PlaylistTrackCrossRef)
+
+    /**
+     * Updates a playlist's name.
+     */
+    @Query("UPDATE playlist SET name = :name WHERE playlistId = :playlistId")
+    suspend fun editName(playlistId: String, name: String)
 
     @Query("UPDATE playlist SET lastEditTime = :lastEditTime WHERE playlistId = :playlistId")
     suspend fun updateEditTime(playlistId: String, lastEditTime: Long = System.currentTimeMillis())

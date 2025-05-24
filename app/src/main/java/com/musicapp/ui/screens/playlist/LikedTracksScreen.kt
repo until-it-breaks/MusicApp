@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -42,6 +41,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
         topBar = {
             TopBarWithBackButton(
                 navController = subNavController,
+                title = stringResource(R.string.liked_tracks),
                 content = { LikedTracksPlaylistDropDownMenu(onClearTracks = viewModel::clearLikedTracks) }
             )
         },
@@ -59,10 +59,6 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = stringResource(R.string.liked_tracks),
-                            style = MaterialTheme.typography.titleLarge
-                        )
                         val timeInMillis = playlist.value?.lastEditTime
                         timeInMillis?.let {
                             Spacer(modifier = Modifier.height(8.dp))

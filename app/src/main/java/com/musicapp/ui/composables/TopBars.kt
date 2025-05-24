@@ -56,39 +56,6 @@ fun TopBarWithBackButton(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun UserPlaylistTopBar(
-    navController: NavController,
-    title: String, modifier: Modifier = Modifier,
-    onAddTrack: () -> Unit,
-    onEditName: () -> Unit,
-    onDeletePlaylist: () -> Unit
-) {
-    CenterAlignedTopAppBar(
-        modifier = modifier,
-        title = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineMedium
-            )
-        },
-        navigationIcon = {
-            if (navController.previousBackStackEntry != null) {
-                IconButton(onClick = {navController.navigateUp() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = null
-                    )
-                }
-            }
-        },
-        actions = {
-            UserPlaylistDropDownMenu(onAddTrack, onEditName, onDeletePlaylist)
-        }
-    )
-}
-
 /**
  * Top bar for the screen that are part of the main screen. It features a settings route.
  */
