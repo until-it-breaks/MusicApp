@@ -222,7 +222,7 @@ fun TrackCard(
 }
 
 @Composable
-fun AddTrackToPlaylistPlaylistCard(
+fun PlaylistCardToAddTo(
     title: String,
     onClick: () -> Unit,
     enabled: Boolean,
@@ -258,7 +258,7 @@ fun AddTrackToPlaylistPlaylistCard(
 }
 
 @Composable
-fun AddTrackToPlaylistTrackCard(
+fun TrackCardToAdd(
     track: TrackModel
 ) {
     Card {

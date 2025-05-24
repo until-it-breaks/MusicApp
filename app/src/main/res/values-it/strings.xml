@@ -3,6 +3,7 @@
     <string name="account_and_settings"><![CDATA[Account & Impostazioni]]></string>
     <string name="account_not_found_or_disabled">Account inesistente o disabilitato</string>
 
+    <string name="add">Aggiungi</string>
     <string name="add_to_liked">Aggiungi ai preferiti</string>
     <string name="add_to_playlist">Aggiungi a playlist</string>
     <string name="add_to_queue">Aggiungi alla coda</string>
@@ -17,6 +18,7 @@
 
     <string name="cancel">Annulla</string>
 
+    <string name="change">Modifica</string>
     <string name="change_password">Cambia Password</string>
 
     <string name="clear_tracks">Svuota tracce</string>
@@ -61,6 +63,7 @@
     <string name="network_error">Errore di rete</string>
 
     <string name="new_playlist">Nuova playlist</string>
+    <string name="new_playlist_name">Nuovo nome playlist</string>
 
     <string name="no_playlists_found">Non è stata trovata alcuna playlist</string>
     <string name="no_user_found">Non è stata trovato un utente corrispondente alla email</string>
@@ -79,6 +82,8 @@
 
     <string name="search">Ricerca</string>
 
+    <string name="select_playlists_to_add_track_to">Seleziona le playlist a cui aggiungere il brano:</string>
+
     <string name="send_password_reset_email">Invia email</string>
 
     <string name="show_password">Mostra password</string>
@@ -96,6 +101,8 @@
 
     <string name="unexpected_error">Errore imprevisto</string>
 
+    <string name="unknown_playlist">Playlist sconosciuta</string>
+
     <string name="username">Username</string>
 
     <string name="view_profile">Visualizza profilo</string>
@@ -105,7 +112,4 @@
     <string name="what_to_play">Cosa vuoi ascoltare?</string>
 
     <string name="your_playlists">Le tue playlist</string>
-    <string name="unknown_playlist">Playlist sconosciuta</string>
-    <string name="change">Modifica</string>
-    <string name="new_playlist_name">Nuovo nome playlist</string>
 </resources>

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 data class PlaylistWithTracks(
     val playlist: Playlist,
@@ -32,21 +33,24 @@ class UserPlaylistRepository(
     private val playlistDAO: UserPlaylistDAO,
     private val trackRepository: TracksRepository
 ) {
-    fun getPlaylists(playlistId: String): Flow<List<Playlist>> {
-        return playlistDAO.getPlaylists(playlistId)
+    fun getPlaylists(userId: String): Flow<List<Playlist>> {
+        return playlistDAO.getPlaylists(userId)
     }
 
-    fun getPlaylistWithTracksFlow(playlistId: String): Flow<PlaylistWithTracks?> {
-        val playlistFlow = playlistDAO.getPlaylist(playlistId)
-        val tracksFlow = playlistDAO.getTracksOfPlaylist(playlistId)
-
-        return combine(playlistFlow, tracksFlow) { playlist, tracks ->
-            if (playlist != null) {
-                PlaylistWithTracks(playlist, tracks)
-            } else {
-                null
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getPlaylistsWithTracksFlow(userId: String): Flow<List<PlaylistWithTracks>> {
+        return playlistDAO.getPlaylists(userId)
+            .flatMapLatest { playlists ->
+                if (playlists.isEmpty()) {
+                    flowOf(emptyList())
+                } else {
+                    val flows: List<Flow<PlaylistWithTracks>> = playlists.map { playlist ->
+                        playlistDAO.getTracksOfPlaylist(playlist.playlistId)
+                            .map { tracks -> PlaylistWithTracks(playlist, tracks) }
+                    }
+                    combine(flows) { it.toList() }
+                }
             }
-        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -30,8 +30,8 @@ data class LibraryUiState(
 
 class LibraryViewModel(private val userPlaylistRepository: UserPlaylistRepository, private val auth: FirebaseAuth): ViewModel() {
     private val _userId = MutableStateFlow<String?>(auth.currentUser?.uid)
-    private val _uiState = MutableStateFlow(LibraryUiState())
 
+    private val _uiState = MutableStateFlow(LibraryUiState())
     val uiState: StateFlow<LibraryUiState> = _uiState.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
