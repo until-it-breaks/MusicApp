@@ -1,6 +1,5 @@
 package com.musicapp.ui.screens.album
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,17 +23,12 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -56,15 +50,14 @@ import java.time.LocalDate
 @Composable
 fun AlbumScreen(navController: NavController, albumId: Long) {
     val viewModel = koinViewModel<AlbumViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(albumId) {
         viewModel.loadAlbum(albumId)
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, title = "Album Details") },
+        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.album_details)) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         LazyColumn(
@@ -74,12 +67,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
         ) {
             item {
-                if (state.error != null) {
-                    Text("Error: ${state.error}")
-                }
-            }
-            item {
-                state.albumDetails?.let { album ->
+                uiState.albumDetails?.let { album ->
                     Column(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
@@ -89,7 +77,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                         ) {
                             LoadableImage(
                                 imageUri = album.bigCover,
-                                contentDescription = stringResource(R.string.album_picture_description)
+                                contentDescription = null
                             )
                         }
                         Text(
@@ -108,7 +96,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                                 album.contributors.forEachIndexed { index, contributor ->
                                     LoadableImage(
                                         imageUri = contributor.smallPicture,
-                                        contentDescription = "Artist picture",
+                                        contentDescription = null,
                                         modifier = Modifier
                                             .size(36.dp)
                                             .offset(x = (index * 24).dp)
@@ -139,30 +127,31 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                     }
                 }
             }
-            items(state.tracks) { track ->
+            items(uiState.tracks) { track ->
                 TrackCard(
                     track = track,
-                    onTrackClick = { Toast.makeText(context, "Playing ${track.title}", Toast.LENGTH_SHORT).show() }, // TODO trigger actual music player
+                    onTrackClick = viewModel::playTrack,
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
                         PublicTrackDropDownMenu(
                             trackModel = track,
+                            onAddToQueue = viewModel::addToQueue,
                             onLiked = viewModel::addToLiked
                         )
                     },
                 )
             }
             item {
-                val albumDetails = state.albumDetails
+                val albumDetails = uiState.albumDetails
                 if (albumDetails != null) {
                     Row {
-                        Text("${albumDetails.trackCount} songs")
+                        Text("${albumDetails.trackCount} ${stringResource(R.string.tracks)}")
                         albumDetails.duration?.let {
                             Text(" · ")
                             Text(convertDurationInSecondsToString(it))
                         }
                     }
-                    Text("Label: ${albumDetails.label}")
+                    Text("${stringResource(R.string.album_label)}: ${albumDetails.label}")
                 }
             }
         }

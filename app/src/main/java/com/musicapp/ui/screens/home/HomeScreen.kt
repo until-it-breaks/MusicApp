@@ -28,6 +28,7 @@ import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import org.koin.androidx.compose.koinViewModel
 import com.musicapp.ui.composables.ArtistCard
+import com.musicapp.ui.composables.CenteredCircularProgressIndicator
 import com.musicapp.ui.composables.MainTopBar
 import com.musicapp.ui.composables.PlayListCard
 
@@ -35,31 +36,38 @@ import com.musicapp.ui.composables.PlayListCard
 @Composable
 fun HomeScreen(mainNavController: NavController, subNavController: NavController) {
     val viewModel = koinViewModel<HomeViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val pullToRefreshState = rememberPullToRefreshState()
 
     Scaffold(
-        topBar = { MainTopBar(mainNavController, "Home") },
+        topBar = { MainTopBar(mainNavController, stringResource(R.string.home)) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         PullToRefreshBox(
-            isRefreshing = state.isLoading,
+            isRefreshing = uiState.isLoading,
             onRefresh = viewModel::loadContent,
             state = pullToRefreshState,
             modifier = Modifier.padding(contentPadding)
         ) {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(12.dp).fillMaxSize()
+                modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxSize()
             ) {
                 item {
                     Text(
                         text = stringResource(R.string.top_playlists),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.headlineSmall
                     )
                 }
-                items(state.playlists.chunked(2)) { rowItems ->
+                item {
+                    if (uiState.showPlaylistLoading) {
+                        CenteredCircularProgressIndicator()
+                    }
+                }
+                items(uiState.playlists.chunked(2)) { rowItems ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -79,12 +87,17 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                 item {
                     Text(
                         text = stringResource(R.string.top_artists),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.headlineSmall
                     )
                 }
                 item {
+                    if (uiState.showArtistsLoading) {
+                        CenteredCircularProgressIndicator()
+                    }
+                }
+                item {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(state.artists) { artist ->
+                        items(uiState.artists) { artist ->
                             ArtistCard(
                                 title = artist.name,
                                 imageUrl = artist.mediumPicture,
@@ -96,10 +109,15 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                 item {
                     Text(
                         text = stringResource(R.string.top_albums),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.headlineSmall
                     )
                 }
-                items(state.albums.chunked(2)) { rowItems ->
+                item {
+                    if (uiState.showAlbumsLoading) {
+                        CenteredCircularProgressIndicator()
+                    }
+                }
+                items(uiState.albums.chunked(2)) { rowItems ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {

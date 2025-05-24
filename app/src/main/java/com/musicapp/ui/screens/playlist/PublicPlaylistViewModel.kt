@@ -1,12 +1,12 @@
 package com.musicapp.ui.screens.playlist
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
-import com.musicapp.data.repositories.PlaylistsRepository
-import com.musicapp.data.repositories.TracksRepository
+import com.musicapp.data.repositories.LikedTracksRepository
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
@@ -18,54 +18,54 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+private const val TAG = "PublicPlaylistViewModel"
+
 data class PublicPlaylistState(
     val playlistDetails: PublicPlaylistModel? = null,
     val tracks: List<TrackModel> = emptyList(),
-    val playlistDetailsAreLoading: Boolean = false,
-    val tracksAreLoading: Boolean = false,
-    val error: String? = null
+    val showPlaylistDetailsLoading: Boolean = false,
+    val showTracksLoading: Boolean = false
 )
 
 class PublicPlaylistViewModel(
     private val deezerDataSource: DeezerDataSource,
     private val auth: FirebaseAuth,
-    private val playlistsRepository: PlaylistsRepository,
-    private val tracksRepository: TracksRepository
+    private val likedTracksRepository: LikedTracksRepository,
 ): ViewModel() {
-    private val _state = MutableStateFlow(PublicPlaylistState())
-    val state: StateFlow<PublicPlaylistState> = _state.asStateFlow()
+    private val _uiState = MutableStateFlow(PublicPlaylistState())
+    val uiState: StateFlow<PublicPlaylistState> = _uiState.asStateFlow()
 
     fun loadPlaylist(id: Long) {
         viewModelScope.launch {
-            _state.update { it.copy(playlistDetailsAreLoading = true, error = null) }
+            _uiState.update { it.copy(showPlaylistDetailsLoading = true) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getPlaylistDetails(id)
                 }
-                _state.update { it.copy(playlistDetails = result.toModel()) }
+                _uiState.update { it.copy(playlistDetails = result.toModel()) }
                 loadTracks()
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error") }
+                Log.e(TAG, e.localizedMessage, e)
             } finally {
-                _state.update { it.copy(playlistDetailsAreLoading = false) }
+                _uiState.update { it.copy(showPlaylistDetailsLoading = false) }
             }
         }
     }
 
     private fun loadTracks() {
         viewModelScope.launch {
-            val tracks = state.value.playlistDetails?.tracks.orEmpty()
-            _state.update { it.copy(tracksAreLoading = true, error = null) }
+            val tracks = uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load only 20 tracks.
+            _uiState.update { it.copy(showTracksLoading = true) }
             for(track in tracks) {
                 try {
                     val detailedTrack: DeezerTrackDetailed = withContext(Dispatchers.IO) {
                         deezerDataSource.getTrackDetails(track.id)
                     }
-                    _state.update { it.copy(tracks = it.tracks + detailedTrack.toModel()) }
+                    _uiState.update { it.copy(tracks = it.tracks + detailedTrack.toModel()) }
                 } catch (e: Exception) {
-                    _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error") }
+                    Log.e(TAG, e.localizedMessage, e)
                 } finally {
-                    _state.update { it.copy(tracksAreLoading = false) }
+                    _uiState.update { it.copy(showTracksLoading = false) }
                 }
             }
         }
@@ -76,9 +76,21 @@ class PublicPlaylistViewModel(
             val userId = auth.currentUser?.uid
             if (userId != null) {
                 withContext(Dispatchers.IO) {
-                    playlistsRepository.addTrackToLikedTracksPlaylist(userId, track)
+                    likedTracksRepository.addTrackToLikedTracks(userId, track)
                 }
             }
+        }
+    }
+
+    fun addToQueue(track: TrackModel) {
+        viewModelScope.launch {
+            // TODO Enqueue given track
+        }
+    }
+
+    fun playTrack(track: TrackModel) {
+        viewModelScope.launch {
+            // TODO Play given track
         }
     }
 }

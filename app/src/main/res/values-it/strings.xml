@@ -1,59 +1,116 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
-    <string name="password_reset_email_sent">L\'email per il reset della password è stata inviata</string>
-    <string name="send_password_reset_email">Invia email</string>
-    <string name="enter_instructions_to_reset_password">Indicaci l\'email alla quale invieremo le istruzioni per il ripristino della password</string>
-    <string name="password_recovery_screen_name">Ripristino Password</string>
-    <string name="account_description">Account</string>
-    <string name="home_screen_name">Home</string>
-    <string name="search_screen_name">Ricerca</string>
-    <string name="library_screen_name">Libreria</string>
-    <string name="back_description">Torna indietro</string>
-    <string name="app_logo_description">Logo App</string>
-    <string name="email_label">Email</string>
-    <string name="password_label">Password</string>
-    <string name="hide_password">Nascondi password</string>
-    <string name="show_password">Mostra password</string>
-    <string name="sign_up_now">Non hai un account? Iscriviti ora</string>
-    <string name="login">Log in</string>
-    <string name="forgot_password">Hai dimenticato la password?</string>
-    <string name="profile_screen_name">Profilo</string>
-    <string name="profile_picture_description">Immagine profilo</string>
-    <string name="username">Username</string>
-    <string name="forward_description">Vai avanti</string>
-    <string name="change_password">Cambia Password</string>
-    <string name="delete_profile">Elimina Profilo</string>
-    <string name="what_to_play">Cosa vuoi ascoltare?</string>
-    <string name="search_description">Ricerca</string>
-    <string name="discover_new_things">Scopri nuovi brani</string>
-    <string name="account_settings_screen_name"><![CDATA[Account & Impostazioni]]></string>
-    <string name="view_profile">Visualizza Profilo</string>
-    <string name="allow_explicit_songs">Consenti brani espliciti</string>
-    <string name="allow_explicit_songs_description">Non ti saranno mostrati brani con contenuto esplicito</string>
-    <string name="sign_up">Iscriviti</string>
-    <string name="discover_new_music">Scopri nuovi brani</string>
-    <string name="username_label">Username</string>
-    <string name="create_account">Crea account</string>
-    <string name="unexpected_error">Errore imprevisto</string>
-    <string name="network_error">Errore di rete</string>
-    <string name="no_user_found">Non è stata trovato un utente corrispondente alla email</string>
-    <string name="invalid_email">Email invalida</string>
-    <string name="invalid_credentials">Credenziali invalide</string>
+    <string name="account_and_settings"><![CDATA[Account & Impostazioni]]></string>
     <string name="account_not_found_or_disabled">Account inesistente o disabilitato</string>
-    <string name="settings_description">Impostazioni</string>
-    <string name="weak_password">Password debole</string>
-    <string name="email_already_in_use">L\'email è già in uso</string>
-    <string name="malformed_email">L\'email è mal formattata</string>
-    <string name="artist_picture_description">Immagine dell\'artista</string>
-    <string name="playlist_picture_description">Immagine della playlist</string>
-    <string name="top_playlists">Le migliori playlist</string>
-    <string name="top_artists">I migliori artisti</string>
-    <string name="top_albums">I migliori album</string>
+
+    <string name="add">Aggiungi</string>
+    <string name="add_to_liked">Aggiungi ai preferiti</string>
+    <string name="add_to_playlist">Aggiungi a playlist</string>
+    <string name="add_to_queue">Aggiungi alla coda</string>
+
     <string name="album_details">Dettagli album</string>
-    <string name="explicit_description">Contenuti espliciti</string>
-    <string name="more_description">Altro</string>
-    <string name="album_picture_description">Immagine dell\'album</string>
+    <string name="album_label">Etichetta discografica</string>
+
+    <string name="allow_explicit_songs">Consenti brani espliciti</string>
+    <string name="allow_explicit_songs_description">Consenti la visualizzazione di contenuti espliciti</string>
+
     <string name="artist_details">Dettagli artista</string>
+
+    <string name="cancel">Annulla</string>
+
+    <string name="change">Modifica</string>
+    <string name="change_password">Cambia Password</string>
+
+    <string name="clear_tracks">Svuota tracce</string>
+
+    <string name="create">Crea</string>
+    <string name="create_account">Crea account</string>
+
+    <string name="delete_playlist">Elimina playlist</string>
+    <string name="delete_profile">Elimina account</string>
+
+    <string name="discography">Discografia</string>
+
+    <string name="discover_new_music">Scopri nuovi brani</string>
+    <string name="discover_new_things">Scopri qualcosa di nuovo</string>
+
+    <string name="edit_playlist_name">Modifica nome</string>
+
+    <string name="email">Email</string>
+    <string name="email_already_in_use">L\'email è già in uso</string>
+
+    <string name="failed_to_authenticate_login_again">Autenticazione fallita. Effettua nuovamente il login.</string>
+
+    <string name="forgot_password">Hai dimenticato la password?</string>
+
+    <string name="go_to_login">Vai al login</string>
+
+    <string name="hide_password">Nascondi password</string>
+
+    <string name="home">Home</string>
+
+    <string name="invalid_credentials">Credenziali invalide</string>
+    <string name="invalid_email">Email invalida</string>
+
+    <string name="last_edited">Ultima modifica</string>
+
+    <string name="library">Libreria</string>
+
+    <string name="liked_tracks">Tracce preferite</string>
+
+    <string name="login">Log in</string>
+
+    <string name="network_error">Errore di rete</string>
+
+    <string name="new_playlist">Nuova playlist</string>
+    <string name="new_playlist_name">Nuovo nome playlist</string>
+
+    <string name="no_playlists_found">Non è stata trovata alcuna playlist</string>
+    <string name="no_user_found">Non è stata trovato un utente corrispondente alla email</string>
+
+    <string name="password">Password</string>
+    <string name="password_recovery">Ripristino Password</string>
+    <string name="password_reset_email_sent">L\'email per il reset della password è stata inviata con successo</string>
+    <string name="password_reset_instructions">Indicaci l\'email alla quale invieremo le istruzioni per il ripristino della password.</string>
+
     <string name="playlist_details">Dettagli playlist</string>
+    <string name="playlist_name">Nome playlist</string>
+
+    <string name="profile">Profilo</string>
+
+    <string name="remove_track">Rimuovi traccia</string>
+
+    <string name="search">Ricerca</string>
+
+    <string name="select_playlists_to_add_track_to">Seleziona le playlist a cui aggiungere il brano:</string>
+
+    <string name="send_password_reset_email">Invia email</string>
+
+    <string name="show_password">Mostra password</string>
+
+    <string name="sign_up">Iscriviti</string>
+    <string name="sign_up_now">Non hai un account? Iscriviti ora!</string>
+
+    <string name="top_albums">I migliori album</string>
+    <string name="top_artists">I migliori artisti</string>
+    <string name="top_playlists">Le migliori playlist</string>
+
+    <string name="track_history">Cronologia tracce</string>
+
+    <string name="tracks">brano/i</string>
+
+    <string name="unexpected_error">Errore imprevisto</string>
+
+    <string name="unknown_playlist">Playlist sconosciuta</string>
+
+    <string name="username">Username</string>
+
+    <string name="view_profile">Visualizza profilo</string>
+
+    <string name="weak_password">Password debole</string>
+
+    <string name="what_to_play">Cosa vuoi ascoltare?</string>
+
+    <string name="your_playlists">Le tue playlist</string>
     <string name="search_results">Risultati di ricerca per:</string>
 </resources>

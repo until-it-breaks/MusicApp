@@ -15,12 +15,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+private const val TAG = "ArtistViewModel"
+
 data class ArtistState(
     val artist: ArtistModel? = null,
     val artistAlbums: List<AlbumModel> = emptyList(),
     val artistIsLoading: Boolean = false,
     val artistAlbumsAreLoading: Boolean = false,
-    val error: String? = null
 )
 
 class ArtistViewModel(private val deezerDataSource: DeezerDataSource): ViewModel() {
@@ -29,30 +30,32 @@ class ArtistViewModel(private val deezerDataSource: DeezerDataSource): ViewModel
 
     fun loadArtist(id: Long) {
         viewModelScope.launch {
-            _state.update { it.copy(artistIsLoading = true, error = null) }
+            _state.update { it.copy(artistIsLoading = true) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getArtistDetails(id)
                 }
-                _state.update { it.copy(artist = result.toModel(), artistIsLoading = false) }
+                _state.update { it.copy(artist = result.toModel()) }
             } catch (e: Exception) {
-                Log.e("ARTIST", e.localizedMessage ?: "Unexpected error loading artist")
-                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error", artistIsLoading = false) }
+                Log.e(TAG, e.localizedMessage, e)
+            } finally {
+                _state.update { it.copy(artistIsLoading = false) }
             }
         }
     }
 
     fun loadArtistAlbums(id: Long) {
         viewModelScope.launch {
-            _state.update { it.copy(artistAlbumsAreLoading = true, error = null) }
+            _state.update { it.copy(artistAlbumsAreLoading = true) }
             try {
                 val result = withContext(Dispatchers.IO)  {
                     deezerDataSource.getArtistAlbums(id)
                 }
-                _state.update { it.copy(artistAlbums = result.map { it.toModel() }, artistAlbumsAreLoading = false) }
+                _state.update { it.copy(artistAlbums = result.map { it.toModel() }) }
             } catch (e: Exception) {
-                Log.e("ARTIST", e.localizedMessage ?: "Unexpected error")
-                _state.update { it.copy(error = e.localizedMessage ?: "Unexpected error", artistAlbumsAreLoading = false) }
+                Log.e(TAG, e.localizedMessage, e)
+            } finally {
+                _state.update { it.copy(artistAlbumsAreLoading = false) }
             }
         }
     }

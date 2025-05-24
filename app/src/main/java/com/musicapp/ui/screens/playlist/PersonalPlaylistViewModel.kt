@@ -1,12 +1,13 @@
 package com.musicapp.ui.screens.playlist
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
-import com.musicapp.data.remote.deezer.DeezerPlaylistDetailed
-import com.musicapp.data.repositories.PlaylistsRepository
-import com.musicapp.ui.models.LikedTracksPlaylistModel
+import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.ui.models.TrackModel
+import com.musicapp.ui.models.UserPlaylistModel
+import com.musicapp.ui.models.toModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,27 +15,33 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+private const val TAG = "PersonalPlaylistViewModel"
 
 data class PersonalPlaylistState(
-    val playlistId: String? = null,
-    val playlistDetails: DeezerPlaylistDetailed? = null,
-    val tracks: List<TrackModel> = emptyList(),
-    val playlistDetailsAreLoading: Boolean = false,
-    val tracksAreLoading: Boolean = false,
-    val error: String? = null
-)
+    val deletionSuccessful: Boolean = false,
+    val isEditingName: Boolean = false,
+    val newName: String = ""
+)  {
+    val canSubmitNameChange = newName.isNotBlank()
+}
 
-class PersonalPlaylistViewModel(private val auth: FirebaseAuth, private val playlistsRepository: PlaylistsRepository): ViewModel() {
-    private val _userId = MutableStateFlow(auth.currentUser?.uid)
-    private val _uiState = MutableStateFlow(LikedTracksState())
-    val uiState: StateFlow<LikedTracksState> = _uiState.asStateFlow()
+class PersonalPlaylistViewModel(private val userPlaylistRepository: UserPlaylistRepository): ViewModel() {
+    private val _selectedPlaylistId = MutableStateFlow<String?>(null)
+
+    private val _uiState = MutableStateFlow(PersonalPlaylistState())
+    val uiState: StateFlow<PersonalPlaylistState> = _uiState.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val playlist: StateFlow<LikedTracksPlaylistModel?> = _userId
+    val playlist: StateFlow<UserPlaylistModel?> = _selectedPlaylistId
         .filterNotNull()
-        .flatMapLatest { userId ->
-            playlistsRepository.getLikedTracksWithTracks(userId)
+        .flatMapLatest { playlistId ->
+            userPlaylistRepository.getPlaylistWithTracksAndArtists(playlistId).map { it?.toModel() }
         }
         .stateIn(
             scope = viewModelScope,
@@ -42,18 +49,73 @@ class PersonalPlaylistViewModel(private val auth: FirebaseAuth, private val play
             initialValue = null
         )
 
-    /*
     fun loadPlaylistTracks(playlistId: String) {
-        _state.update { it.copy(playlistId = playlistId) }
+        _selectedPlaylistId.value = playlistId
+    }
+
+    fun removeTrackFromPlaylist(trackId: Long) {
+        viewModelScope.launch {
+            _selectedPlaylistId.value?.let {
+                try {
+                    withContext(Dispatchers.IO) {
+                        userPlaylistRepository.removeTrackFromPlaylist(it, trackId)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, e.localizedMessage, e)
+                }
+            }
+        }
     }
 
     fun deletePlaylist() {
         viewModelScope.launch {
-            val playlistId = state.value.playlistId
-            if (playlistId != null) {
-                playlistRepository.deletePlaylist(playlistId)
+            _selectedPlaylistId.value?.let {
+                try {
+                    withContext(Dispatchers.IO) {
+                        userPlaylistRepository.deletePlaylist(it)
+                    }
+                    _uiState.update { it.copy(deletionSuccessful = true) }
+                } catch (e: Exception) {
+                    Log.e(TAG, e.localizedMessage, e)
+                }
             }
         }
     }
-    */
+
+    fun startEditingName(currentName: String) {
+        _uiState.update { it.copy(isEditingName = true, newName = currentName) }
+    }
+
+    fun dismissEditingName() {
+        _uiState.update { it.copy(isEditingName = false, newName = "") }
+    }
+
+    fun onPlaylistNameChanged(name: String) {
+        _uiState.update { it.copy(newName = name) }
+    }
+
+    fun confirmNameChange() {
+        val playlistId = _selectedPlaylistId.value ?: return
+        val name = _uiState.value.newName
+        viewModelScope.launch {
+            try {
+                userPlaylistRepository.editPlaylistName(playlistId, name)
+                dismissEditingName()
+            } catch (e: Exception) {
+                Log.e(TAG, e.localizedMessage, e)
+            }
+        }
+    }
+
+    fun addToQueue(track: TrackModel) {
+        viewModelScope.launch {
+            // TODO Enqueue given track
+        }
+    }
+
+    fun playTrack(track: TrackModel) {
+        viewModelScope.launch {
+            // TODO Play given track
+        }
+    }
 }

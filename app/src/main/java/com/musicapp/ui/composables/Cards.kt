@@ -15,9 +15,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Explicit
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,31 +28,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.musicapp.R
 import com.musicapp.ui.models.TrackModel
 
+enum class PlaylistType {
+    DEFAULT,
+    LIKED,
+    HISTORY
+}
+
+/**
+ * Simple card for playlist/album home representation
+ */
 @Composable
 fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = null, onClick: () -> Unit) {
     Card(
         onClick = onClick,
-        modifier = modifier
+        modifier = modifier,
+        shape = MaterialTheme.shapes.medium,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             LoadableImage(
                 imageUri = imageUri,
-                contentDescription = stringResource(R.string.playlist_picture_description),
+                contentDescription = null,
                 modifier = Modifier.size(72.dp)
             )
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(horizontal = 8.dp)
@@ -59,25 +69,53 @@ fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = 
     }
 }
 
+/**
+ * Card for a given user's personal playlist (liked, history or generic playlist)
+ */
 @Composable
-fun UserPlaylistCard(title: String, onClick: () -> Unit) {
+fun UserPlaylistCard(
+    title: String,
+    modifier: Modifier = Modifier,
+    imageUri: Uri? = null,
+    playlistType: PlaylistType = PlaylistType.DEFAULT,
+    onClick: () -> Unit
+) {
     Card(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Image,
-                contentDescription = "Playlist Picture",
-                modifier = Modifier.size(72.dp)
-            )
+            when(playlistType) {
+                PlaylistType.DEFAULT -> LoadableImage(
+                    imageUri = imageUri,
+                    contentDescription = "Playlist picture",
+                    modifier = Modifier.size(72.dp).padding(8.dp)
+                )
+                PlaylistType.LIKED -> Icon(
+                    imageVector = Icons.Outlined.Favorite,
+                    contentDescription = "Liked tracks",
+                    modifier = Modifier.size(72.dp).padding(8.dp)
+                )
+                PlaylistType.HISTORY -> Icon(
+                    imageVector = Icons.Outlined.History,
+                    contentDescription = "Track history",
+                    modifier = Modifier.size(72.dp).padding(8.dp)
+                )
+            }
+
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
             )
-            Spacer(modifier = Modifier.weight(1f))
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
                 contentDescription = "Forward",
@@ -87,6 +125,9 @@ fun UserPlaylistCard(title: String, onClick: () -> Unit) {
     }
 }
 
+/**
+ * Simple card for artist home representation
+ */
 @Composable
 fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: Uri? = null, onClick: () -> Unit) {
     Card(
@@ -100,7 +141,7 @@ fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: Uri? = nu
         ) {
             LoadableImage(
                 imageUri = imageUrl,
-                contentDescription = stringResource(R.string.artist_picture_description),
+                contentDescription = null,
                 modifier = Modifier
                     .size(96.dp)
                     .clip(CircleShape),
@@ -108,7 +149,7 @@ fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: Uri? = nu
             )
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center
@@ -134,13 +175,14 @@ fun TrackCard(
             modifier = Modifier.padding(8.dp)
         ) {
             if (showPicture) {
-                LoadableImage(track.album?.mediumCover, "Track picture", modifier = Modifier.size(48.dp))
+                LoadableImage(track.mediumPicture, "Track picture", modifier = Modifier.size(48.dp))
             }
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = track.title,
+                    style = MaterialTheme.typography.titleLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -148,10 +190,12 @@ fun TrackCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     track.isExplicit?.let {
-                        Icon(
-                            imageVector = Icons.Filled.Explicit,
-                            contentDescription = stringResource(R.string.explicit_description)
-                        )
+                        if (it) {
+                            Icon(
+                                imageVector = Icons.Filled.Explicit,
+                                contentDescription = null
+                            )
+                        }
                     }
 
                     track.contributors.forEachIndexed { index, contributor ->
@@ -178,19 +222,17 @@ fun TrackCard(
 }
 
 @Composable
-fun AddTrackToPlaylistPlaylistCard(
+fun PlaylistCardToAddTo(
     title: String,
     onClick: () -> Unit,
-    disabled: Boolean,
+    enabled: Boolean,
     showCheck: Boolean
 ) {
     Card(
         onClick = onClick,
+        enabled = enabled,
         modifier = Modifier.fillMaxWidth()
     ) {
-        if (disabled) {
-            Text("I'm disabled") // TODO improve
-        }
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -204,7 +246,7 @@ fun AddTrackToPlaylistPlaylistCard(
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.weight(1f))
-            if (showCheck) {
+            if (showCheck || !enabled) {
                 Icon(
                     imageVector = Icons.Outlined.Check,
                     contentDescription = "Forward",
@@ -216,7 +258,7 @@ fun AddTrackToPlaylistPlaylistCard(
 }
 
 @Composable
-fun AddTrackToPlaylistTrackCard(
+fun TrackCardToAdd(
     track: TrackModel
 ) {
     Card {
@@ -225,7 +267,7 @@ fun AddTrackToPlaylistTrackCard(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.padding(8.dp)
         ) {
-            LoadableImage(track.album?.mediumCover, "Track picture", modifier = Modifier.size(48.dp))
+            LoadableImage(track.mediumPicture, "Track picture", modifier = Modifier.size(48.dp))
             Column(
                 modifier = Modifier.weight(1f)
             ) {

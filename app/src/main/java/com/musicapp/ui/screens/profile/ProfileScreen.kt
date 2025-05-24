@@ -41,7 +41,7 @@ fun ProfileScreen(navController: NavController) {
     val profileScreenViewModel: ProfileScreenViewModel = koinViewModel()
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.profile_screen_name)) }
+        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.profile)) }
     ) { contentPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -53,7 +53,7 @@ fun ProfileScreen(navController: NavController) {
         ) {
             Image(
                 imageVector = Icons.Outlined.Image,
-                contentDescription = stringResource(R.string.profile_picture_description),
+                contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(128.dp)
@@ -88,7 +88,7 @@ fun ProfileScreen(navController: NavController) {
                         Spacer(Modifier.weight(1f))
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                            contentDescription = stringResource(R.string.forward_description)
+                            contentDescription = null
                         )
                     }
                 }

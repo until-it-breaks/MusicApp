@@ -1,9 +1,9 @@
 package com.musicapp.ui.composables
 
 import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -14,7 +14,7 @@ import coil.request.ImageRequest
 @Composable
 fun LoadableImage(
     imageUri: Uri?,
-    contentDescription: String,
+    contentDescription: String?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit
 ) {
@@ -29,10 +29,9 @@ fun LoadableImage(
             contentScale = contentScale
         )
     } else {
-        Image(
+        Icon(
             imageVector = Icons.Outlined.Image,
-            contentDescription = "Image placeholder",
-            contentScale = contentScale,
+            contentDescription = null,
             modifier = modifier
         )
     }

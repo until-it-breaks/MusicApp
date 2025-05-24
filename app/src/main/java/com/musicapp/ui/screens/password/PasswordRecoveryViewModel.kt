@@ -1,5 +1,6 @@
 package com.musicapp.ui.screens.password
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.FirebaseNetworkException
@@ -14,43 +15,48 @@ import com.musicapp.R
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.tasks.await
 
+private const val TAG = "PasswordRecoveryViewModel"
+
 data class PasswordRecoveryState(
     val email: String = "",
-    val errorMessageId: Int? = null,
     val isLoading: Boolean = false,
-    val emailSent: Boolean = false
+    val emailSent: Boolean = false,
+    val errorMessageId: Int? = null
 ) {
     val canSubmit = email.isNotBlank()
 }
 
 class PasswordRecoveryViewModel(private val auth: FirebaseAuth): ViewModel() {
-
-    private val _state = MutableStateFlow(PasswordRecoveryState())
-    val state: StateFlow<PasswordRecoveryState> = _state.asStateFlow()
+    private val _uiState = MutableStateFlow(PasswordRecoveryState())
+    val uiState: StateFlow<PasswordRecoveryState> = _uiState.asStateFlow()
 
     fun onEmailChanged(email: String) {
-        _state.update { it.copy(email = email) }
+        _uiState.update { it.copy(email = email) }
     }
 
     fun sendPasswordResetEmail() {
-        if (!state.value.canSubmit) return
+        if (!uiState.value.canSubmit) return
 
-        _state.update { it.copy(isLoading = true, emailSent = false, errorMessageId = null) }
+        _uiState.update { it.copy(isLoading = true, emailSent = false, errorMessageId = null) }
 
         viewModelScope.launch {
             try {
-                auth.sendPasswordResetEmail(state.value.email.trim()).await()
-                _state.update { it.copy(emailSent = true) }
+                auth.sendPasswordResetEmail(uiState.value.email.trim()).await()
+                _uiState.update { it.copy(emailSent = true, email = "") }
             } catch (e: FirebaseAuthInvalidUserException) {
-                _state.update { it.copy(errorMessageId = R.string.no_user_found) }
+                Log.e(TAG, e.localizedMessage, e)
+                _uiState.update { it.copy(errorMessageId = R.string.no_user_found) }
             } catch (e: FirebaseAuthInvalidCredentialsException) {
-                _state.update { it.copy(errorMessageId = R.string.invalid_email) }
+                Log.e(TAG, e.localizedMessage, e)
+                _uiState.update { it.copy(errorMessageId = R.string.invalid_email) }
             } catch (e: FirebaseNetworkException) {
-                _state.update { it.copy(errorMessageId = R.string.network_error) }
+                Log.e(TAG, e.localizedMessage, e)
+                _uiState.update { it.copy(errorMessageId = R.string.network_error) }
             } catch (e: Exception) {
-                _state.update { it.copy(errorMessageId = R.string.unexpected_error) }
+                Log.e(TAG, e.localizedMessage, e)
+                _uiState.update { it.copy(errorMessageId = R.string.unexpected_error) }
             } finally {
-                _state.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }

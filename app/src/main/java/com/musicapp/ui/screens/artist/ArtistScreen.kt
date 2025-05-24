@@ -17,7 +17,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -31,7 +30,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ArtistScreen(navController: NavController, artistId: Long) {
     val viewModel = koinViewModel<ArtistViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(artistId) {
         viewModel.loadArtist(artistId)
@@ -49,39 +48,33 @@ fun ArtistScreen(navController: NavController, artistId: Long) {
                 .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
         ) {
             item {
-                if (state.error != null) {
-                    Text("Error: ${state.error}")
-                }
-            }
-            item {
-                state.artist?.let { artist ->
+                uiState.artist?.let { artist ->
                     Row(
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         LoadableImage(
                             imageUri = artist.bigPicture,
-                            contentDescription = stringResource(R.string.artist_picture_description)
+                            contentDescription = null
                         )
                     }
                 }
             }
             item {
-                state.artist?.let { artist ->
+                uiState.artist?.let { artist ->
                     Text(
                         text = artist.name,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.headlineMedium
                     )
                 }
             }
             item {
                 Text(
-                    text = "Discography",
-                    style = MaterialTheme.typography.titleMedium
+                    text = stringResource(R.string.discography),
+                    style = MaterialTheme.typography.titleLarge
                 )
             }
-            items(state.artistAlbums){ album ->
+            items(uiState.artistAlbums){ album ->
                 PlayListCard(
                     modifier = Modifier.fillMaxWidth(),
                     title = album.title,

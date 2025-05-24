@@ -28,17 +28,17 @@ import com.musicapp.ui.composables.MainNavBar
 
 enum class MainCategory(val stringId: Int, val primaryIcon: ImageVector, val secondaryIcon: ImageVector) {
     HOME(
-        R.string.home_screen_name,
+        R.string.home,
         Icons.Filled.Home,
         Icons.Outlined.Home
     ),
     SEARCH(
-        R.string.search_screen_name,
+        R.string.search,
         Icons.Filled.Search,
         Icons.Outlined.Search
     ),
     LIBRARY(
-        R.string.library_screen_name,
+        R.string.library,
         Icons.AutoMirrored.Filled.LibraryBooks,
         Icons.AutoMirrored.Outlined.LibraryBooks
     )

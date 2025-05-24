@@ -1,107 +1,100 @@
 package com.musicapp.data.database
 
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.Junction
 import androidx.room.PrimaryKey
-import androidx.room.Relation
-import java.util.UUID
+
+// Track
 
 @Entity
 data class Track(
     @PrimaryKey
     val trackId: Long,
-    @ColumnInfo
     val title: String,
-    @ColumnInfo
     val duration: Long?,
-    @ColumnInfo
     val releaseDate: String?,
-    @ColumnInfo
-    val isExplicit: Boolean?
+    val isExplicit: Boolean?,
+    val previewUri: String?,
+    val storedPreviewUri: String?,
+    val smallPictureUri: String?,
+    val mediumPictureUri: String?,
+    val bigPictureUri: String?
 )
+
+// Artist
+
+@Entity
+data class Artist(
+    @PrimaryKey
+    val artistId: Long,
+    val name: String,
+    val smallPictureUri: String?,
+    val mediumPictureUri: String?,
+    val bigPictureUri: String?
+)
+
+@Entity(primaryKeys = ["trackId", "artistId"])
+data class TrackArtistCrossRef(
+    val trackId: Long,
+    val artistId: Long
+)
+
+// User
 
 @Entity
 data class User(
     @PrimaryKey
     val userId: String,
-    @ColumnInfo
     val username: String,
-    @ColumnInfo
-    val email: String
+    val email: String,
+    val lastEditTime: Long
 )
 
-@Entity()
+// Normal playlist
+
+@Entity
 data class Playlist(
     @PrimaryKey()
-    val playlistId: String = UUID.randomUUID().toString(), // Should be better than a combined primary key, avoids offline to online synchronization issues across multiple devices.
-    @ColumnInfo
+    val playlistId: String,
     val ownerId: String,
-    @ColumnInfo
     val name: String,
+    val lastEditTime: Long
 )
 
 @Entity(primaryKeys = ["playlistId", "trackId"])
 data class PlaylistTrackCrossRef(
     val playlistId: String,
-    val trackId: Long
+    val trackId: Long,
+    val timeOfAddition: Long
 )
 
-data class PlaylistWithTracks(
-    @Embedded val playlist: Playlist,
-    @Relation(
-        parentColumn = "playlistId",
-        entityColumn = "trackId",
-        associateBy = Junction(PlaylistTrackCrossRef::class)
-    )
-    val tracks: List<Track>
-)
+// Liked Tracks
 
 @Entity
-data class LikedTracksPlaylist(
+data class LikedPlaylist(
     @PrimaryKey
     val ownerId: String,
-    @ColumnInfo
-    val lastUpdateTime: String
+    val lastEditTime: Long
 )
 
 @Entity(primaryKeys = ["ownerId", "trackId"])
-data class LikedTracksPlaylistTrackCrossRef(
+data class LikedPlaylistTrackCrossRef(
     val ownerId: String,
-    val trackId: Long
+    val trackId: Long,
+    val timeOfAddition: Long
 )
 
-data class LikedTracksPlaylistWithTracks(
-    @Embedded val playlist: LikedTracksPlaylist,
-    @Relation(
-        parentColumn = "ownerId",
-        entityColumn = "trackId",
-        associateBy = Junction(LikedTracksPlaylistTrackCrossRef::class)
-    )
-    val tracks: List<Track>
-)
+// Track history
 
 @Entity
 data class TrackHistory(
     @PrimaryKey
     val ownerId: String,
-    @ColumnInfo
-    val lastUpdateTime: String
+    val lastEditTime: Long
 )
 
 @Entity(primaryKeys = ["ownerId", "trackId"])
 data class TrackHistoryTrackCrossRef(
     val ownerId: String,
-    val trackId: Long
-)
-
-data class TrackHistoryWithTracks(
-    @Embedded val playlist: TrackHistory,
-    @Relation(
-        parentColumn = "ownerId",
-        entityColumn = "trackId",
-        associateBy = Junction(TrackHistoryTrackCrossRef::class)
-    )
-    val tracks: List<Track>
+    val trackId: Long,
+    val timeOfAddition: Long
 )
