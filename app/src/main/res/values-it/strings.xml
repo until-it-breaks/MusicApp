@@ -112,5 +112,7 @@
     <string name="what_to_play">Cosa vuoi ascoltare?</string>
 
     <string name="your_playlists">Le tue playlist</string>
+
     <string name="search_results">Risultati di ricerca per:</string>
+    <string name="search_description">Scopri nuovi brani</string>
 </resources>

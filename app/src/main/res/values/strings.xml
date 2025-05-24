@@ -114,6 +114,8 @@
     <string name="what_to_play">What do you want to play?</string>
 
     <string name="your_playlists">Your playlists</string>
-    <string name="search_result">Search result for:</string>
+
     <string name="search_results">Search result for:</string>
+    <string name="search_description">Find new tracks</string>
+    <string name="error_search">An error has occurred, please try again</string>
 </resources>

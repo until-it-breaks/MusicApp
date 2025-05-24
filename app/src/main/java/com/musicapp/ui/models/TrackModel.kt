@@ -5,6 +5,7 @@ import androidx.core.net.toUri
 import com.musicapp.data.database.Track
 import com.musicapp.data.remote.deezer.DeezerAlbumTrack
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
+import com.musicapp.data.remote.deezer.DeezerTrackSummary
 import com.musicapp.data.repositories.TrackWithArtists
 
 data class TrackModel(
@@ -85,5 +86,15 @@ fun TrackModel.toDbEntity(): Track {
         smallPictureUri = smallPicture.toString(),
         mediumPictureUri = mediumPicture.toString(),
         bigPictureUri = bigPicture.toString()
+    )
+}
+
+fun DeezerTrackSummary.toModel(): TrackModel {
+    return TrackModel(
+        id = this.id,
+        title = this.title,
+        isExplicit = this.explicitLyrics,
+        previewUri = this.preview.toUri(),
+        contributors = listOf(this.artist.toModel())
     )
 }

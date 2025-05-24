@@ -79,39 +79,38 @@ fun SearchScreen(
                     )
                 }
 
-                uiState.error != null -> {
+                uiState.error -> {
                     Text(
-                        text = uiState.error!!,
+                        text = stringResource(R.string.error_search),
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(8.dp)
                     )
                 }
 
 
-                uiState.searchResults.isNotEmpty() -> {
-                    LazyColumn {
+                uiState.searchResults.tracks.isNotEmpty() -> {
+                    LazyColumn(
+                        
+                    ) {
                         item {
+                            val lastSearch = uiState.searchText
                             Text(
-                                text = "${stringResource(R.string.search_results)} '${uiState.searchText}'",
+                                text = "${stringResource(R.string.search_results)} '${lastSearch}'",
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                         }
-                        items(uiState.searchResults) { track ->
+                        items(uiState.searchResults.tracks) { track ->
                             TrackCard(
                                 track = track,
                                 onTrackClick = { /*TODO*/ },
                                 onArtistClick = { /*TODO*/ },
                                 extraMenu = {}
                             )
-
-
                         }
 
                     }
                 }
-
-
                 else -> {
                     Text(
                         text = stringResource(R.string.discover_new_things),
