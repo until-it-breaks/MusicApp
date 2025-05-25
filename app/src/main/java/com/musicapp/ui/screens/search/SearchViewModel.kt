@@ -1,5 +1,6 @@
 package com.musicapp.ui.screens.search
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
@@ -78,6 +79,11 @@ class SearchViewModel(private val deezerDataSource: DeezerDataSource) : ViewMode
                     )
                 }
             } catch (e: Exception) {
+                Log.e(
+                    "SearchViewModel",
+                    "Error performing initial search for '$currentSearchText': ${e.message}",
+                    e
+                )
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -114,6 +120,7 @@ class SearchViewModel(private val deezerDataSource: DeezerDataSource) : ViewMode
                     )
                 }
             } catch (e: Exception) {
+                Log.e("SearchViewModel", "Error loading next page from $nextUrl: ${e.message}", e)
                 _uiState.update {
                     it.copy(
                         isLoadingMore = false,
