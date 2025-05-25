@@ -11,8 +11,8 @@
     <string name="album_details">Album details</string>
     <string name="album_label">Label</string>
 
-    <string name="allow_explicit_songs">Allow explicit songs</string>
-    <string name="allow_explicit_songs_description">Explicit content will be shown</string>
+    <string name="allow_explicit">Explicit content</string>
+    <string name="allow_explicit_description">Allow explicit content.</string>
 
     <string name="app_name" translatable="false">MusicApp</string>
 
@@ -118,4 +118,9 @@
     <string name="search_results">Search result for:</string>
     <string name="search_description">Find new tracks</string>
     <string name="error_search">An error has occurred, please try again</string>
+    <string name="theme_default">Default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme">Theme</string>
+    <string name="theme_description">Set how the app will look.</string>
 </resources>
