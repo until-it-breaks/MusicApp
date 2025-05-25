@@ -12,6 +12,7 @@ import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.data.repositories.TracksRepository
 import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.data.repositories.UserRepository
+import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.screens.addtoplaylist.AddToPlaylistViewModel
 import com.musicapp.ui.screens.album.AlbumViewModel
 import com.musicapp.ui.screens.artist.ArtistViewModel
@@ -111,6 +112,8 @@ val appModule = module {
     single { DeezerDataSource(get()) }
 
     // ViewModels
+    single { MediaPlayerManager() }
+
     viewModel { SignUpViewModel(get(), get()) }
 
     viewModel { LoginViewModel(get()) }
