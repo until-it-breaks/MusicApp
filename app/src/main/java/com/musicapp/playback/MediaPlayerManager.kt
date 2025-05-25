@@ -105,6 +105,7 @@ class MediaPlayerManager(
         _playbackState.update {
             it.copy(
                 currentPlayingTrackId = track.id,
+                currentTrack = track,
                 isPlaying = false, // Will be true on prepare
                 isLoading = true,
                 playbackError = null
