@@ -3,6 +3,7 @@ package com.musicapp.ui.composables
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,7 +41,7 @@ fun BottomMusicBar(
     onBarClick: () -> Unit, // open the track screen
     modifier: Modifier = Modifier
 ) {
-    // Only show the bar if a track is actively playing or loading
+
     val isVisible = playbackState.currentTrack != null
 
     AnimatedVisibility(
