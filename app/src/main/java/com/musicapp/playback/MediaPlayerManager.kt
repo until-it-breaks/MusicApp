@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 data class PlaybackUiState(
     val currentPlayingTrackId: Long? = null,
     val isPlaying: Boolean = false,
-    val isLoading: Boolean = false, // True when preparing (buffering)
+    val isLoading: Boolean = false,
     val playbackError: String? = null
     // Add other properties like currentPosition, duration, mediaTitle, mediaArtist if needed
 )
