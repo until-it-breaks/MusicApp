@@ -59,7 +59,34 @@ fun BottomMusicBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Left Side: Plus and Play/Pause buttons
+
+            // Left: Song Title and Artist
+            Column(
+                modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                playbackState.currentTrack?.let { track ->
+                    val artists = track.contributors.joinToString(separator = ",") { it.name }
+                    Text(
+                        text = track.title,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = artists,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    )
+                }
+            }
+
+            // Right: Plus and Play/Pause buttons
             Row(verticalAlignment = Alignment.CenterVertically) {
                 playbackState.currentTrack?.let { track ->
                     IconButton(onClick = { onAddToList(track) }) {
@@ -87,32 +114,6 @@ fun BottomMusicBar(
                             )
                         }
                     }
-                }
-            }
-
-            // Center: Song Title and Artist
-            Column(
-                modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                playbackState.currentTrack?.let { track ->
-                    val artists = track.contributors.joinToString(separator = ",") { it.name }
-                    Text(
-                        text = track.title,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = artists,
-                        style = MaterialTheme.typography.bodySmall,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                    )
                 }
             }
 
