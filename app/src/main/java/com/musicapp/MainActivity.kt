@@ -7,11 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
-<<<<<<< HEAD
 import com.musicapp.playback.MediaPlayerManager
-=======
 import com.musicapp.data.models.Theme
->>>>>>> 04655c0264bcfff0ccbc96c7107dedde98305482
 import com.musicapp.ui.MusicAppNavGraph
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.theme.MusicAppTheme
