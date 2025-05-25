@@ -3,6 +3,7 @@ package com.musicapp.ui.screens.main
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.automirrored.outlined.LibraryBooks
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,7 +26,10 @@ import com.musicapp.ui.HomeNavGraph
 import com.musicapp.ui.LibraryNavGraph
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.SearchNavGraph
+import com.musicapp.ui.composables.BottomMusicBar
 import com.musicapp.ui.composables.MainNavBar
+import org.checkerframework.common.subtyping.qual.Bottom
+import org.koin.androidx.compose.koinViewModel
 
 enum class MainCategory(val stringId: Int, val primaryIcon: ImageVector, val secondaryIcon: ImageVector) {
     HOME(
@@ -52,8 +57,24 @@ fun MainScreen(navController: NavController) {
     val searchNavController = rememberNavController()
     val libraryNavController = rememberNavController()
 
+    // mainViewModel for the mediaPlayer
+    val mainViewModel: MainViewModel = koinViewModel()
+    val playbackUiState by mainViewModel.playbackUiState.collectAsState()
+
     Column(modifier = Modifier.fillMaxSize()) {
         // Music player bar goes --> HERE <--
+        BottomMusicBar(
+            playbackState = playbackUiState,
+            onTogglePlayback = { track -> mainViewModel.togglePlayback(track) },
+            onAddToList = { track -> mainViewModel.addTrackToPlaylist(track) }, // it does nothing for now
+            onBarClick = {
+                // TODO: Implement navigation to a full "Now Playing" screen if desired
+                // For now, log the click
+                println("Now Playing Bar Clicked!")
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
         Row(
             modifier = Modifier.weight(1f)
         ) {
