@@ -1,5 +1,6 @@
 package com.musicapp.ui.screens.main
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
@@ -26,12 +28,15 @@ import com.musicapp.ui.HomeNavGraph
 import com.musicapp.ui.LibraryNavGraph
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.SearchNavGraph
-import com.musicapp.ui.composables.BottomMusicBar
 import com.musicapp.ui.composables.MainNavBar
-import org.checkerframework.common.subtyping.qual.Bottom
+import com.musicapp.ui.composables.MusicBar
 import org.koin.androidx.compose.koinViewModel
 
-enum class MainCategory(val stringId: Int, val primaryIcon: ImageVector, val secondaryIcon: ImageVector) {
+enum class MainCategory(
+    val stringId: Int,
+    val primaryIcon: ImageVector,
+    val secondaryIcon: ImageVector
+) {
     HOME(
         R.string.home,
         Icons.Filled.Home,
@@ -61,61 +66,67 @@ fun MainScreen(navController: NavController) {
     val mainViewModel: MainViewModel = koinViewModel()
     val playbackUiState by mainViewModel.playbackUiState.collectAsState()
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Music player bar goes --> HERE <--
-
-
-        Row(
-            modifier = Modifier.weight(1f)
-        ) {
-            when (selectedCategory) {
-                MainCategory.HOME -> HomeNavGraph(navController, homeNavController)
-                MainCategory.SEARCH -> SearchNavGraph(navController, searchNavController)
-                MainCategory.LIBRARY -> LibraryNavGraph(navController, libraryNavController)
-            }
-        }
-
-        BottomMusicBar(
-            playbackState = playbackUiState,
-            onTogglePlayback = { track -> mainViewModel.togglePlayback(track) },
-            onAddToList = { track -> mainViewModel.addTrackToPlaylist(track) }, // it does nothing for now
-            onBarClick = {
-                // TODO: Implement navigation to a full "Now Playing" screen if desired
-                // For now, log the click
-                println("Now Playing Bar Clicked!")
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        MainNavBar(
-            categories = MainCategory.entries.toList(),
-            selectedCategory = selectedCategory,
-            onCategorySelected = { category ->
-                if (selectedCategory == category) {
-                    when (category) {
-                        MainCategory.HOME -> {
-                            homeNavController.popBackStack(
-                                route = MusicAppRoute.Home,
-                                inclusive = false
-                            )
-                        }
-                        MainCategory.SEARCH -> {
-                            searchNavController.popBackStack(
-                                route = MusicAppRoute.Search,
-                                inclusive = false
-                            )
-                        }
-                        MainCategory.LIBRARY -> {
-                            libraryNavController.popBackStack(
-                                route = MusicAppRoute.Library,
-                                inclusive = false
-                            )
-                        }
-                    }
-                } else {
-                    selectedCategory = category
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Music player bar goes --> HERE <--
+            Row(
+                modifier = Modifier.weight(1f)
+            ) {
+                when (selectedCategory) {
+                    MainCategory.HOME -> HomeNavGraph(navController, homeNavController)
+                    MainCategory.SEARCH -> SearchNavGraph(navController, searchNavController)
+                    MainCategory.LIBRARY -> LibraryNavGraph(navController, libraryNavController)
                 }
             }
-        )
+
+            MusicBar(
+                playbackState = playbackUiState,
+                onTogglePlayback = { track -> mainViewModel.togglePlayback(track) },
+                onAddToList = { track -> mainViewModel.addTrackToPlaylist(track) }, // it does nothing for now
+                onBarClick = {
+                    // TODO: Implement navigation to a full "Now Playing" screen if desired
+                    // For now, log the click
+                    println("Now Playing Bar Clicked!")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+
+            MainNavBar(
+                categories = MainCategory.entries.toList(),
+                selectedCategory = selectedCategory,
+                onCategorySelected = { category ->
+                    if (selectedCategory == category) {
+                        when (category) {
+                            MainCategory.HOME -> {
+                                homeNavController.popBackStack(
+                                    route = MusicAppRoute.Home,
+                                    inclusive = false
+                                )
+                            }
+
+                            MainCategory.SEARCH -> {
+                                searchNavController.popBackStack(
+                                    route = MusicAppRoute.Search,
+                                    inclusive = false
+                                )
+                            }
+
+                            MainCategory.LIBRARY -> {
+                                libraryNavController.popBackStack(
+                                    route = MusicAppRoute.Library,
+                                    inclusive = false
+                                )
+                            }
+                        }
+                    } else {
+                        selectedCategory = category
+                    }
+                }
+            )
+
+
+
+        }
     }
 }

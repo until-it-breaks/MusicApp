@@ -34,7 +34,7 @@ import com.musicapp.playback.PlaybackUiState
 import com.musicapp.ui.models.TrackModel
 
 @Composable
-fun BottomMusicBar(
+fun MusicBar(
     playbackState: PlaybackUiState,
     onTogglePlayback: (TrackModel) -> Unit,
     onAddToList: (TrackModel) -> Unit, // Action for the plus button
@@ -44,12 +44,7 @@ fun BottomMusicBar(
 
     val isVisible = playbackState.currentTrack != null
 
-    AnimatedVisibility(
-        visible = isVisible,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it }),
-        modifier = modifier.fillMaxWidth()
-    ) {
+    if (isVisible) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -63,11 +58,13 @@ fun BottomMusicBar(
 
             // Left: Song Title and Artist
             Column(
-                modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                playbackState.currentTrack?.let { track ->
+                playbackState.currentTrack.let { track ->
                     val artists = track.contributors.joinToString(separator = ",") { it.name }
                     Text(
                         text = track.title,
@@ -89,7 +86,7 @@ fun BottomMusicBar(
 
             // Right: Plus and Play/Pause buttons
             Row(verticalAlignment = Alignment.CenterVertically) {
-                playbackState.currentTrack?.let { track ->
+                playbackState.currentTrack.let { track ->
                     IconButton(onClick = { onAddToList(track) }) {
                         Icon(
                             imageVector = Icons.Filled.Add,
