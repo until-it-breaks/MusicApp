@@ -45,7 +45,6 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingsScreen(navController: NavController) {
-
     val viewModel = koinViewModel<SettingsViewModel>()
 
     val allowExplicit by viewModel.allowExplicit.collectAsState()
