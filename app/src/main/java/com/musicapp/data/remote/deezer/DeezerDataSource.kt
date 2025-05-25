@@ -89,4 +89,10 @@ class DeezerDataSource(private val httpClient: HttpClient) {
         val response: JsonObject = httpClient.get(url).body()
         return json.decodeFromJsonElement(response)
     }
+
+    suspend fun getTracksByUrl(track: String): DeezerSearchResponse {
+        val url = track
+        val response: JsonObject = httpClient.get(url).body()
+        return json.decodeFromJsonElement(response)
+    }
 }

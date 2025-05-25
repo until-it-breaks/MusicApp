@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Search
@@ -51,7 +52,8 @@ fun SearchScreen(
         Column(
             modifier = Modifier
                 .padding(contentPadding)
-                .padding(12.dp),
+                .padding(horizontal = 12.dp)
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Search TextField
@@ -60,6 +62,7 @@ fun SearchScreen(
                 onValueChange = searchViewModel::onSearchTextChange,
                 placeholder = { Text(stringResource(R.string.what_to_play)) },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
                 trailingIcon = {
                     IconButton(onClick = searchViewModel::performSearch) {
                         Icon(
@@ -90,7 +93,7 @@ fun SearchScreen(
 
                 uiState.searchResults.tracks.isNotEmpty() -> {
                     LazyColumn(
-                        
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         item {
                             val lastSearch = uiState.searchText
@@ -100,7 +103,20 @@ fun SearchScreen(
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                         }
-                        items(uiState.searchResults.tracks) { track ->
+                        itemsIndexed(uiState.searchResults.tracks) { index, track ->
+
+                            if ((index >= uiState.searchResults.tracks.size - 1) && uiState.searchResults.hasNext) {
+                                searchViewModel.loadMoreTracks()
+                            }
+
+//                            if (uiState.isLoadingMore){
+//                                CircularProgressIndicator(
+//                                    modifier = Modifier
+//                                        .align(Alignment.CenterHorizontally)
+//                                        .padding(16.dp)
+//                                )
+//                            }
+
                             TrackCard(
                                 track = track,
                                 onTrackClick = { /*TODO*/ },
@@ -108,7 +124,6 @@ fun SearchScreen(
                                 extraMenu = {}
                             )
                         }
-
                     }
                 }
                 else -> {
@@ -116,7 +131,6 @@ fun SearchScreen(
                         text = stringResource(R.string.discover_new_things),
                         style = MaterialTheme.typography.titleLarge
                     )
-
                 }
             }
         }
