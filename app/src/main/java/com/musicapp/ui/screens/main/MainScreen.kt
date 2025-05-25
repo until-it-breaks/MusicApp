@@ -63,6 +63,18 @@ fun MainScreen(navController: NavController) {
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Music player bar goes --> HERE <--
+
+
+        Row(
+            modifier = Modifier.weight(1f)
+        ) {
+            when (selectedCategory) {
+                MainCategory.HOME -> HomeNavGraph(navController, homeNavController)
+                MainCategory.SEARCH -> SearchNavGraph(navController, searchNavController)
+                MainCategory.LIBRARY -> LibraryNavGraph(navController, libraryNavController)
+            }
+        }
+
         BottomMusicBar(
             playbackState = playbackUiState,
             onTogglePlayback = { track -> mainViewModel.togglePlayback(track) },
@@ -75,15 +87,6 @@ fun MainScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Row(
-            modifier = Modifier.weight(1f)
-        ) {
-            when (selectedCategory) {
-                MainCategory.HOME -> HomeNavGraph(navController, homeNavController)
-                MainCategory.SEARCH -> SearchNavGraph(navController, searchNavController)
-                MainCategory.LIBRARY -> LibraryNavGraph(navController, libraryNavController)
-            }
-        }
         MainNavBar(
             categories = MainCategory.entries.toList(),
             selectedCategory = selectedCategory,
