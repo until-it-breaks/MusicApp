@@ -2,6 +2,7 @@ package com.musicapp.playback
 
 import android.media.MediaPlayer
 import android.util.Log
+import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.launch
 
 data class PlaybackUiState(
     val currentPlayingTrackId: Long? = null,
+    val currentTrack: TrackModel? = null,
     val isPlaying: Boolean = false,
     val isLoading: Boolean = false,
     val playbackError: String? = null
@@ -43,12 +45,25 @@ class MediaPlayerManager(
             mediaPlayer = MediaPlayer().apply {
                 setOnPreparedListener { mp ->
                     mp.start()
-                    _playbackState.update { it.copy(isPlaying = true, isLoading = false, playbackError = null) }
+                    _playbackState.update {
+                        it.copy(
+                            isPlaying = true,
+                            isLoading = false,
+                            playbackError = null
+                        )
+                    }
                 }
                 setOnCompletionListener { mp ->
                     mp.stop()
                     mp.reset() // Reset for next use
-                    _playbackState.update { it.copy(isPlaying = false, currentPlayingTrackId = null, isLoading = false) }
+                    _playbackState.update {
+                        it.copy(
+                            isPlaying = false,
+                            currentPlayingTrackId = null,
+                            currentTrack = null,
+                            isLoading = false
+                        )
+                    }
                 }
                 setOnErrorListener { mp, what, extra ->
                     Log.e("MediaPlayerManager", "MediaPlayer error: what=$what, extra=$extra")
@@ -57,6 +72,7 @@ class MediaPlayerManager(
                         it.copy(
                             isPlaying = false,
                             currentPlayingTrackId = null,
+                            currentTrack = null,
                             isLoading = false,
                             playbackError = "Playback error: $what"
                         )
@@ -69,26 +85,26 @@ class MediaPlayerManager(
     }
 
     // Public API for controlling playback
-    fun togglePlayback(trackId: Long, previewUrl: String) {
+    fun togglePlayback(track: TrackModel) {
         scope.launch {
             val currentState = _playbackState.value
-            if (currentState.currentPlayingTrackId == trackId && currentState.isPlaying) {
+            if (currentState.currentPlayingTrackId == track.id && currentState.isPlaying) {
                 // Same track is playing, pause it
                 pause()
-            } else if (currentState.currentPlayingTrackId == trackId && !currentState.isPlaying) {
+            } else if (currentState.currentPlayingTrackId == track.id && !currentState.isPlaying) {
                 // Same track is paused, resume it
                 resume()
             } else {
                 // Different track, or nothing playing, start new playback
-                play(trackId, previewUrl)
+                play(track)
             }
         }
     }
 
-    private fun play(trackId: Long, previewUrl: String) {
+    private fun play(track: TrackModel) {
         _playbackState.update {
             it.copy(
-                currentPlayingTrackId = trackId,
+                currentPlayingTrackId = track.id,
                 isPlaying = false, // Will be true on prepare
                 isLoading = true,
                 playbackError = null
@@ -97,15 +113,20 @@ class MediaPlayerManager(
         mediaPlayer?.apply {
             try {
                 reset() // Reset to idle state
-                setDataSource(previewUrl) // Set the URL
+                setDataSource(track.previewUri.toString()) // Set the URL
                 prepareAsync() // Prepare in background
             } catch (e: Exception) {
-                Log.e("MediaPlayerManager", "Error setting data source or preparing MediaPlayer for $previewUrl: ${e.message}", e)
+                Log.e(
+                    "MediaPlayerManager",
+                    "Error setting data source or preparing MediaPlayer for ${track.previewUri.toString()}: ${e.message}",
+                    e
+                )
                 _playbackState.update {
                     it.copy(
                         isPlaying = false,
                         isLoading = false,
                         currentPlayingTrackId = null,
+                        currentTrack = null,
                         playbackError = "Failed to play track: ${e.message}"
                     )
                 }
@@ -117,7 +138,7 @@ class MediaPlayerManager(
             mediaPlayer?.let { player ->
                 try {
                     player.reset()
-                    player.setDataSource(previewUrl)
+                    player.setDataSource(track.previewUri.toString())
                     player.prepareAsync()
                 } catch (e: Exception) {
                     Log.e("MediaPlayerManager", "Failed to re-initialize and play: ${e.message}", e)
@@ -126,6 +147,7 @@ class MediaPlayerManager(
                             isPlaying = false,
                             isLoading = false,
                             currentPlayingTrackId = null,
+                            currentTrack = null,
                             playbackError = "Failed to play track: ${e.message}"
                         )
                     }
@@ -158,7 +180,13 @@ class MediaPlayerManager(
                 stop()
             }
             reset() // Reset to idle state
-            _playbackState.update { it.copy(isPlaying = false, currentPlayingTrackId = null, isLoading = false) }
+            _playbackState.update {
+                it.copy(
+                    isPlaying = false,
+                    currentPlayingTrackId = null,
+                    isLoading = false
+                )
+            }
         }
     }
 
