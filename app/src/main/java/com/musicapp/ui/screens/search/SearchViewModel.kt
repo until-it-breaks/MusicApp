@@ -32,6 +32,7 @@ data class SearchResultsUiState(
 
 data class SearchUiState(
     val searchText: String = "",
+    val lastSearchText: String = "",
     val searchResults: SearchResultsUiState = SearchResultsUiState(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
@@ -46,6 +47,7 @@ class SearchViewModel(
 ) : ViewModel() {
 
     private val _searchText = MutableStateFlow("")
+    private val _lastSearchText = MutableStateFlow("")
     private val _searchResultsState = MutableStateFlow(SearchResultsUiState())
     private val _isLoading = MutableStateFlow(false)
     private val _isLoadingMore = MutableStateFlow(false)
@@ -53,9 +55,10 @@ class SearchViewModel(
     private val _paginationError = MutableStateFlow(false)
 
     val uiState: StateFlow<SearchUiState> = combine(
-        // Provide the flows as a List explicitly >:(
+        // Provide the flows as a List explicitly because for some reason it can't infer the types
         listOf(
             _searchText,
+            _lastSearchText,
             _searchResultsState,
             _isLoading,
             _isLoadingMore,
@@ -65,15 +68,17 @@ class SearchViewModel(
         )
     ) { values ->
         val searchText = values[0] as String
-        val searchResults = values[1] as SearchResultsUiState
-        val isLoading = values[2] as Boolean
-        val isLoadingMore = values[3] as Boolean
-        val error = values[4] as Boolean
-        val paginationError = values[5] as Boolean
-        val playbackState = values[6] as PlaybackUiState
+        val lastSearchText = values[1] as String
+        val searchResults = values[2] as SearchResultsUiState
+        val isLoading = values[3] as Boolean
+        val isLoadingMore = values[4] as Boolean
+        val error = values[5] as Boolean
+        val paginationError = values[6] as Boolean
+        val playbackState = values[7] as PlaybackUiState
 
         SearchUiState(
             searchText = searchText,
+            lastSearchText = lastSearchText,
             searchResults = searchResults,
             isLoading = isLoading,
             isLoadingMore = isLoadingMore,
@@ -94,6 +99,8 @@ class SearchViewModel(
 
     fun performSearch() {
         val currentSearchText = _searchText.value
+        _lastSearchText.value = currentSearchText
+
         if (currentSearchText.isBlank()) {
             _searchResultsState.value = SearchResultsUiState()
             _error.value = false
@@ -161,6 +168,14 @@ class SearchViewModel(
                 _paginationError.value = true
             }
         }
+    }
+
+    fun togglePlayback(track: TrackModel) {
+        mediaPlayerManager.togglePlayback(track.id, track.previewUri.toString())
+    }
+
+    fun stopMusic() {
+        mediaPlayerManager.stop()
     }
 }
 

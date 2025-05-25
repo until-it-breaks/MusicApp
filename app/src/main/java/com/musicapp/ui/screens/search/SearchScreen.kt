@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
@@ -96,7 +98,7 @@ fun SearchScreen(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         item {
-                            val lastSearch = uiState.searchText
+                            val lastSearch = uiState.lastSearchText
                             Text(
                                 text = "${stringResource(R.string.search_results)} '${lastSearch}'",
                                 style = MaterialTheme.typography.titleLarge,
@@ -108,7 +110,7 @@ fun SearchScreen(
                             if ((index >= uiState.searchResults.tracks.size - 1) && uiState.searchResults.hasNext) {
                                 searchViewModel.loadMoreTracks()
                             }
-
+// si bugga nice!
 //                            if (uiState.isLoadingMore){
 //                                CircularProgressIndicator(
 //                                    modifier = Modifier
@@ -119,9 +121,24 @@ fun SearchScreen(
 
                             TrackCard(
                                 track = track,
-                                onTrackClick = { /*TODO*/ },
+                                onTrackClick = {  searchViewModel.togglePlayback(track) },
                                 onArtistClick = { /*TODO*/ },
-                                extraMenu = {}
+                                extraMenu = {
+                                    // handles the dedicated play-pause button
+                                    IconButton(onClick = { searchViewModel.togglePlayback(track) }) {
+                                        val isPlayingThisTrack = uiState.playbackState.currentPlayingTrackId == track.id && uiState.playbackState.isPlaying
+                                        val isPausedThisTrack = uiState.playbackState.currentPlayingTrackId == track.id && !uiState.playbackState.isPlaying
+                                        Icon(
+                                            imageVector = when {
+                                                isPlayingThisTrack -> Icons.Filled.Pause
+                                                isPausedThisTrack -> Icons.Filled.PlayArrow
+                                                else -> Icons.Filled.PlayArrow
+                                            },
+                                            contentDescription = if (isPlayingThisTrack) "Pause" else "Play",
+                                            tint = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
                             )
                         }
                     }
