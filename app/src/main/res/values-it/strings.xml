@@ -11,8 +11,8 @@
     <string name="album_details">Dettagli album</string>
     <string name="album_label">Etichetta discografica</string>
 
-    <string name="allow_explicit_songs">Consenti brani espliciti</string>
-    <string name="allow_explicit_songs_description">Consenti la visualizzazione di contenuti espliciti</string>
+    <string name="allow_explicit">Contenuti espliciti</string>
+    <string name="allow_explicit_description">Consenti contenuti espliciti.</string>
 
     <string name="artist_details">Dettagli artista</string>
 
@@ -115,4 +115,9 @@
 
     <string name="search_results">Risultati di ricerca per:</string>
     <string name="search_description">Scopri nuovi brani</string>
+    <string name="theme_default">Default</string>
+    <string name="theme_light">Chiaro</string>
+    <string name="theme_dark">Scuro</string>
+    <string name="theme">Tema</string>
+    <string name="theme_description">Scegli come apparirà l\'applicazione.</string>
 </resources>

@@ -24,7 +24,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MusicAppTheme {
+            val viewModel = koinViewModel<MainActivityViewModel>()
+            val theme = viewModel.theme.collectAsStateWithLifecycle()
+
+            MusicAppTheme(
+                darkTheme = when (theme.value) {
+                    Theme.Light -> false
+                    Theme.Dark -> true
+                    else -> isSystemInDarkTheme()
+                }
+            ) {
                 val navController = rememberNavController()
                 val viewModel : MainViewModel = koinViewModel()
                 val initialRoute = if (viewModel.isSessionActive()) MusicAppRoute.Main else MusicAppRoute.Login
