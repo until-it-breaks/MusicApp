@@ -46,7 +46,8 @@ data class User(
     val userId: String,
     val username: String,
     val email: String,
-    val lastEditTime: Long
+    val lastEditTime: Long,
+    val profilePictureUri: String? = null
 )
 
 // Normal playlist

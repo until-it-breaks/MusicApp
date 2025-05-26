@@ -144,5 +144,5 @@ val appModule = module {
 
     viewModel { AddToPlaylistViewModel(get(), get(), get()) }
 
-    viewModel { SettingsViewModel(get()) }
+    viewModel { SettingsViewModel(get(), get(), get()) }
 }

@@ -33,8 +33,8 @@ interface TrackDAO {
 
 @Dao
 interface UserDAO {
-    @Query("SELECT * FROM user")
-    suspend fun getUsers(): List<User>
+    @Query("SELECT * FROM user WHERE userId = :userId")
+    fun getUser(userId: String): Flow<User>
 
     @Insert
     suspend fun insertUser(user: User)

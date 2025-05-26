@@ -1,5 +1,6 @@
 package com.musicapp.ui.screens.signup
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -97,7 +98,7 @@ class SignUpViewModel(
     }
 
     private suspend fun createLocalUser(userId: String, username: String, email: String) {
-        val user = UserModel(userId, username, email)
+        val user = UserModel(userId, username, email, Uri.EMPTY)
         userRepository.createNewUser(user)
     }
 }
