@@ -171,7 +171,7 @@ class SearchViewModel(
     }
 
     fun togglePlayback(track: TrackModel) {
-        mediaPlayerManager.togglePlayback(track.id, track.previewUri.toString())
+        mediaPlayerManager.togglePlayback(track)
     }
 
     fun stopMusic() {
