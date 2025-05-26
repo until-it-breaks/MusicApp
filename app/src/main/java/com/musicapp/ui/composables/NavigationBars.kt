@@ -10,7 +10,12 @@ import androidx.compose.ui.res.stringResource
 import com.musicapp.ui.screens.main.MainCategory
 
 @Composable
-fun MainNavBar(categories: List<MainCategory>, selectedCategory: MainCategory, modifier: Modifier = Modifier, onCategorySelected: (MainCategory) -> Unit) {
+fun MainNavBar(
+    categories: List<MainCategory>,
+    selectedCategory: MainCategory,
+    modifier: Modifier = Modifier,
+    onCategorySelected: (MainCategory) -> Unit
+) {
     NavigationBar(
         modifier = modifier,
     ) {

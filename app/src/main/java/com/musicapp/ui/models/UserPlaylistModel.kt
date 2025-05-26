@@ -1,5 +1,6 @@
 package com.musicapp.ui.models
 
+import android.net.Uri
 import androidx.core.net.toUri
 import com.musicapp.data.database.Playlist
 import com.musicapp.data.repositories.PlaylistWithTracks
@@ -45,11 +46,11 @@ fun PlaylistWithTracksAndArtists.toModel(): UserPlaylistModel {
                 duration = it.track.duration,
                 releaseDate = it.track.releaseDate,
                 isExplicit = it.track.isExplicit,
-                smallPicture = it.track.smallPictureUri?.toUri(),
-                mediumPicture = it.track.mediumPictureUri?.toUri(),
-                bigPicture = it.track.bigPictureUri?.toUri(),
+                smallPictureUri = it.track.smallPictureUri?.toUri() ?: Uri.EMPTY,
+                mediumPictureUri = it.track.mediumPictureUri?.toUri() ?: Uri.EMPTY,
+                bigPictureUri = it.track.bigPictureUri?.toUri() ?: Uri.EMPTY,
                 contributors = it.artists.map { it.toModel() },
-                previewUri = it.track.previewUri?.toUri()
+                previewUri = it.track.previewUri?.toUri() ?: Uri.EMPTY
             )
         }
     )

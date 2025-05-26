@@ -11,8 +11,9 @@ data class PublicPlaylistModel(
     val description: String? = null,
     val duration: Long? = null,
     val trackCount: Int? = null,
-    val mediumPicture: Uri? = null,
-    val bigPicture: Uri? = null,
+    val smallPictureUri: Uri = Uri.EMPTY,
+    val mediumPictureUri: Uri = Uri.EMPTY,
+    val bigPictureUri: Uri = Uri.EMPTY,
     val creator: CreatorModel? = null,
     val tracks: List<TrackModel> = emptyList()
 )
@@ -21,7 +22,9 @@ fun DeezerChartPlaylist.toModel(): PublicPlaylistModel {
     return PublicPlaylistModel(
         id = id,
         title = title,
-        mediumPicture = this@toModel.mediumPicture.toUri()
+        smallPictureUri = smallPicture?.toUri() ?: Uri.EMPTY,
+        mediumPictureUri = mediumPicture?.toUri() ?: Uri.EMPTY,
+        bigPictureUri = bigPicture?.toUri() ?: Uri.EMPTY,
     )
 }
 
@@ -32,8 +35,9 @@ fun DeezerPlaylistDetailed.toModel(): PublicPlaylistModel {
         description = description,
         duration = duration,
         trackCount = trackCount,
-        mediumPicture = mediumPicture.toUri(),
-        bigPicture = bigPicture.toUri(),
+        smallPictureUri = smallPicture?.toUri() ?: Uri.EMPTY,
+        mediumPictureUri = mediumPicture?.toUri() ?: Uri.EMPTY,
+        bigPictureUri = bigPicture?.toUri() ?: Uri.EMPTY,
         creator = creator.toModel(),
         tracks = tracks.data.map { it.toModel() }
     )

@@ -60,7 +60,7 @@ fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             LoadableImage(
-                                imageUri = playlist.bigPicture,
+                                imageUri = playlist.bigPictureUri,
                                 contentDescription = null
                             )
                         }

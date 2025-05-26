@@ -8,7 +8,7 @@ data class UserModel(
     val userId: String,
     val username: String,
     val email: String,
-    val profilePictureUri: Uri
+    val profilePictureUri: Uri = Uri.EMPTY
 )
 
 fun User.toModel(): UserModel {
@@ -17,14 +17,5 @@ fun User.toModel(): UserModel {
         username = username,
         email = email,
         profilePictureUri = profilePictureUri?.toUri() ?: Uri.EMPTY
-    )
-}
-
-fun UserModel.toDbEntity(): User {
-    return User(
-        userId = userId,
-        username = username,
-        email = email,
-        lastEditTime = System.currentTimeMillis()
     )
 }

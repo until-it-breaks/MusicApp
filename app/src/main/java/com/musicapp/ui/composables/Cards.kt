@@ -175,7 +175,7 @@ fun TrackCard(
             modifier = Modifier.padding(8.dp)
         ) {
             if (showPicture) {
-                LoadableImage(track.mediumPicture, "Track picture", modifier = Modifier.size(48.dp))
+                LoadableImage(track.mediumPictureUri, "Track picture", modifier = Modifier.size(48.dp))
             }
             Column(
                 modifier = Modifier.weight(1f)
@@ -267,7 +267,7 @@ fun TrackCardToAdd(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.padding(8.dp)
         ) {
-            LoadableImage(track.mediumPicture, "Track picture", modifier = Modifier.size(48.dp))
+            LoadableImage(track.mediumPictureUri, "Track picture", modifier = Modifier.size(48.dp))
             Column(
                 modifier = Modifier.weight(1f)
             ) {

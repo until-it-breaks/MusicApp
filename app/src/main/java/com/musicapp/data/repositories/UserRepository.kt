@@ -17,7 +17,7 @@ class UserRepository(
     private val historyDAO: TrackHistoryDAO,
     private val db: MusicAppDatabase
 ) {
-    suspend fun getUser(userId: String): Flow<User> = usersDAO.getUser(userId)
+    fun getUser(userId: String): Flow<User> = usersDAO.getUser(userId)
 
     suspend fun deleteUser(user: User) = usersDAO.deleteUser(user) // TODO Can be improved
 

@@ -32,7 +32,11 @@ import com.musicapp.ui.screens.addtoplaylist.AddTrackToPlaylistModal
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserPlaylistDropDownMenu(onDeletePlaylist: () -> Unit, onEditPlaylistName: () -> Unit, modifier: Modifier = Modifier) {
+fun UserPlaylistDropDownMenu(
+    onDeletePlaylist: () -> Unit,
+    onEditPlaylistName: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var expanded by remember { mutableStateOf(false) }
 
     Box(

@@ -14,7 +14,7 @@ data class DeezerAlbumTrack(
     @SerialName("explicit_lyrics")
     val isExplicit: Boolean,
     @SerialName("preview")
-    val preview: String
+    val preview: String?
 )
 
 @Serializable
@@ -30,7 +30,7 @@ data class DeezerTrackDetailed(
     @SerialName("explicit_lyrics")
     val isExplicit: Boolean,
     @SerialName("preview")
-    val preview: String,
+    val preview: String?,
     @SerialName("contributors")
     val contributors: List<DeezerArtist>,
     @SerialName("album")
