@@ -82,7 +82,6 @@ fun TrackModel.toDbEntity(): Track {
         releaseDate = releaseDate,
         isExplicit = isExplicit,
         previewUri = previewUri.toString(),
-        storedPreviewUri = null, // TODO
         smallPictureUri = smallPicture.toString(),
         mediumPictureUri = mediumPicture.toString(),
         bigPictureUri = bigPicture.toString()

@@ -14,7 +14,6 @@ data class Track(
     val releaseDate: String?,
     val isExplicit: Boolean?,
     val previewUri: String?,
-    val storedPreviewUri: String?,
     val smallPictureUri: String?,
     val mediumPictureUri: String?,
     val bigPictureUri: String?
@@ -35,7 +34,8 @@ data class Artist(
 @Entity(primaryKeys = ["trackId", "artistId"])
 data class TrackArtistCrossRef(
     val trackId: Long,
-    val artistId: Long
+    val artistId: Long,
+    val order: Int
 )
 
 // User

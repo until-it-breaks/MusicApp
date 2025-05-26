@@ -14,7 +14,7 @@ interface TrackDAO {
 
     @Query("""
     SELECT Artist.* FROM Artist, TrackArtistCrossRef WHERE Artist.artistId = TrackArtistCrossRef.artistId
-    AND TrackArtistCrossRef.trackId = :trackId
+    AND TrackArtistCrossRef.trackId = :trackId ORDER BY TrackArtistCrossRef.`order`
     """)
     fun getTrackArtistsFlow(trackId: Long): Flow<List<Artist>>
 
