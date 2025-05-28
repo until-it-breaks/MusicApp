@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.musicapp.R
+import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.MainTopBar
 import com.musicapp.ui.composables.TrackCard
 import org.koin.androidx.compose.koinViewModel
@@ -121,22 +122,9 @@ fun SearchScreen(
                             TrackCard(
                                 track = track,
                                 onTrackClick = {  searchViewModel.playTrack(track) },
-                                onArtistClick = { /*TODO*/ },
+                                onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                                 extraMenu = {
-                                    // handles the dedicated play-pause button
-                                    IconButton(onClick = { searchViewModel.playTrack(track) }) {
-                                        val isPlayingThisTrack = uiState.playbackState.currentPlayingTrackId == track.id && uiState.playbackState.isPlaying
-                                        val isPausedThisTrack = uiState.playbackState.currentPlayingTrackId == track.id && !uiState.playbackState.isPlaying
-                                        Icon(
-                                            imageVector = when {
-                                                isPlayingThisTrack -> Icons.Filled.Pause
-                                                isPausedThisTrack -> Icons.Filled.PlayArrow
-                                                else -> Icons.Filled.PlayArrow
-                                            },
-                                            contentDescription = if (isPlayingThisTrack) "Pause" else "Play",
-                                            tint = MaterialTheme.colorScheme.onSurface
-                                        )
-                                    }
+                                    /* TODO */
                                 }
                             )
                         }
