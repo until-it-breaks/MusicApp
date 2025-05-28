@@ -125,13 +125,13 @@ val appModule = module {
 
     viewModel { MainActivityViewModel(get(), get()) }
 
-    viewModel { HomeViewModel(get()) }
+    viewModel { HomeViewModel(get(), get()) }
 
     viewModel { AlbumViewModel(get(), get(), get()) }
 
-    viewModel { PublicPlaylistViewModel(get(), get(), get()) }
+    viewModel { PublicPlaylistViewModel(get(), get(), get(), get()) }
 
-    viewModel { ArtistViewModel(get()) }
+    viewModel { ArtistViewModel(get(), get()) }
 
     viewModel { LibraryViewModel(get(), get()) }
 

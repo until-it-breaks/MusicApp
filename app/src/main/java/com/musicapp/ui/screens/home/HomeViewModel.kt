@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.musicapp.data.remote.deezer.DeezerDataSource
+import com.musicapp.data.repositories.SettingsRepository
 import com.musicapp.ui.models.AlbumModel
 import com.musicapp.ui.models.ArtistModel
 import com.musicapp.ui.models.PublicPlaylistModel
@@ -15,6 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,7 +33,10 @@ data class HomeState(
     val albums: List<AlbumModel> = emptyList()
 )
 
-class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel() {
+class HomeViewModel(
+    private val deezerDataSource: DeezerDataSource,
+    private val settingsRepository: SettingsRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeState())
     val uiState: StateFlow<HomeState> = _uiState.asStateFlow()
 
@@ -75,10 +80,22 @@ class HomeViewModel(private val deezerDataSource: DeezerDataSource) : ViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(showAlbumsLoading = true) }
             try {
+                val allowExplicit = settingsRepository.allowExplicit.first()
+
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopAlbums()
                 }
-                _uiState.update { it.copy(albums = result.map { it.toModel() }) }
+
+                /**
+                 * If explicit content is allowed, the album will be shown regardless of their nature.
+                 * If such setting is active only the album that are not explicit or have a null isExplicit
+                 * property are displayed.
+                 */
+                val albums = result
+                    .map { it.toModel() }
+                    .filter { allowExplicit || it.isExplicit != true }
+
+                _uiState.update { it.copy(albums = albums) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
             } finally {
