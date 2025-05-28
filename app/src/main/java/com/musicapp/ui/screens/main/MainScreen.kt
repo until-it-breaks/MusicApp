@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -28,7 +28,6 @@ import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.SearchNavGraph
 import com.musicapp.ui.composables.BottomMusicBar
 import com.musicapp.ui.composables.MainNavBar
-import org.checkerframework.common.subtyping.qual.Bottom
 import org.koin.androidx.compose.koinViewModel
 
 enum class MainCategory(val stringId: Int, val primaryIcon: ImageVector, val secondaryIcon: ImageVector) {
@@ -51,7 +50,7 @@ enum class MainCategory(val stringId: Int, val primaryIcon: ImageVector, val sec
 
 @Composable
 fun MainScreen(navController: NavController) {
-    var selectedCategory by remember { mutableStateOf(MainCategory.HOME) }
+    var selectedCategory by rememberSaveable { mutableStateOf(MainCategory.HOME) }
 
     val homeNavController = rememberNavController()
     val searchNavController = rememberNavController()
