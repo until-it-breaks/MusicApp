@@ -129,19 +129,19 @@ val appModule = module {
 
     viewModel { AlbumViewModel(get(), get(), get(), get()) }
 
-    viewModel { PublicPlaylistViewModel(get(), get(), get()) }
+    viewModel { PublicPlaylistViewModel(get(), get(), get(), get()) }
 
     viewModel { ArtistViewModel(get()) }
 
     viewModel { LibraryViewModel(get(), get()) }
 
-    viewModel { PersonalPlaylistViewModel(get()) }
+    viewModel { PersonalPlaylistViewModel(get(), get()) }
 
-    viewModel { LikedTracksViewModel(get(), get()) }
+    viewModel { LikedTracksViewModel(get(), get(), get()) }
 
     viewModel { SearchViewModel(get(), get()) }
     
-    viewModel { TrackHistoryViewModel(get(), get()) }
+    viewModel { TrackHistoryViewModel(get(), get(), get()) }
 
     viewModel { AddToPlaylistViewModel(get(), get(), get()) }
 
