@@ -39,6 +39,7 @@ class PublicPlaylistViewModel(
     val uiState: StateFlow<PublicPlaylistState> = _uiState.asStateFlow()
 
     fun loadPlaylist(id: Long) {
+        if (_uiState.value.playlistDetails?.id == id) return
         viewModelScope.launch {
             _uiState.update { it.copy(showPlaylistDetailsLoading = true) }
             try {
@@ -62,13 +63,10 @@ class PublicPlaylistViewModel(
             val allowExplicit = settingsRepository.allowExplicit.first()
             for(track in tracks) {
                 try {
-
                     val detailedTrack: DeezerTrackDetailed = withContext(Dispatchers.IO) {
                         deezerDataSource.getTrackDetails(track.id)
                     }
-
                     val trackModel = detailedTrack.toModel()
-
                     /**
                      * If explicit content is allowed, the track will be shown regardless of their nature.
                      * If such setting is active only the tracks that are not explicit or have a null isExplicit

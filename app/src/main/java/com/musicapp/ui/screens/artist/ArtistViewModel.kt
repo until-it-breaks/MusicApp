@@ -34,6 +34,7 @@ class ArtistViewModel(
     val state: StateFlow<ArtistState> = _state.asStateFlow()
 
     fun loadArtist(id: Long) {
+        if (_state.value.artist?.id == id) return
         viewModelScope.launch {
             _state.update { it.copy(artistIsLoading = true) }
             try {
@@ -50,6 +51,7 @@ class ArtistViewModel(
     }
 
     fun loadArtistAlbums(id: Long) {
+        if (_state.value.artist?.id == id) return
         viewModelScope.launch {
             _state.update { it.copy(artistAlbumsAreLoading = true) }
             try {
