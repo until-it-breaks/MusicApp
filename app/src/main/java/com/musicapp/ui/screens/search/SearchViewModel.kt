@@ -170,6 +170,10 @@ class SearchViewModel(
         }
     }
 
+    fun addToLiked(track: TrackModel) { /*TODO*/}
+
+    fun addToQueue(track: TrackModel) {/*TODO*/}
+
     fun playTrack(track: TrackModel) {
         mediaPlayerManager.togglePlayback(track)
     }

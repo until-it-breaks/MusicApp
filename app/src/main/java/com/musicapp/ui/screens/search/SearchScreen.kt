@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.MainTopBar
+import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.TrackCard
 import org.koin.androidx.compose.koinViewModel
 
@@ -124,7 +125,11 @@ fun SearchScreen(
                                 onTrackClick = {  searchViewModel.playTrack(track) },
                                 onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                                 extraMenu = {
-                                    /* TODO */
+                                    PublicTrackDropDownMenu(
+                                        trackModel = track,
+                                        onLiked = searchViewModel::addToLiked, // TODO
+                                        onAddToQueue = searchViewModel::addToQueue // TODO
+                                    )
                                 }
                             )
                         }
