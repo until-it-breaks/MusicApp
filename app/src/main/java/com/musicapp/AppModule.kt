@@ -39,6 +39,7 @@ import org.koin.dsl.module
 val Context.dataStore by preferencesDataStore("settings")
 
 val appModule = module {
+
     // Firebase Auth
     single { FirebaseAuth.getInstance() }
 
@@ -78,7 +79,7 @@ val appModule = module {
     single {
         TrackHistoryRepository(
             get(),
-            get<TracksRepository>(),
+            get(),
             get<MusicAppDatabase>().trackHistoryDAO()
         )
     }
@@ -112,9 +113,10 @@ val appModule = module {
     // Deezer API data source
     single { DeezerDataSource(get()) }
 
-    // ViewModels
+    // Media player
     single { MediaPlayerManager() }
 
+    // ViewModels
     viewModel { SignUpViewModel(get(), get()) }
 
     viewModel { LoginViewModel(get(), get()) }

@@ -81,11 +81,9 @@ class HomeViewModel(
             _uiState.update { it.copy(showAlbumsLoading = true) }
             try {
                 val allowExplicit = settingsRepository.allowExplicit.first()
-
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopAlbums()
                 }
-
                 /**
                  * If explicit content is allowed, the album will be shown regardless of their nature.
                  * If such setting is active only the album that are not explicit or have a null isExplicit
@@ -94,7 +92,6 @@ class HomeViewModel(
                 val albums = result
                     .map { it.toModel() }
                     .filter { allowExplicit || it.isExplicit != true }
-
                 _uiState.update { it.copy(albums = albums) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)

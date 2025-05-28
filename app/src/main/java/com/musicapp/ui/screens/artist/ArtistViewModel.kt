@@ -56,11 +56,9 @@ class ArtistViewModel(
             _state.update { it.copy(artistAlbumsAreLoading = true) }
             try {
                 val allowExplicit = settingsRepository.allowExplicit.first()
-
                 val result = withContext(Dispatchers.IO)  {
                     deezerDataSource.getArtistAlbums(id)
                 }
-
                 /**
                  * If explicit content is allowed, the album will be shown regardless of their nature.
                  * If such setting is active only the album that are not explicit or have a null isExplicit
@@ -69,7 +67,6 @@ class ArtistViewModel(
                 val albums = result
                     .map { it.toModel() }
                     .filter { allowExplicit || it.isExplicit != true }
-
                 _state.update { it.copy(artistAlbums = albums) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
