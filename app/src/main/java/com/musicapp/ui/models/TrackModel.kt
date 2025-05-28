@@ -14,11 +14,11 @@ data class TrackModel(
     val duration: Long? = null,
     val releaseDate: String? = null,
     val isExplicit: Boolean? = null,
-    val smallPicture: Uri? = null,
-    val mediumPicture: Uri? = null,
-    val bigPicture: Uri? = null,
+    val smallPictureUri: Uri = Uri.EMPTY,
+    val mediumPictureUri: Uri = Uri.EMPTY,
+    val bigPictureUri: Uri = Uri.EMPTY,
     val contributors: List<ArtistModel> = emptyList(),
-    val previewUri: Uri? = null,
+    val previewUri: Uri = Uri.EMPTY,
 )
 
 fun DeezerAlbumTrack.toModel(): TrackModel {
@@ -27,7 +27,7 @@ fun DeezerAlbumTrack.toModel(): TrackModel {
         title = title,
         duration = duration,
         isExplicit = isExplicit,
-        previewUri = preview.toUri()
+        previewUri = preview?.toUri() ?: Uri.EMPTY
     )
 }
 
@@ -38,8 +38,10 @@ fun DeezerTrackDetailed.toModel(): TrackModel {
         duration = duration,
         releaseDate = releaseDate,
         isExplicit = isExplicit,
-        mediumPicture = album.mediumCover.toUri(),
-        previewUri = preview.toUri(),
+        smallPictureUri = album.smallCover?.toUri() ?: Uri.EMPTY,
+        mediumPictureUri = album.mediumCover?.toUri() ?: Uri.EMPTY,
+        bigPictureUri = album.bigCover?.toUri() ?: Uri.EMPTY,
+        previewUri = preview?.toUri() ?: Uri.EMPTY,
         contributors = contributors.map { it.toModel() }
     )
 }
@@ -51,11 +53,11 @@ fun Track.toModel(): TrackModel {
         duration = duration,
         releaseDate = releaseDate,
         isExplicit = isExplicit,
-        smallPicture = smallPictureUri?.toUri(),
-        mediumPicture = mediumPictureUri?.toUri(),
-        bigPicture = bigPictureUri?.toUri(),
+        smallPictureUri = smallPictureUri?.toUri() ?: Uri.EMPTY,
+        mediumPictureUri = mediumPictureUri?.toUri() ?: Uri.EMPTY,
+        bigPictureUri = bigPictureUri?.toUri() ?: Uri.EMPTY,
         contributors = emptyList(),
-        previewUri = previewUri?.toUri()
+        previewUri = previewUri?.toUri() ?: Uri.EMPTY
     )
 }
 
@@ -66,11 +68,11 @@ fun TrackWithArtists.toModel(): TrackModel {
         duration = track.duration,
         releaseDate = track.releaseDate,
         isExplicit = track.isExplicit,
-        smallPicture = track.smallPictureUri?.toUri(),
-        mediumPicture = track.mediumPictureUri?.toUri(),
-        bigPicture = track.bigPictureUri?.toUri(),
+        smallPictureUri = track.smallPictureUri?.toUri() ?: Uri.EMPTY,
+        mediumPictureUri = track.mediumPictureUri?.toUri() ?: Uri.EMPTY,
+        bigPictureUri = track.bigPictureUri?.toUri() ?: Uri.EMPTY,
         contributors = artists.map { it.toModel() },
-        previewUri = track.previewUri?.toUri()
+        previewUri = track.previewUri?.toUri() ?: Uri.EMPTY
     )
 }
 
@@ -82,10 +84,9 @@ fun TrackModel.toDbEntity(): Track {
         releaseDate = releaseDate,
         isExplicit = isExplicit,
         previewUri = previewUri.toString(),
-        storedPreviewUri = null, // TODO
-        smallPictureUri = smallPicture.toString(),
-        mediumPictureUri = mediumPicture.toString(),
-        bigPictureUri = bigPicture.toString()
+        smallPictureUri = smallPictureUri.toString(),
+        mediumPictureUri = mediumPictureUri.toString(),
+        bigPictureUri = bigPictureUri.toString()
     )
 }
 

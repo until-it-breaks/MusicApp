@@ -123,4 +123,5 @@
     <string name="theme_dark">Dark</string>
     <string name="theme">Theme</string>
     <string name="theme_description">Set how the app will look.</string>
+    <string name="unknown_user">Unknown user</string>
 </resources>

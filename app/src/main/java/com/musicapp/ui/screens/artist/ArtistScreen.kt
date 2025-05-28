@@ -54,7 +54,7 @@ fun ArtistScreen(navController: NavController, artistId: Long) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         LoadableImage(
-                            imageUri = artist.bigPicture,
+                            imageUri = artist.bigPictureUri,
                             contentDescription = null
                         )
                     }
@@ -78,7 +78,7 @@ fun ArtistScreen(navController: NavController, artistId: Long) {
                 PlayListCard(
                     modifier = Modifier.fillMaxWidth(),
                     title = album.title,
-                    imageUri = album.mediumCover,
+                    imageUri = album.mediumCoverUri,
                     onClick = { navController.navigate(MusicAppRoute.Album(album.id)) }
                 )
             }

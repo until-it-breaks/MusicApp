@@ -9,8 +9,9 @@ import com.musicapp.data.remote.deezer.DeezerTrackAlbum
 data class AlbumModel(
     val id: Long,
     val title: String,
-    val mediumCover: Uri? = null,
-    val bigCover: Uri? = null,
+    val smallCoverUri: Uri = Uri.EMPTY,
+    val mediumCoverUri: Uri = Uri.EMPTY,
+    val bigCoverUri: Uri = Uri.EMPTY,
     val label: String? = null,
     val trackCount: Int? = null,
     val duration: Long? = null,
@@ -24,7 +25,9 @@ fun DeezerChartAlbum.toModel(): AlbumModel {
     return AlbumModel(
         id = id,
         title = title,
-        mediumCover = mediumCover?.toUri(),
+        smallCoverUri = smallCover?.toUri() ?: Uri.EMPTY,
+        mediumCoverUri = mediumCover?.toUri() ?: Uri.EMPTY,
+        bigCoverUri = bigCover?.toUri() ?: Uri.EMPTY,
         isExplicit = isExplicit
     )
 }
@@ -33,7 +36,9 @@ fun DeezerTrackAlbum.toModel(): AlbumModel {
     return AlbumModel(
         id = id,
         title = title,
-        mediumCover = mediumCover.toUri()
+        smallCoverUri = smallCover?.toUri() ?: Uri.EMPTY,
+        mediumCoverUri = mediumCover?.toUri() ?: Uri.EMPTY,
+        bigCoverUri = bigCover?.toUri() ?: Uri.EMPTY
     )
 }
 
@@ -41,8 +46,9 @@ fun DeezerAlbumDetailed.toModel(): AlbumModel {
     return AlbumModel(
         id = id,
         title = title,
-        mediumCover = mediumCover.toUri(),
-        bigCover = bigCover.toUri(),
+        smallCoverUri = smallCover?.toUri() ?: Uri.EMPTY,
+        mediumCoverUri = mediumCover?.toUri() ?: Uri.EMPTY,
+        bigCoverUri = bigCover?.toUri() ?: Uri.EMPTY,
         label = label,
         trackCount = trackCount,
         duration = duration,

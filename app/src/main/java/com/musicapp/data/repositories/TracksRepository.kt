@@ -29,9 +29,9 @@ class TracksRepository(
 
     suspend fun upsertTrack(track: TrackModel) {
         dao.upsertTrack(track.toDbEntity())
-        for (contributor in track.contributors) {
+        track.contributors.forEachIndexed { index, contributor ->
             dao.upsertArtist(contributor.toDbEntity())
-            dao.addArtistToTrack(TrackArtistCrossRef(track.id, contributor.id))
+            dao.addArtistToTrack(TrackArtistCrossRef(track.id, contributor.id, index))
         }
     }
 }

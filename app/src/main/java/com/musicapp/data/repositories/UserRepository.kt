@@ -9,6 +9,7 @@ import com.musicapp.data.database.TrackHistoryDAO
 import com.musicapp.data.database.User
 import com.musicapp.data.database.UserDAO
 import com.musicapp.ui.models.UserModel
+import kotlinx.coroutines.flow.Flow
 
 class UserRepository(
     private val usersDAO: UserDAO,
@@ -16,7 +17,7 @@ class UserRepository(
     private val historyDAO: TrackHistoryDAO,
     private val db: MusicAppDatabase
 ) {
-    suspend fun getUsers(): List<User> = usersDAO.getUsers() // Could be useful. Maybe not.
+    fun getUser(userId: String): Flow<User> = usersDAO.getUser(userId)
 
     suspend fun deleteUser(user: User) = usersDAO.deleteUser(user) // TODO Can be improved
 

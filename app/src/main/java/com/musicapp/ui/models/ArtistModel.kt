@@ -8,18 +8,18 @@ import com.musicapp.data.remote.deezer.DeezerArtist
 data class ArtistModel(
     val id: Long,
     val name: String,
-    val smallPicture: Uri? = null,
-    val mediumPicture: Uri? = null,
-    val bigPicture: Uri? = null
+    val smallPictureUri: Uri = Uri.EMPTY,
+    val mediumPictureUri: Uri = Uri.EMPTY,
+    val bigPictureUri: Uri = Uri.EMPTY
 )
 
 fun DeezerArtist.toModel(): ArtistModel {
     return ArtistModel(
         id = id,
         name = name,
-        smallPicture = smallPicture.toUri(),
-        mediumPicture = mediumPicture.toUri(),
-        bigPicture = bigPicture.toUri()
+        smallPictureUri = smallPicture?.toUri() ?: Uri.EMPTY,
+        mediumPictureUri = mediumPicture?.toUri() ?: Uri.EMPTY,
+        bigPictureUri = bigPicture?.toUri() ?: Uri.EMPTY
     )
 }
 
@@ -27,9 +27,9 @@ fun Artist.toModel(): ArtistModel {
     return ArtistModel(
         id = artistId,
         name = name,
-        smallPicture = smallPictureUri?.toUri(),
-        mediumPicture = mediumPictureUri?.toUri(),
-        bigPicture = bigPictureUri?.toUri(),
+        smallPictureUri = smallPictureUri?.toUri() ?: Uri.EMPTY,
+        mediumPictureUri = mediumPictureUri?.toUri() ?: Uri.EMPTY,
+        bigPictureUri = bigPictureUri?.toUri() ?: Uri.EMPTY,
     )
 }
 
@@ -37,8 +37,8 @@ fun ArtistModel.toDbEntity(): Artist {
     return Artist(
         artistId = id,
         name = name,
-        smallPictureUri = smallPicture.toString(),
-        mediumPictureUri = mediumPicture.toString(),
-        bigPictureUri = bigPicture.toString(),
+        smallPictureUri = smallPictureUri.toString(),
+        mediumPictureUri = mediumPictureUri.toString(),
+        bigPictureUri = bigPictureUri.toString(),
     )
 }

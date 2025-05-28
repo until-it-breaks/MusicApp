@@ -18,7 +18,13 @@ fun LoadableImage(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit
 ) {
-    if (imageUri != null) {
+    if (imageUri == null || imageUri == Uri.EMPTY) {
+        Icon(
+            imageVector = Icons.Outlined.Image,
+            contentDescription = null,
+            modifier = modifier
+        )
+    } else {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(imageUri)
@@ -27,12 +33,6 @@ fun LoadableImage(
             contentDescription = contentDescription,
             modifier = modifier,
             contentScale = contentScale
-        )
-    } else {
-        Icon(
-            imageVector = Icons.Outlined.Image,
-            contentDescription = null,
-            modifier = modifier
         )
     }
 }

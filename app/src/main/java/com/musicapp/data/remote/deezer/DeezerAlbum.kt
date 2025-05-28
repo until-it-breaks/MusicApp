@@ -9,8 +9,12 @@ data class DeezerChartAlbum(
     val id: Long,
     @SerialName("title")
     val title: String,
+    @SerialName("cover_small")
+    val smallCover: String?,
     @SerialName("cover_medium")
     val mediumCover: String?,
+    @SerialName("cover_big")
+    val bigCover: String?,
     @SerialName("explicit_lyrics")
     val isExplicit: Boolean
 )
@@ -22,11 +26,11 @@ data class DeezerTrackAlbum(
     @SerialName("title")
     val title: String,
     @SerialName("cover_small")
-    val smallCover: String,
+    val smallCover: String?,
     @SerialName("cover_medium")
-    val mediumCover: String,
+    val mediumCover: String?,
     @SerialName("cover_big")
-    val bigCover: String
+    val bigCover: String?
 )
 
 @Serializable
@@ -35,10 +39,12 @@ data class DeezerAlbumDetailed(
     val id: Long,
     @SerialName("title")
     val title: String,
+    @SerialName("cover_small")
+    val smallCover: String?,
     @SerialName("cover_medium")
-    val mediumCover: String,
+    val mediumCover: String?,
     @SerialName("cover_big")
-    val bigCover: String,
+    val bigCover: String?,
     @SerialName("label")
     val label: String,
     @SerialName("nb_tracks")

@@ -1,6 +1,5 @@
 package com.musicapp.ui.screens.settings
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -33,20 +31,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.data.models.Theme
 import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.TopBarWithBackButton
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingsScreen(navController: NavController) {
     val viewModel = koinViewModel<SettingsViewModel>()
-
+    val user by viewModel.user.collectAsStateWithLifecycle()
     val allowExplicit by viewModel.allowExplicit.collectAsState()
     val currentTheme by viewModel.theme.collectAsState()
 
@@ -77,15 +76,14 @@ fun SettingsScreen(navController: NavController) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(
-                        imageVector = Icons.Filled.Image,
+                    LoadableImage(
+                        imageUri = user?.profilePictureUri,
                         contentDescription = null,
-                        contentScale = ContentScale.Fit,
                         modifier = Modifier.size(72.dp)
                     )
                     Column {
                         Text(
-                            text = "Profile Name",
+                            text = user?.username ?: stringResource(R.string.unknown_user),
                             style = MaterialTheme.typography.headlineSmall
                         )
                         Text(

@@ -14,7 +14,7 @@ interface TrackDAO {
 
     @Query("""
     SELECT Artist.* FROM Artist, TrackArtistCrossRef WHERE Artist.artistId = TrackArtistCrossRef.artistId
-    AND TrackArtistCrossRef.trackId = :trackId
+    AND TrackArtistCrossRef.trackId = :trackId ORDER BY TrackArtistCrossRef.`order`
     """)
     fun getTrackArtistsFlow(trackId: Long): Flow<List<Artist>>
 
@@ -33,8 +33,8 @@ interface TrackDAO {
 
 @Dao
 interface UserDAO {
-    @Query("SELECT * FROM user")
-    suspend fun getUsers(): List<User>
+    @Query("SELECT * FROM user WHERE userId = :userId")
+    fun getUser(userId: String): Flow<User>
 
     @Insert
     suspend fun insertUser(user: User)

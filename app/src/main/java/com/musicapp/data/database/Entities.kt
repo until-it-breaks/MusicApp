@@ -14,7 +14,6 @@ data class Track(
     val releaseDate: String?,
     val isExplicit: Boolean?,
     val previewUri: String?,
-    val storedPreviewUri: String?,
     val smallPictureUri: String?,
     val mediumPictureUri: String?,
     val bigPictureUri: String?
@@ -35,7 +34,8 @@ data class Artist(
 @Entity(primaryKeys = ["trackId", "artistId"])
 data class TrackArtistCrossRef(
     val trackId: Long,
-    val artistId: Long
+    val artistId: Long,
+    val order: Int
 )
 
 // User
@@ -46,7 +46,8 @@ data class User(
     val userId: String,
     val username: String,
     val email: String,
-    val lastEditTime: Long
+    val lastEditTime: Long,
+    val profilePictureUri: String? = null
 )
 
 // Normal playlist

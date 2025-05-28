@@ -74,7 +74,7 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                         rowItems.forEach { playlist ->
                             PlayListCard(
                                 title = playlist.title,
-                                imageUri = playlist.mediumPicture,
+                                imageUri = playlist.mediumPictureUri,
                                 modifier = Modifier.weight(1f),
                                 onClick = { subNavController.navigate(MusicAppRoute.Playlist(playlist.id)) }
                             )
@@ -100,7 +100,7 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                         items(uiState.artists) { artist ->
                             ArtistCard(
                                 title = artist.name,
-                                imageUrl = artist.mediumPicture,
+                                imageUrl = artist.mediumPictureUri,
                                 onClick = { subNavController.navigate(MusicAppRoute.Artist(artist.id)) }
                             )
                         }
@@ -124,7 +124,7 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                         rowItems.forEach { item ->
                             PlayListCard(
                                 title = item.title,
-                                imageUri = item.mediumCover,
+                                imageUri = item.mediumCoverUri,
                                 modifier = Modifier.weight(1f),
                                 onClick = { subNavController.navigate(MusicAppRoute.Album(item.id)) }
                             )

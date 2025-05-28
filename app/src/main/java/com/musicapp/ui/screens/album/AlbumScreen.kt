@@ -76,7 +76,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             LoadableImage(
-                                imageUri = album.bigCover,
+                                imageUri = album.bigCoverUri,
                                 contentDescription = null
                             )
                         }
@@ -95,7 +95,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                             ) {
                                 album.contributors.forEachIndexed { index, contributor ->
                                     LoadableImage(
-                                        imageUri = contributor.smallPicture,
+                                        imageUri = contributor.smallPictureUri,
                                         contentDescription = null,
                                         modifier = Modifier
                                             .size(36.dp)
