@@ -127,7 +127,7 @@ val appModule = module {
 
     viewModel { HomeViewModel(get()) }
 
-    viewModel { AlbumViewModel(get(), get(), get()) }
+    viewModel { AlbumViewModel(get(), get(), get(), get()) }
 
     viewModel { PublicPlaylistViewModel(get(), get(), get()) }
 

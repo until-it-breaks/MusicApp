@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
 import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
@@ -31,6 +32,7 @@ class PublicPlaylistViewModel(
     private val deezerDataSource: DeezerDataSource,
     private val auth: FirebaseAuth,
     private val likedTracksRepository: LikedTracksRepository,
+    private val mediaPlayerManager: MediaPlayerManager
 ): ViewModel() {
     private val _uiState = MutableStateFlow(PublicPlaylistState())
     val uiState: StateFlow<PublicPlaylistState> = _uiState.asStateFlow()
@@ -89,8 +91,6 @@ class PublicPlaylistViewModel(
     }
 
     fun playTrack(track: TrackModel) {
-        viewModelScope.launch {
-            // TODO Play given track
-        }
+        mediaPlayerManager.togglePlayback(track)
     }
 }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
@@ -121,11 +120,11 @@ fun SearchScreen(
 
                             TrackCard(
                                 track = track,
-                                onTrackClick = {  searchViewModel.togglePlayback(track) },
+                                onTrackClick = {  searchViewModel.playTrack(track) },
                                 onArtistClick = { /*TODO*/ },
                                 extraMenu = {
                                     // handles the dedicated play-pause button
-                                    IconButton(onClick = { searchViewModel.togglePlayback(track) }) {
+                                    IconButton(onClick = { searchViewModel.playTrack(track) }) {
                                         val isPlayingThisTrack = uiState.playbackState.currentPlayingTrackId == track.id && uiState.playbackState.isPlaying
                                         val isPausedThisTrack = uiState.playbackState.currentPlayingTrackId == track.id && !uiState.playbackState.isPlaying
                                         Icon(

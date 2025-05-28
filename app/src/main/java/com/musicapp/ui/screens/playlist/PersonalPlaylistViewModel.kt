@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.musicapp.data.repositories.UserPlaylistRepository
+import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.UserPlaylistModel
 import com.musicapp.ui.models.toModel
@@ -27,11 +28,14 @@ data class PersonalPlaylistState(
     val deletionSuccessful: Boolean = false,
     val isEditingName: Boolean = false,
     val newName: String = ""
-)  {
+) {
     val canSubmitNameChange = newName.isNotBlank()
 }
 
-class PersonalPlaylistViewModel(private val userPlaylistRepository: UserPlaylistRepository): ViewModel() {
+class PersonalPlaylistViewModel(
+    private val userPlaylistRepository: UserPlaylistRepository,
+    private val mediaPlayerManager: MediaPlayerManager
+) : ViewModel() {
     private val _selectedPlaylistId = MutableStateFlow<String?>(null)
 
     private val _uiState = MutableStateFlow(PersonalPlaylistState())
@@ -114,8 +118,6 @@ class PersonalPlaylistViewModel(private val userPlaylistRepository: UserPlaylist
     }
 
     fun playTrack(track: TrackModel) {
-        viewModelScope.launch {
-            // TODO Play given track
-        }
+        mediaPlayerManager.togglePlayback(track)
     }
 }

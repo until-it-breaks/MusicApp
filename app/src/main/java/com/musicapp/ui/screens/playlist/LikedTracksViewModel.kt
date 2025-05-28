@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
@@ -28,7 +29,8 @@ data class LikedTracksState(val showAuthError: Boolean = false)
 
 class LikedTracksViewModel(
     private val auth: FirebaseAuth,
-    private val likedTracksRepository: LikedTracksRepository
+    private val likedTracksRepository: LikedTracksRepository,
+    private val mediaPlayerManager: MediaPlayerManager
 ): ViewModel() {
     private val _userId = MutableStateFlow(auth.currentUser?.uid)
     private val _uiState = MutableStateFlow(LikedTracksState())
@@ -91,9 +93,7 @@ class LikedTracksViewModel(
     }
 
     fun playTrack(track: TrackModel) {
-        viewModelScope.launch {
-            // TODO Play given track
-        }
+        mediaPlayerManager.togglePlayback(track)
     }
 
     fun logout() {

@@ -170,7 +170,7 @@ class SearchViewModel(
         }
     }
 
-    fun togglePlayback(track: TrackModel) {
+    fun playTrack(track: TrackModel) {
         mediaPlayerManager.togglePlayback(track)
     }
 
