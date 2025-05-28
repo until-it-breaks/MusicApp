@@ -1,5 +1,6 @@
 package com.musicapp.ui.screens.login
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.musicapp.R
+import com.musicapp.data.repositories.UserRepository
+import com.musicapp.ui.models.UserModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +31,10 @@ data class LoginState(
     val canSubmit = email.isNotBlank() && password.isNotBlank()
 }
 
-class LoginViewModel(private val auth: FirebaseAuth): ViewModel() {
+class LoginViewModel(
+    private val auth: FirebaseAuth,
+    private val userRepository: UserRepository
+): ViewModel() {
     private val _uiState = MutableStateFlow(LoginState())
     val uiState: StateFlow<LoginState> = _uiState.asStateFlow()
 
@@ -55,8 +61,19 @@ class LoginViewModel(private val auth: FirebaseAuth): ViewModel() {
 
         viewModelScope.launch {
             try {
-                auth.signInWithEmailAndPassword(uiState.value.email.trim(), uiState.value.password.trim()).await()
-                _uiState.update { it.copy(navigateToMain = true) }
+                val authResult = auth.signInWithEmailAndPassword(uiState.value.email.trim(), uiState.value.password.trim()).await()
+
+                val userId = authResult.user?.uid
+                val username = "Unknown"
+                val email = authResult.user?.email
+
+                if (userId != null && email != null) {
+                    createLocalUser(userId, username, email)
+                    _uiState.update { it.copy(navigateToMain = true) }
+                } else {
+                    _uiState.update { it.copy(errorMessageId = R.string.unexpected_error) }
+                }
+
             } catch (e: FirebaseAuthInvalidUserException) {
                 Log.e(TAG, e.localizedMessage, e)
                 _uiState.update { it.copy(errorMessageId = R.string.account_not_found_or_disabled) }
@@ -73,5 +90,10 @@ class LoginViewModel(private val auth: FirebaseAuth): ViewModel() {
                 _uiState.update { it.copy(isLoading = false) }
             }
         }
+    }
+
+    private suspend fun createLocalUser(userId: String, username: String, email: String) {
+        val user = UserModel(userId, username, email, Uri.EMPTY)
+        userRepository.createNewUser(user)
     }
 }
