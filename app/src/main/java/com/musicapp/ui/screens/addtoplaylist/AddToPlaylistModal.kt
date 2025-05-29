@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.musicapp.R
 import com.musicapp.ui.composables.PlaylistCardToAddTo
+import com.musicapp.ui.composables.PlaylistType
 import com.musicapp.ui.composables.TrackCardToAdd
 import com.musicapp.ui.models.TrackModel
 import org.koin.androidx.compose.koinViewModel
@@ -88,6 +89,7 @@ fun AddTrackToPlaylistModal(
                     ) {
                         PlaylistCardToAddTo(
                             title = stringResource(R.string.liked_tracks),
+                            playlistType = PlaylistType.LIKED,
                             onClick = { addToLiked = !addToLiked },
                             enabled = likedPlaylist.value?.tracks?.none { it.id == track.id } == true,
                             showCheck = addToLiked
@@ -95,6 +97,7 @@ fun AddTrackToPlaylistModal(
                         for (playlist in playlists.value) {
                             PlaylistCardToAddTo(
                                 title = playlist.name,
+                                imageUri = playlist.playlistPictureUri,
                                 onClick = {
                                     clickedPlaylists.value = clickedPlaylists.value.toMutableSet().apply {
                                         if (contains(playlist.id)) {

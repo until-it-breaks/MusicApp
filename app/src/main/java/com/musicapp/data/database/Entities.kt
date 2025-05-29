@@ -58,6 +58,7 @@ data class Playlist(
     val playlistId: String,
     val ownerId: String,
     val name: String,
+    val pictureUri: String?,
     val lastEditTime: Long
 )
 

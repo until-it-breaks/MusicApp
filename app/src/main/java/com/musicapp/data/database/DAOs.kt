@@ -92,6 +92,9 @@ interface UserPlaylistDAO {
     @Query("UPDATE playlist SET name = :name WHERE playlistId = :playlistId")
     suspend fun editName(playlistId: String, name: String)
 
+    @Query("UPDATE playlist SET pictureUri = :pictureUri WHERE playlistId = :playlistId")
+    suspend fun updatePlaylistPicture(playlistId: String, pictureUri: String)
+
     @Query("UPDATE playlist SET lastEditTime = :lastEditTime WHERE playlistId = :playlistId")
     suspend fun updateEditTime(playlistId: String, lastEditTime: Long = System.currentTimeMillis())
 

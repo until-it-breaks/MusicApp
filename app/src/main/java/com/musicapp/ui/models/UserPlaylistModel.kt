@@ -11,6 +11,7 @@ data class UserPlaylistModel (
     val ownerId: String,
     val name: String,
     val tracks: List<TrackModel> = emptyList(),
+    val playlistPictureUri: Uri = Uri.EMPTY,
     val lastEditTime: Long
 )
 
@@ -19,6 +20,7 @@ fun Playlist.toModel(): UserPlaylistModel {
         id = playlistId,
         ownerId = ownerId,
         name = name,
+        playlistPictureUri = pictureUri?.toUri() ?: Uri.EMPTY,
         lastEditTime = lastEditTime
     )
 }
@@ -29,6 +31,7 @@ fun PlaylistWithTracks.toModel(): UserPlaylistModel {
         ownerId = playlist.ownerId,
         name = playlist.name,
         tracks = tracks.map { it.toModel() },
+        playlistPictureUri = playlist.pictureUri?.toUri() ?: Uri.EMPTY,
         lastEditTime = playlist.lastEditTime
     )
 }
@@ -38,20 +41,8 @@ fun PlaylistWithTracksAndArtists.toModel(): UserPlaylistModel {
         id = playlist.playlistId,
         ownerId = playlist.ownerId,
         name = playlist.name,
+        playlistPictureUri = playlist.pictureUri?.toUri() ?: Uri.EMPTY,
         lastEditTime = playlist.lastEditTime,
-        tracks = tracks.map {
-            TrackModel(
-                id = it.track.trackId,
-                title = it.track.title,
-                duration = it.track.duration,
-                releaseDate = it.track.releaseDate,
-                isExplicit = it.track.isExplicit,
-                smallPictureUri = it.track.smallPictureUri?.toUri() ?: Uri.EMPTY,
-                mediumPictureUri = it.track.mediumPictureUri?.toUri() ?: Uri.EMPTY,
-                bigPictureUri = it.track.bigPictureUri?.toUri() ?: Uri.EMPTY,
-                contributors = it.artists.map { it.toModel() },
-                previewUri = it.track.previewUri?.toUri() ?: Uri.EMPTY
-            )
-        }
+        tracks = tracks.map { it.toModel() }
     )
 }
