@@ -29,6 +29,7 @@ import com.musicapp.ui.screens.profile.ProfileScreenViewModel
 import com.musicapp.ui.screens.search.SearchViewModel
 import com.musicapp.ui.screens.settings.SettingsViewModel
 import com.musicapp.ui.screens.signup.SignUpViewModel
+import com.musicapp.ui.viewmodels.BasePlaybackViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -112,8 +113,9 @@ val appModule = module {
     // Deezer API data source
     single { DeezerDataSource(get()) }
 
-    // ViewModels
     single { MediaPlayerManager() }
+    // ViewModels
+
 
     viewModel { SignUpViewModel(get(), get()) }
 

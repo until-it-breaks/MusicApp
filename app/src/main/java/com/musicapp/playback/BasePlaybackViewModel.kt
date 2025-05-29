@@ -1,0 +1,60 @@
+// app/src/main/java/com/musicapp/ui/viewmodels/BasePlaybackViewModel.kt (or a similar path)
+package com.musicapp.ui.viewmodels
+
+import androidx.lifecycle.ViewModel
+import com.musicapp.playback.MediaPlayerManager
+import com.musicapp.playback.PlaybackUiState
+import com.musicapp.ui.models.TrackModel
+import kotlinx.coroutines.flow.StateFlow
+
+/**
+ * Base ViewModel for screens that interact with music playback.
+ * Provides access to MediaPlayerManager and common playback actions.
+ *
+ * @param mediaPlayerManager The MediaPlayerManager instance, in this case injected via Koin.
+ */
+abstract class BasePlaybackViewModel(
+    protected val mediaPlayerManager: MediaPlayerManager
+) : ViewModel() {
+
+    val playbackUiState: StateFlow<PlaybackUiState> = mediaPlayerManager.playbackState
+
+    fun addTrackToQueue(track: TrackModel) {
+        mediaPlayerManager.addTrackToQueue(track)
+    }
+
+
+    fun clearPlaybackQueue() {
+        mediaPlayerManager.clearQueue()
+    }
+
+
+    /**
+     * Toggles playback for a given track.
+     * If the track is currently playing, it pauses.
+     * If the track is paused, it resumes.
+     * If a different track, it stops current playback and starts playing the new track,
+     * replacing the current queue with just this track.
+     */
+    fun togglePlayback(track: TrackModel) {
+        mediaPlayerManager.togglePlayback(track)
+    }
+
+    fun stopMusic() {
+        mediaPlayerManager.stop()
+    }
+
+    /**
+     * Plays the next track in the queue.
+     */
+    fun playNextTrack() {
+        mediaPlayerManager.playNext()
+    }
+
+    /**
+     * Plays the previous track in the queue.
+     */
+    fun playPreviousTrack() {
+        mediaPlayerManager.playPrevious()
+    }
+}
