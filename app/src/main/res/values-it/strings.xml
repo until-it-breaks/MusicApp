@@ -121,4 +121,12 @@
     <string name="theme">Tema</string>
     <string name="theme_description">Scegli come apparirà l\'applicazione.</string>
     <string name="unknown_user">Utente sconosciuto</string>
+    <string name="confirm_delete_playlist">Elimina la playlist</string>
+    <string name="confirm_clear_liked_tracks">Elimina le tracce preferite</string>
+    <string name="confirm_clear_liked_tracks_description">Sei sicuro di voler eliminare le tracce preferite?</string>
+    <string name="confirm_delete_playlist_message">Sei sicuro di voler eliminare la playlist?</string>
+    <string name="delete">Elimina</string>
+    <string name="confirm_clear_history">Elimina la cronologia</string>
+    <string name="confirm_clear_history_message">Sei sicuro di voler eliminare la cronologia?</string>
+    <string name="confirm">Conferma</string>
 </resources>

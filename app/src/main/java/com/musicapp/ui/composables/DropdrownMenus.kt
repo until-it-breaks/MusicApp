@@ -9,17 +9,20 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.QueuePlayNext
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -38,6 +41,7 @@ fun UserPlaylistDropDownMenu(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -65,10 +69,33 @@ fun UserPlaylistDropDownMenu(
                 leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null) },
                 onClick = {
                     expanded = !expanded
-                    onDeletePlaylist()
+                    showConfirmDialog = true
                 }
             )
         }
+    }
+
+    if (showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmDialog = false },
+            title = { Text(text = stringResource(R.string.confirm_delete_playlist)) },
+            text = { Text(text = stringResource(R.string.confirm_delete_playlist_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showConfirmDialog = false
+                        onDeletePlaylist()
+                    }
+                ) {
+                    Text(text = stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmDialog = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 }
 
@@ -203,6 +230,7 @@ fun SavedTrackDropDownMenu(
 @Composable
 fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -222,10 +250,33 @@ fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks
                 leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
                 onClick = {
                     expanded = !expanded
-                    onClearTracks()
+                    showConfirmDialog = true
                 }
             )
         }
+    }
+
+    if (showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmDialog = false },
+            title = { Text(text = stringResource(R.string.confirm_clear_liked_tracks)) },
+            text = { Text(text = stringResource(R.string.confirm_clear_liked_tracks_description)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showConfirmDialog = false
+                        onClearTracks()
+                    }
+                ) {
+                    Text(text = stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmDialog = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 }
 
@@ -236,6 +287,7 @@ fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks
 @Composable
 fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
+    var showConfirmDialog by rememberSaveable { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -255,9 +307,32 @@ fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () ->
                 leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
                 onClick = {
                     expanded = !expanded
-                    onClearTracks()
+                    showConfirmDialog = true
                 }
             )
         }
+    }
+
+    if (showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmDialog = false },
+            title = { Text(text = stringResource(R.string.confirm_clear_history)) },
+            text = { Text(text = stringResource(R.string.confirm_clear_history_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showConfirmDialog = false
+                        onClearTracks()
+                    }
+                ) {
+                    Text(text = stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmDialog = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 }
