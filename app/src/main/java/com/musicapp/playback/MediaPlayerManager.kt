@@ -209,7 +209,7 @@ class MediaPlayerManager(
         }
     }
 
-    private fun pause() {
+    fun pause() {
         mediaPlayer?.apply {
             if (isPlaying) {
                 pause()
@@ -218,7 +218,7 @@ class MediaPlayerManager(
         }
     }
 
-    private fun resume() {
+    fun resume() {
         mediaPlayer?.apply {
             if (!isPlaying) {
                 start()
