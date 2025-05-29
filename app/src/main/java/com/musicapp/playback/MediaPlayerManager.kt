@@ -1,5 +1,7 @@
 package com.musicapp.playback
 
+import android.content.Context
+import android.content.Intent
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.runtime.currentRecomposeScope
@@ -27,7 +29,7 @@ data class PlaybackUiState(
 // import android.content.Context
 
 class MediaPlayerManager(
-    // private val appContext: Context // If you need context for MediaPlayer initialization later
+    private val appContext: Context
 ) {
     private var mediaPlayer: MediaPlayer? = null
 
@@ -163,10 +165,15 @@ class MediaPlayerManager(
                 playbackError = null
             )
         }
+
+        val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
+        appContext.startService(serviceIntent)
+        Log.d("MediaPlayerManager", "Started MediaPlaybackService for track: ${track.title}")
+
         mediaPlayer?.apply {
             try {
-                reset() // Reset to idle state
-                setDataSource(track.previewUri.toString()) // Set the URL
+                reset()
+                setDataSource(track.previewUri.toString())
                 prepareAsync() // Prepare in background
             } catch (e: Exception) {
                 Log.e(
@@ -223,6 +230,9 @@ class MediaPlayerManager(
             if (!isPlaying) {
                 start()
                 _playbackState.update { it.copy(isPlaying = true) }
+                val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
+                appContext.startService(serviceIntent)
+                Log.d("MediaPlayerManager", "Resumed playback and ensured MediaPlaybackService is running.")
             }
         }
     }
@@ -243,6 +253,9 @@ class MediaPlayerManager(
                     playbackQueue = emptyList()
                 )
             }
+            val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
+            appContext.stopService(serviceIntent)
+            Log.d("MediaPlayerManager", "Stopped playback and MediaPlaybackService.")
         }
     }
 
