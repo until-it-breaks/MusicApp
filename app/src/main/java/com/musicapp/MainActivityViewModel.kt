@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.stateIn
 
 class MainActivityViewModel(
     private val auth: FirebaseAuth,
-    private val settingsRepository: SettingsRepository
+    settingsRepository: SettingsRepository
 ): ViewModel() {
     val theme = settingsRepository.theme.stateIn(
         scope = viewModelScope,

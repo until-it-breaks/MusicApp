@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
 import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.data.repositories.SettingsRepository
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.TrackModel
@@ -16,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,12 +35,12 @@ class PublicPlaylistViewModel(
     private val deezerDataSource: DeezerDataSource,
     private val auth: FirebaseAuth,
     private val likedTracksRepository: LikedTracksRepository,
-    mediaPlayerManager: MediaPlayerManager
-): BasePlaybackViewModel(mediaPlayerManager) {
+): ViewModel() {
     private val _uiState = MutableStateFlow(PublicPlaylistState())
     val uiState: StateFlow<PublicPlaylistState> = _uiState.asStateFlow()
 
     fun loadPlaylist(id: Long) {
+        if (_uiState.value.playlistDetails?.id == id) return
         viewModelScope.launch {
             _uiState.update { it.copy(showPlaylistDetailsLoading = true) }
             try {
@@ -59,12 +61,21 @@ class PublicPlaylistViewModel(
         viewModelScope.launch {
             val tracks = uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load only 20 tracks.
             _uiState.update { it.copy(showTracksLoading = true) }
+            val allowExplicit = settingsRepository.allowExplicit.first()
             for(track in tracks) {
                 try {
                     val detailedTrack: DeezerTrackDetailed = withContext(Dispatchers.IO) {
                         deezerDataSource.getTrackDetails(track.id)
                     }
-                    _uiState.update { it.copy(tracks = it.tracks + detailedTrack.toModel()) }
+                    val trackModel = detailedTrack.toModel()
+                    /**
+                     * If explicit content is allowed, the track will be shown regardless of their nature.
+                     * If such setting is active only the tracks that are not explicit or have a null isExplicit
+                     * property are displayed.
+                     */
+                    if (allowExplicit || trackModel.isExplicit != true) {
+                        _uiState.update { it.copy(tracks = it.tracks + trackModel) }
+                    }
                 } catch (e: Exception) {
                     Log.e(TAG, e.localizedMessage, e)
                 } finally {

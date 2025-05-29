@@ -39,6 +39,12 @@ interface UserDAO {
     @Insert
     suspend fun insertUser(user: User)
 
+    @Query("UPDATE user SET username = :username WHERE userId = :userId")
+    suspend fun updateUsername(username: String, userId: String)
+
+    @Query("UPDATE user SET profilePictureUri = :profilePictureUri WHERE userId = :userId")
+    suspend fun updateProfilePicture(profilePictureUri: String, userId: String)
+
     @Delete
     suspend fun deleteUser(user: User)
 }

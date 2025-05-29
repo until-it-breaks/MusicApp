@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.musicapp.playback.MediaPlayerManager
@@ -29,6 +30,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel = koinViewModel<MainActivityViewModel>()
             val theme = viewModel.theme.collectAsStateWithLifecycle()
+            val navController = rememberNavController()
+
+            val initialRoute = remember {
+                if (viewModel.isSessionActive()) MusicAppRoute.Main else MusicAppRoute.Login
+            }
 
             MusicAppTheme(
                 darkTheme = when (theme.value) {
@@ -37,9 +43,6 @@ class MainActivity : ComponentActivity() {
                     else -> isSystemInDarkTheme()
                 }
             ) {
-                val navController = rememberNavController()
-                val viewModel : MainActivityViewModel = koinViewModel()
-                val initialRoute = if (viewModel.isSessionActive()) MusicAppRoute.Main else MusicAppRoute.Login
                 MusicAppNavGraph(navController, initialRoute)
             }
         }

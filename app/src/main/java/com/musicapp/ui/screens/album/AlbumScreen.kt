@@ -113,9 +113,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                                     Text(
                                         text = contributor.name,
                                         textDecoration = TextDecoration.Underline,
-                                        modifier = Modifier.clickable {
-                                            navController.navigate(MusicAppRoute.Artist(contributor.id))
-                                        }
+                                        modifier = Modifier.clickable { navController.navigate(MusicAppRoute.Artist(contributor.id)) }
                                     )
                                     if (index < album.contributors.lastIndex) {
                                         Text(" · ")

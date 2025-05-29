@@ -39,6 +39,7 @@ class AlbumViewModel(
     val uiState: StateFlow<AlbumState> = _uiState.asStateFlow()
 
     fun loadAlbum(albumId: Long) {
+        if (_uiState.value.albumDetails?.id == albumId) return
         viewModelScope.launch {
             _uiState.update { it.copy(albumDetailsAreLoading = true) }
             try {
