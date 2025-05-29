@@ -60,11 +60,10 @@ class PublicPlaylistViewModel(
 
     private fun loadTracks() {
         viewModelScope.launch {
-            val tracks =
-                uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load only 20 tracks.
+            val tracks = uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load only 20 tracks.
             _uiState.update { it.copy(showTracksLoading = true) }
             val allowExplicit = settingsRepository.allowExplicit.first()
-            for (track in tracks) {
+            for(track in tracks) {
                 try {
                     val detailedTrack: DeezerTrackDetailed = withContext(Dispatchers.IO) {
                         deezerDataSource.getTrackDetails(track.id)
