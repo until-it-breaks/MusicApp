@@ -124,4 +124,12 @@
     <string name="theme">Theme</string>
     <string name="theme_description">Set how the app will look.</string>
     <string name="unknown_user">Unknown user</string>
+    <string name="delete">Delete</string>
+    <string name="confirm_clear_history">Clear track history</string>
+    <string name="confirm_clear_history_message">Are you sure you want to clear the track history?</string>
+    <string name="confirm">Confirm</string>
+    <string name="confirm_clear_liked_tracks">Clear liked tracks</string>
+    <string name="confirm_clear_liked_tracks_description">Are you sure you want to clear the liked tracks</string>
+    <string name="confirm_delete_playlist_message">Are you sure you want to delete the playlist?</string>
+    <string name="confirm_delete_playlist">Delete playlist</string>
 </resources>
