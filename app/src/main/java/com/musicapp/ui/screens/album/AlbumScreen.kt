@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -125,10 +126,10 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                     }
                 }
             }
-            items(uiState.tracks) { track ->
+            itemsIndexed(uiState.tracks) { index, track ->
                 TrackCard(
                     track = track,
-                    onTrackClick = viewModel::togglePlayback,
+                    onTrackClick = { viewModel.setPlaybackQueue(uiState.tracks, index) },
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
                         PublicTrackDropDownMenu(
