@@ -34,6 +34,7 @@ class PublicPlaylistViewModel(
     private val deezerDataSource: DeezerDataSource,
     private val auth: FirebaseAuth,
     private val likedTracksRepository: LikedTracksRepository,
+    private val settingsRepository: SettingsRepository,
     mediaPlayerManager: MediaPlayerManager
 ) : BasePlaybackViewModel(mediaPlayerManager) {
     private val _uiState = MutableStateFlow(PublicPlaylistState())
