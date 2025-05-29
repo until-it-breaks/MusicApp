@@ -132,4 +132,11 @@
     <string name="confirm_clear_liked_tracks_description">Are you sure you want to clear the liked tracks</string>
     <string name="confirm_delete_playlist_message">Are you sure you want to delete the playlist?</string>
     <string name="confirm_delete_playlist">Delete playlist</string>
+    <string name="connection_timed_out">Connection timed out. Please try again.</string>
+    <string name="server_took_too_long">Server took too long to respond.</string>
+    <string name="could_not_connect">Could not connect. Check your internet connection.</string>
+    <string name="network_error_exception">Network error. Please check your connection.</string>
+    <string name="failed_to_load_playlists">Failed to load playlists</string>
+    <string name="failed_to_load_artists">Failed to load artists</string>
+    <string name="failed_to_load_albums">Failed to load albums</string>
 </resources>

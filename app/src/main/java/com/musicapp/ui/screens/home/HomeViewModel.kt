@@ -3,16 +3,14 @@ package com.musicapp.ui.screens.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.musicapp.R
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.repositories.SettingsRepository
 import com.musicapp.ui.models.AlbumModel
 import com.musicapp.ui.models.ArtistModel
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.toModel
-import io.ktor.client.network.sockets.ConnectTimeoutException
-import io.ktor.client.network.sockets.SocketTimeoutException
-import io.ktor.util.network.UnresolvedAddressException
-import io.ktor.utils.io.errors.IOException
+import com.musicapp.util.getErrorMessageResId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -24,7 +22,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.net.UnknownHostException
 
 private const val TAG = "HomeViewModel"
 
@@ -36,9 +33,9 @@ data class HomeState(
     val playlists: List<PublicPlaylistModel> = emptyList(),
     val artists: List<ArtistModel> = emptyList(),
     val albums: List<AlbumModel> = emptyList(),
-    val playlistError: String? = null,
-    val artistError: String? = null,
-    val albumError: String? = null
+    val playlistErrorStringId: Int? = null,
+    val artistErrorStringId: Int? = null,
+    val albumErrorStringId: Int? = null
 )
 
 class HomeViewModel(
@@ -54,22 +51,14 @@ class HomeViewModel(
 
     fun loadTopPlaylist() {
         viewModelScope.launch {
-            _uiState.update { it.copy(showPlaylistLoading = true, playlistError = null) }
+            _uiState.update { it.copy(showPlaylistLoading = true, playlistErrorStringId = null) }
             try {
-                val result = withContext(Dispatchers.IO) {
-                    deezerDataSource.getTopPlaylists()
-                }
+                val result = withContext(Dispatchers.IO) { deezerDataSource.getTopPlaylists() }
                 _uiState.update { it.copy(playlists = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
-                val message = when (e) {
-                    is ConnectTimeoutException -> "Connection timed out. Please try again."
-                    is SocketTimeoutException -> "Server took too long to respond."
-                    is UnknownHostException, is UnresolvedAddressException -> "Could not connect. Check your internet connection."
-                    is IOException -> "Network error. Please check your connection."
-                    else -> "Failed to load playlists"
-                }
-                _uiState.update { it.copy(playlistError = message) }
+                val resId: Int = getErrorMessageResId(e) ?: R.string.failed_to_load_playlists
+                _uiState.update { it.copy(playlistErrorStringId = resId) }
             } finally {
                 _uiState.update { it.copy(showPlaylistLoading = false) }
             }
@@ -78,22 +67,14 @@ class HomeViewModel(
 
     fun loadTopArtists() {
         viewModelScope.launch {
-            _uiState.update { it.copy(showArtistsLoading = true, artistError = null) }
+            _uiState.update { it.copy(showArtistsLoading = true, artistErrorStringId = null) }
             try {
-                val result = withContext(Dispatchers.IO) {
-                    deezerDataSource.getTopArtists()
-                }
+                val result = withContext(Dispatchers.IO) { deezerDataSource.getTopArtists() }
                 _uiState.update { it.copy(artists = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
-                val message = when (e) {
-                    is ConnectTimeoutException -> "Connection timed out. Please try again."
-                    is SocketTimeoutException -> "Server took too long to respond."
-                    is UnknownHostException, is UnresolvedAddressException -> "Could not connect. Check your internet connection."
-                    is IOException -> "Network error. Please check your connection."
-                    else -> "Failed to load artists"
-                }
-                _uiState.update { it.copy(artistError = message) }
+                val resId: Int = getErrorMessageResId(e) ?: R.string.failed_to_load_artists
+                _uiState.update { it.copy(artistErrorStringId = resId) }
             } finally {
                 _uiState.update { it.copy(showArtistsLoading = false) }
             }
@@ -102,12 +83,10 @@ class HomeViewModel(
 
     fun loadTopAlbums() {
         viewModelScope.launch {
-            _uiState.update { it.copy(showAlbumsLoading = true, albumError = null) }
+            _uiState.update { it.copy(showAlbumsLoading = true, albumErrorStringId = null) }
             try {
                 val allowExplicit = settingsRepository.allowExplicit.first()
-                val result = withContext(Dispatchers.IO) {
-                    deezerDataSource.getTopAlbums()
-                }
+                val result = withContext(Dispatchers.IO) { deezerDataSource.getTopAlbums() }
                 /**
                  * If explicit content is allowed, the album will be shown regardless of their nature.
                  * If such setting is active only the album that are not explicit or have a null isExplicit
@@ -119,14 +98,8 @@ class HomeViewModel(
                 _uiState.update { it.copy(albums = albums) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
-                val message = when (e) {
-                    is ConnectTimeoutException -> "Connection timed out. Please try again."
-                    is SocketTimeoutException -> "Server took too long to respond."
-                    is UnknownHostException, is UnresolvedAddressException -> "Could not connect. Check your internet connection."
-                    is IOException -> "Network error. Please check your connection."
-                    else -> "Failed to load albums"
-                }
-                _uiState.update { it.copy(albumError = message) }
+                val resId: Int = getErrorMessageResId(e) ?: R.string.failed_to_load_albums
+                _uiState.update { it.copy(albumErrorStringId = resId) }
             } finally {
                 _uiState.update { it.copy(showAlbumsLoading = false) }
             }
@@ -135,7 +108,12 @@ class HomeViewModel(
 
     fun loadContent() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, playlists = emptyList(), artists = emptyList(), albums = emptyList()) }
+            _uiState.update { it.copy(
+                isLoading = true,
+                playlists = emptyList(),
+                artists = emptyList(),
+                albums = emptyList()
+            ) }
             val jobs = listOf(
                 async { loadTopPlaylist() },
                 async { loadTopArtists() },

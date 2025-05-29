@@ -14,17 +14,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -36,6 +32,7 @@ import com.musicapp.ui.composables.CenteredCircularProgressIndicator
 import com.musicapp.ui.composables.ErrorSection
 import com.musicapp.ui.composables.MainTopBar
 import com.musicapp.ui.composables.PlayListCard
+import com.musicapp.ui.theme.AppPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +43,7 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
     val pullToRefreshState = rememberPullToRefreshState()
 
     Scaffold(
-        topBar = { MainTopBar(mainNavController, stringResource(R.string.home)) },
+        topBar = { MainTopBar(navController = mainNavController, title = stringResource(R.string.home)) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         PullToRefreshBox(
@@ -57,26 +54,20 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
         ) {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .padding(12.dp)
-                    .fillMaxSize()
+                modifier = Modifier.padding(AppPadding.ScaffoldContent).fillMaxSize()
             ) {
                 item {
                     Text(
                         text = stringResource(R.string.top_playlists),
                         style = MaterialTheme.typography.headlineSmall
                     )
-                }
-                item {
                     if (uiState.showPlaylistLoading) {
                         CenteredCircularProgressIndicator()
                     }
-                }
-                item {
-                    val error = uiState.playlistError
-                    if (error != null) {
+                    val resId = uiState.playlistErrorStringId
+                    if (resId != null) {
                         ErrorSection(
-                            message = error,
+                            message = stringResource(resId),
                             onRetry = viewModel::loadTopPlaylist
                         )
                     }
@@ -103,17 +94,13 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                         text = stringResource(R.string.top_artists),
                         style = MaterialTheme.typography.headlineSmall
                     )
-                }
-                item {
                     if (uiState.showArtistsLoading) {
                         CenteredCircularProgressIndicator()
                     }
-                }
-                item {
-                    val error = uiState.artistError
-                    if (error != null) {
+                    val resId = uiState.artistErrorStringId
+                    if (resId != null) {
                         ErrorSection(
-                            message = error,
+                            message = stringResource(resId),
                             onRetry = viewModel::loadTopArtists
                         )
                     }
@@ -134,17 +121,13 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                         text = stringResource(R.string.top_albums),
                         style = MaterialTheme.typography.headlineSmall
                     )
-                }
-                item {
                     if (uiState.showAlbumsLoading) {
                         CenteredCircularProgressIndicator()
                     }
-                }
-                item {
-                    val error = uiState.albumError
-                    if (error != null) {
+                    val resId = uiState.albumErrorStringId
+                    if (resId != null) {
                         ErrorSection(
-                            message = error,
+                            message = stringResource(resId),
                             onRetry = viewModel::loadTopAlbums
                         )
                     }
