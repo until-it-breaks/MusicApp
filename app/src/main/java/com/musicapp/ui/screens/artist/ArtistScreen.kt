@@ -22,15 +22,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.CenteredCircularProgressIndicator
+import com.musicapp.ui.composables.ErrorSection
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.PlayListCard
 import com.musicapp.ui.composables.TopBarWithBackButton
+import com.musicapp.ui.theme.AppPadding
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ArtistScreen(navController: NavController, artistId: Long) {
     val viewModel = koinViewModel<ArtistViewModel>()
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(artistId) {
         viewModel.loadArtist(artistId)
@@ -38,30 +41,34 @@ fun ArtistScreen(navController: NavController, artistId: Long) {
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.artist_details)) },
+        topBar = { TopBarWithBackButton(navController = navController, title = stringResource(R.string.artist_details)) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier
-                .padding(contentPadding)
-                .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
+            modifier = Modifier.padding(contentPadding).padding(AppPadding.ScaffoldContent)
         ) {
             item {
+                if (uiState.showArtistLoading) {
+                    CenteredCircularProgressIndicator()
+                }
+                val resId = uiState.artistErrorStringId
+                if (resId != null) {
+                    ErrorSection(
+                        message = stringResource(resId),
+                        onRetry = { viewModel.loadArtist(artistId) }
+                    )
+                }
                 uiState.artist?.let { artist ->
                     Row(
                         horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
                     ) {
                         LoadableImage(
                             imageUri = artist.bigPictureUri,
                             contentDescription = null
                         )
                     }
-                }
-            }
-            item {
-                uiState.artist?.let { artist ->
                     Text(
                         text = artist.name,
                         style = MaterialTheme.typography.headlineMedium
@@ -73,6 +80,16 @@ fun ArtistScreen(navController: NavController, artistId: Long) {
                     text = stringResource(R.string.discography),
                     style = MaterialTheme.typography.titleLarge
                 )
+                if (uiState.showAlbumsLoading) {
+                    CenteredCircularProgressIndicator()
+                }
+                val resId = uiState.albumErrorStringId
+                if (resId != null) {
+                    ErrorSection(
+                        message = stringResource(resId),
+                        onRetry = { viewModel.loadArtistAlbums(artistId) }
+                    )
+                }
             }
             items(uiState.artistAlbums){ album ->
                 PlayListCard(

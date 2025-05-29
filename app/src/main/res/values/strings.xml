@@ -139,4 +139,5 @@
     <string name="failed_to_load_playlists">Failed to load playlists</string>
     <string name="failed_to_load_artists">Failed to load artists</string>
     <string name="failed_to_load_albums">Failed to load albums</string>
+    <string name="failed_to_load_artist">Failed to load artist details</string>
 </resources>

@@ -3,11 +3,13 @@ package com.musicapp.ui.screens.artist
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.musicapp.R
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.repositories.SettingsRepository
 import com.musicapp.ui.models.AlbumModel
 import com.musicapp.ui.models.ArtistModel
 import com.musicapp.ui.models.toModel
+import com.musicapp.util.getErrorMessageResId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,38 +24,44 @@ private const val TAG = "ArtistViewModel"
 data class ArtistState(
     val artist: ArtistModel? = null,
     val artistAlbums: List<AlbumModel> = emptyList(),
-    val artistIsLoading: Boolean = false,
-    val artistAlbumsAreLoading: Boolean = false,
+    val isArtistLoaded: Boolean = false,
+    val areAlbumsLoaded: Boolean = false,
+    val showArtistLoading: Boolean = false,
+    val showAlbumsLoading: Boolean = false,
+    val artistErrorStringId: Int? = null,
+    val albumErrorStringId: Int? = null,
 )
 
 class ArtistViewModel(
     private val deezerDataSource: DeezerDataSource,
     private val settingsRepository: SettingsRepository
 ): ViewModel() {
-    private val _state = MutableStateFlow(ArtistState())
-    val state: StateFlow<ArtistState> = _state.asStateFlow()
+    private val _uiState = MutableStateFlow(ArtistState())
+    val uiState: StateFlow<ArtistState> = _uiState.asStateFlow()
 
     fun loadArtist(id: Long) {
-        if (_state.value.artist?.id == id) return
+        if (_uiState.value.isArtistLoaded && _uiState.value.artist?.id == id) return
         viewModelScope.launch {
-            _state.update { it.copy(artistIsLoading = true) }
+            _uiState.update { it.copy(showArtistLoading = true, artistErrorStringId = null) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getArtistDetails(id)
                 }
-                _state.update { it.copy(artist = result.toModel()) }
+                _uiState.update { it.copy(artist = result.toModel(), isArtistLoaded = true) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
+                val resId: Int = getErrorMessageResId(e) ?: R.string.failed_to_load_artist
+                _uiState.update { it.copy(artistErrorStringId = resId) }
             } finally {
-                _state.update { it.copy(artistIsLoading = false) }
+                _uiState.update { it.copy(showArtistLoading = false) }
             }
         }
     }
 
     fun loadArtistAlbums(id: Long) {
-        if (_state.value.artist?.id == id) return
+        if (_uiState.value.areAlbumsLoaded && _uiState.value.artist?.id == id) return
         viewModelScope.launch {
-            _state.update { it.copy(artistAlbumsAreLoading = true) }
+            _uiState.update { it.copy(showAlbumsLoading = true, albumErrorStringId = null) }
             try {
                 val allowExplicit = settingsRepository.allowExplicit.first()
                 val result = withContext(Dispatchers.IO)  {
@@ -67,11 +75,13 @@ class ArtistViewModel(
                 val albums = result
                     .map { it.toModel() }
                     .filter { allowExplicit || it.isExplicit != true }
-                _state.update { it.copy(artistAlbums = albums) }
+                _uiState.update { it.copy(artistAlbums = albums, areAlbumsLoaded = true) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
+                val resId: Int = getErrorMessageResId(e) ?: R.string.failed_to_load_albums
+                _uiState.update { it.copy(albumErrorStringId = resId) }
             } finally {
-                _state.update { it.copy(artistAlbumsAreLoading = false) }
+                _uiState.update { it.copy(showAlbumsLoading = false) }
             }
         }
     }
