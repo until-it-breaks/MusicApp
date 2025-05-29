@@ -122,13 +122,13 @@ fun SearchScreen(
 
                             TrackCard(
                                 track = track,
-                                onTrackClick = searchViewModel::playTrack,
+                                onTrackClick = searchViewModel::togglePlayback,
                                 onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                                 extraMenu = {
                                     PublicTrackDropDownMenu(
                                         trackModel = track,
                                         onLiked = searchViewModel::addToLiked, // TODO
-                                        onAddToQueue = searchViewModel::addToQueue
+                                        onAddToQueue = searchViewModel::addTrackToQueue
                                     )
                                 }
                             )

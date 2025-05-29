@@ -8,6 +8,7 @@ import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.UserPlaylistModel
 import com.musicapp.ui.models.toModel
+import com.musicapp.ui.viewmodels.BasePlaybackViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,8 +35,8 @@ data class PersonalPlaylistState(
 
 class PersonalPlaylistViewModel(
     private val userPlaylistRepository: UserPlaylistRepository,
-    private val mediaPlayerManager: MediaPlayerManager
-) : ViewModel() {
+    mediaPlayerManager: MediaPlayerManager
+) : BasePlaybackViewModel(mediaPlayerManager) {
     private val _selectedPlaylistId = MutableStateFlow<String?>(null)
 
     private val _uiState = MutableStateFlow(PersonalPlaylistState())
@@ -109,15 +110,5 @@ class PersonalPlaylistViewModel(
                 Log.e(TAG, e.localizedMessage, e)
             }
         }
-    }
-
-    fun addToQueue(track: TrackModel) {
-        viewModelScope.launch {
-            // TODO Enqueue given track
-        }
-    }
-
-    fun playTrack(track: TrackModel) {
-        mediaPlayerManager.togglePlayback(track)
     }
 }

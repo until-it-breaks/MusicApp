@@ -133,7 +133,7 @@ class MediaPlayerManager(
                     resume()
                 }
             } else {
-                // if the track id is different, start a new session
+                // if the track id is different, start a new session, this will clear the queue
                 playNewTrack(track)
             }
         }

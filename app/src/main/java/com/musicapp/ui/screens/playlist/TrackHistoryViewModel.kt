@@ -9,6 +9,7 @@ import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.TrackHistoryModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
+import com.musicapp.ui.viewmodels.BasePlaybackViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,8 +31,8 @@ data class TrackHistoryState(val showAuthError: Boolean = false)
 class TrackHistoryViewModel(
     private val auth: FirebaseAuth,
     private val trackHistoryRepository: TrackHistoryRepository,
-    private val mediaPlayerManager: MediaPlayerManager
-): ViewModel() {
+    mediaPlayerManager: MediaPlayerManager
+): BasePlaybackViewModel(mediaPlayerManager) {
     private val _userId = MutableStateFlow(auth.currentUser?.uid)
     private val _uiState = MutableStateFlow(TrackHistoryState())
     val uiState: StateFlow<TrackHistoryState> = _uiState.asStateFlow()

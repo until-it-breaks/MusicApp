@@ -100,12 +100,12 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                 TrackCard(
                     track = track,
                     showPicture = true,
-                    onTrackClick = { viewModel.playTrack(track) },
+                    onTrackClick = viewModel::togglePlayback,
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
                         SavedTrackDropDownMenu(
                             track = track,
-                            onAddToQueue = { viewModel.addToQueue(track) },
+                            onAddToQueue = viewModel::addTrackToQueue,
                             onRemoveTrack = { viewModel.removeTrackFromPlaylist(track.id) }
                         )
                     }

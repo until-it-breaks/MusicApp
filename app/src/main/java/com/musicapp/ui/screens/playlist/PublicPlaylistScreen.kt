@@ -87,13 +87,13 @@ fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
                 TrackCard(
                     track = track,
                     showPicture = true,
-                    onTrackClick = viewModel::playTrack,
+                    onTrackClick = viewModel::togglePlayback,
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
                         PublicTrackDropDownMenu(
                             trackModel = track,
                             onLiked = viewModel::addToLiked,
-                            onAddToQueue = viewModel::addToQueue
+                            onAddToQueue = viewModel::addTrackToQueue
                         )
                     }
                 )

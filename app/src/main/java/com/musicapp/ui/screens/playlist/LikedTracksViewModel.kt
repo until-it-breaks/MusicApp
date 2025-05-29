@@ -9,6 +9,7 @@ import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
+import com.musicapp.ui.viewmodels.BasePlaybackViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,8 +31,8 @@ data class LikedTracksState(val showAuthError: Boolean = false)
 class LikedTracksViewModel(
     private val auth: FirebaseAuth,
     private val likedTracksRepository: LikedTracksRepository,
-    private val mediaPlayerManager: MediaPlayerManager
-): ViewModel() {
+    mediaPlayerManager: MediaPlayerManager
+): BasePlaybackViewModel(mediaPlayerManager) {
     private val _userId = MutableStateFlow(auth.currentUser?.uid)
     private val _uiState = MutableStateFlow(LikedTracksState())
     val uiState: StateFlow<LikedTracksState> = _uiState.asStateFlow()
@@ -84,16 +85,6 @@ class LikedTracksViewModel(
                 Log.e(TAG, e.localizedMessage, e)
             }
         }
-    }
-
-    fun addToQueue(track: TrackModel) {
-        viewModelScope.launch {
-            // TODO Enqueue given track
-        }
-    }
-
-    fun playTrack(track: TrackModel) {
-        mediaPlayerManager.togglePlayback(track)
     }
 
     fun logout() {

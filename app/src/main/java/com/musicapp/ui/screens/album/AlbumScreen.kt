@@ -130,12 +130,12 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
             items(uiState.tracks) { track ->
                 TrackCard(
                     track = track,
-                    onTrackClick = viewModel::playTrack,
+                    onTrackClick = viewModel::togglePlayback,
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
                         PublicTrackDropDownMenu(
                             trackModel = track,
-                            onAddToQueue = viewModel::addToQueue,
+                            onAddToQueue = viewModel::addTrackToQueue,
                             onLiked = viewModel::addToLiked
                         )
                     },

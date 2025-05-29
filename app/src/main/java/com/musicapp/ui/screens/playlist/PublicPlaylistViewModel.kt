@@ -11,6 +11,7 @@ import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
+import com.musicapp.ui.viewmodels.BasePlaybackViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,8 +33,8 @@ class PublicPlaylistViewModel(
     private val deezerDataSource: DeezerDataSource,
     private val auth: FirebaseAuth,
     private val likedTracksRepository: LikedTracksRepository,
-    private val mediaPlayerManager: MediaPlayerManager
-): ViewModel() {
+    mediaPlayerManager: MediaPlayerManager
+): BasePlaybackViewModel(mediaPlayerManager) {
     private val _uiState = MutableStateFlow(PublicPlaylistState())
     val uiState: StateFlow<PublicPlaylistState> = _uiState.asStateFlow()
 
@@ -84,13 +85,4 @@ class PublicPlaylistViewModel(
         }
     }
 
-    fun addToQueue(track: TrackModel) {
-        viewModelScope.launch {
-            // TODO Enqueue given track
-        }
-    }
-
-    fun playTrack(track: TrackModel) {
-        mediaPlayerManager.togglePlayback(track)
-    }
 }

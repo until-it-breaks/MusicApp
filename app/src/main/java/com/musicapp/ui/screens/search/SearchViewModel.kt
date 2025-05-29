@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 import android.util.Log
+import com.musicapp.ui.viewmodels.BasePlaybackViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
@@ -43,8 +44,8 @@ data class SearchUiState(
 
 class SearchViewModel(
     private val deezerDataSource: DeezerDataSource,
-    private val mediaPlayerManager: MediaPlayerManager
-) : ViewModel() {
+    mediaPlayerManager: MediaPlayerManager
+) : BasePlaybackViewModel(mediaPlayerManager) {
 
     private val _searchText = MutableStateFlow("")
     private val _lastSearchText = MutableStateFlow("")
@@ -172,16 +173,5 @@ class SearchViewModel(
 
     fun addToLiked(track: TrackModel) { /*TODO*/}
 
-    fun addToQueue(track: TrackModel) {
-        mediaPlayerManager.addTrackToQueue(track)
-    }
-
-    fun playTrack(track: TrackModel) {
-        mediaPlayerManager.togglePlayback(track)
-    }
-
-    fun stopMusic() {
-        mediaPlayerManager.stop()
-    }
 }
 
