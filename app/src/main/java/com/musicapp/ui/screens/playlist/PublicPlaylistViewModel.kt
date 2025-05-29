@@ -27,7 +27,9 @@ data class PublicPlaylistState(
     val playlistDetails: PublicPlaylistModel? = null,
     val tracks: List<TrackModel> = emptyList(),
     val showPlaylistDetailsLoading: Boolean = false,
-    val showTracksLoading: Boolean = false
+    val showTracksLoading: Boolean = false,
+    val playlistError: String? = null,
+    val trackError: String? = null
 )
 
 class PublicPlaylistViewModel(
@@ -60,10 +62,11 @@ class PublicPlaylistViewModel(
 
     private fun loadTracks() {
         viewModelScope.launch {
-            val tracks =
-                uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load only 20 tracks.
-            _uiState.update { it.copy(showTracksLoading = true) }
+            val tracks = uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load only 20 tracks.
+            _uiState.update { it.copy(showTracksLoading = true, trackError = null, tracks = emptyList()) }
             val allowExplicit = settingsRepository.allowExplicit.first()
+            val failedTracks = mutableListOf<Long>()
+
             for (track in tracks) {
                 try {
                     val detailedTrack: DeezerTrackDetailed = withContext(Dispatchers.IO) {
@@ -80,10 +83,15 @@ class PublicPlaylistViewModel(
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, e.localizedMessage, e)
-                } finally {
-                    _uiState.update { it.copy(showTracksLoading = false) }
+                    failedTracks += track.id
                 }
             }
+            if (failedTracks.isNotEmpty()) {
+                _uiState.update {
+                    it.copy(trackError = "Failed to load ${failedTracks.size} track(s).")
+                }
+            }
+            _uiState.update { it.copy(showTracksLoading = false) }
         }
     }
 
@@ -97,5 +105,4 @@ class PublicPlaylistViewModel(
             }
         }
     }
-
 }

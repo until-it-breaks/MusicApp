@@ -9,6 +9,10 @@ import com.musicapp.ui.models.AlbumModel
 import com.musicapp.ui.models.ArtistModel
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.toModel
+import io.ktor.client.network.sockets.ConnectTimeoutException
+import io.ktor.client.network.sockets.SocketTimeoutException
+import io.ktor.util.network.UnresolvedAddressException
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -20,6 +24,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.UnknownHostException
 
 private const val TAG = "HomeViewModel"
 
@@ -30,7 +35,10 @@ data class HomeState(
     val showAlbumsLoading: Boolean = false,
     val playlists: List<PublicPlaylistModel> = emptyList(),
     val artists: List<ArtistModel> = emptyList(),
-    val albums: List<AlbumModel> = emptyList()
+    val albums: List<AlbumModel> = emptyList(),
+    val playlistError: String? = null,
+    val artistError: String? = null,
+    val albumError: String? = null
 )
 
 class HomeViewModel(
@@ -44,9 +52,9 @@ class HomeViewModel(
         loadContent()
     }
 
-    private fun loadTopPlaylist() {
+    fun loadTopPlaylist() {
         viewModelScope.launch {
-            _uiState.update { it.copy(showPlaylistLoading = true) }
+            _uiState.update { it.copy(showPlaylistLoading = true, playlistError = null) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopPlaylists()
@@ -54,15 +62,23 @@ class HomeViewModel(
                 _uiState.update { it.copy(playlists = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
+                val message = when (e) {
+                    is ConnectTimeoutException -> "Connection timed out. Please try again."
+                    is SocketTimeoutException -> "Server took too long to respond."
+                    is UnknownHostException, is UnresolvedAddressException -> "Could not connect. Check your internet connection."
+                    is IOException -> "Network error. Please check your connection."
+                    else -> "Failed to load playlists"
+                }
+                _uiState.update { it.copy(playlistError = message) }
             } finally {
                 _uiState.update { it.copy(showPlaylistLoading = false) }
             }
         }
     }
 
-    private fun loadTopArtists() {
+    fun loadTopArtists() {
         viewModelScope.launch {
-            _uiState.update { it.copy(showArtistsLoading = true) }
+            _uiState.update { it.copy(showArtistsLoading = true, artistError = null) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getTopArtists()
@@ -70,15 +86,23 @@ class HomeViewModel(
                 _uiState.update { it.copy(artists = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
+                val message = when (e) {
+                    is ConnectTimeoutException -> "Connection timed out. Please try again."
+                    is SocketTimeoutException -> "Server took too long to respond."
+                    is UnknownHostException, is UnresolvedAddressException -> "Could not connect. Check your internet connection."
+                    is IOException -> "Network error. Please check your connection."
+                    else -> "Failed to load artists"
+                }
+                _uiState.update { it.copy(artistError = message) }
             } finally {
                 _uiState.update { it.copy(showArtistsLoading = false) }
             }
         }
     }
 
-    private fun loadTopAlbums() {
+    fun loadTopAlbums() {
         viewModelScope.launch {
-            _uiState.update { it.copy(showAlbumsLoading = true) }
+            _uiState.update { it.copy(showAlbumsLoading = true, albumError = null) }
             try {
                 val allowExplicit = settingsRepository.allowExplicit.first()
                 val result = withContext(Dispatchers.IO) {
@@ -95,6 +119,14 @@ class HomeViewModel(
                 _uiState.update { it.copy(albums = albums) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
+                val message = when (e) {
+                    is ConnectTimeoutException -> "Connection timed out. Please try again."
+                    is SocketTimeoutException -> "Server took too long to respond."
+                    is UnknownHostException, is UnresolvedAddressException -> "Could not connect. Check your internet connection."
+                    is IOException -> "Network error. Please check your connection."
+                    else -> "Failed to load albums"
+                }
+                _uiState.update { it.copy(albumError = message) }
             } finally {
                 _uiState.update { it.copy(showAlbumsLoading = false) }
             }

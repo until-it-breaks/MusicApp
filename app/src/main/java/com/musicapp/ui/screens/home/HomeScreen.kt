@@ -14,13 +14,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -29,6 +33,7 @@ import com.musicapp.ui.MusicAppRoute
 import org.koin.androidx.compose.koinViewModel
 import com.musicapp.ui.composables.ArtistCard
 import com.musicapp.ui.composables.CenteredCircularProgressIndicator
+import com.musicapp.ui.composables.ErrorSection
 import com.musicapp.ui.composables.MainTopBar
 import com.musicapp.ui.composables.PlayListCard
 
@@ -67,6 +72,15 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                         CenteredCircularProgressIndicator()
                     }
                 }
+                item {
+                    val error = uiState.playlistError
+                    if (error != null) {
+                        ErrorSection(
+                            message = error,
+                            onRetry = viewModel::loadTopPlaylist
+                        )
+                    }
+                }
                 items(uiState.playlists.chunked(2)) { rowItems ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -96,6 +110,15 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                     }
                 }
                 item {
+                    val error = uiState.artistError
+                    if (error != null) {
+                        ErrorSection(
+                            message = error,
+                            onRetry = viewModel::loadTopArtists
+                        )
+                    }
+                }
+                item {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(uiState.artists) { artist ->
                             ArtistCard(
@@ -115,6 +138,15 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                 item {
                     if (uiState.showAlbumsLoading) {
                         CenteredCircularProgressIndicator()
+                    }
+                }
+                item {
+                    val error = uiState.albumError
+                    if (error != null) {
+                        ErrorSection(
+                            message = error,
+                            onRetry = viewModel::loadTopAlbums
+                        )
                     }
                 }
                 items(uiState.albums.chunked(2)) { rowItems ->
