@@ -7,11 +7,11 @@ import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
 import com.musicapp.data.repositories.LikedTracksRepository
 import com.musicapp.data.repositories.SettingsRepository
+import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
-import com.musicapp.ui.viewmodels.BasePlaybackViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

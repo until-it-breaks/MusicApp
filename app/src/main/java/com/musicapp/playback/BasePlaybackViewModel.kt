@@ -1,9 +1,6 @@
-// app/src/main/java/com/musicapp/ui/viewmodels/BasePlaybackViewModel.kt (or a similar path)
-package com.musicapp.ui.viewmodels
+package com.musicapp.playback
 
 import androidx.lifecycle.ViewModel
-import com.musicapp.playback.MediaPlayerManager
-import com.musicapp.playback.PlaybackUiState
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.flow.StateFlow
 
@@ -23,6 +20,9 @@ abstract class BasePlaybackViewModel(
         mediaPlayerManager.addTrackToQueue(track)
     }
 
+    fun setPlaybackQueue(queue: List<TrackModel>, index = 0) {
+
+    }
 
     fun clearPlaybackQueue() {
         mediaPlayerManager.clearQueue()

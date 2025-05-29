@@ -1,15 +1,13 @@
 package com.musicapp.ui.screens.playlist
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.LikedTracksRepository
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.LikedTracksPlaylistModel
-import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
-import com.musicapp.ui.viewmodels.BasePlaybackViewModel
+import com.musicapp.playback.BasePlaybackViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
