@@ -19,7 +19,6 @@ import com.musicapp.ui.screens.artist.ArtistViewModel
 import com.musicapp.ui.screens.home.HomeViewModel
 import com.musicapp.ui.screens.library.LibraryViewModel
 import com.musicapp.ui.screens.login.LoginViewModel
-import com.musicapp.ui.screens.main.MainViewModel
 import com.musicapp.ui.screens.password.PasswordRecoveryViewModel
 import com.musicapp.ui.screens.playlist.LikedTracksViewModel
 import com.musicapp.ui.screens.playlist.PersonalPlaylistViewModel
@@ -152,5 +151,4 @@ val appModule = module {
 
     viewModel { SettingsViewModel(get(), get(), get()) }
 
-    viewModel { MainViewModel(get()) }
 }

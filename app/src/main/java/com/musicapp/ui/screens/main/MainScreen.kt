@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.musicapp.R
+import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.ui.HomeNavGraph
 import com.musicapp.ui.LibraryNavGraph
 import com.musicapp.ui.MusicAppRoute
@@ -62,13 +63,12 @@ fun MainScreen(navController: NavController) {
     val searchNavController = rememberNavController()
     val libraryNavController = rememberNavController()
 
-    // mainViewModel for the mediaPlayer
-    val mainViewModel: MainViewModel = koinViewModel()
-    val playbackUiState by mainViewModel.playbackUiState.collectAsState()
+    // view model for the music player
+    val viewModel: BasePlaybackViewModel = koinViewModel()
+    val playbackUiState by viewModel.playbackUiState.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Music player bar goes --> HERE <--
             Row(
                 modifier = Modifier.weight(1f)
             ) {
@@ -81,8 +81,8 @@ fun MainScreen(navController: NavController) {
 
             MusicBar(
                 playbackState = playbackUiState,
-                onTogglePlayback = { track -> mainViewModel.togglePlayback(track) },
-                onAddToList = { track -> mainViewModel.addTrackToPlaylist(track) }, // it does nothing for now
+                onTogglePlayback = viewModel::togglePlayback,
+                onAddToList = { /* TODO */ }, // it does nothing for now
                 onBarClick = {
                     // TODO: Implement navigation to a full "Now Playing" screen if desired
                     // For now, log the click

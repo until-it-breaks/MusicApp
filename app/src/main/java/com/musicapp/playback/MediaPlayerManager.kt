@@ -104,7 +104,7 @@ class MediaPlayerManager(
                     it.copy(currentQueueIndex = nextIndex)
                 }
                 playInternal(nextTrack)
-            } else if (nextIndex >= currentState.playbackQueue.size){
+            } else if (nextIndex >= currentState.playbackQueue.size && currentState.playbackQueue.size != 1){
                 Log.d("MediaPlayerManager", "End of queue reached.")
                 // No more tracks in queue, reset state
                 stop()
