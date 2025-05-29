@@ -173,7 +173,7 @@ fun TrackCard(
             modifier = Modifier.padding(8.dp)
         ) {
             if (showPicture) {
-                LoadableImage(track.mediumPictureUri, "Track picture", modifier = Modifier.size(48.dp))
+                LoadableImage(track.mediumPictureUri, "Track picture", modifier = Modifier.size(48.dp), cornerRadius = 4.dp)
             }
             Column(
                 modifier = Modifier.weight(1f)

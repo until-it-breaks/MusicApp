@@ -21,5 +21,8 @@ data class DeezerTrackSummary(
     @SerialName("preview")
     val preview: String,
     @SerialName("artist")
-    val artist: DeezerArtist
+    val artist: DeezerArtist,
+    @SerialName("album")
+    val album: DeezerTrackAlbum
+
 )

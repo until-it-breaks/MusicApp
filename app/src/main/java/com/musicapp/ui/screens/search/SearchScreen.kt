@@ -122,6 +122,7 @@ fun SearchScreen(
 
                             TrackCard(
                                 track = track,
+                                showPicture = true,
                                 onTrackClick = searchViewModel::togglePlayback,
                                 onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                                 extraMenu = {
