@@ -12,6 +12,7 @@ import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.data.repositories.TracksRepository
 import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.data.repositories.UserRepository
+import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.screens.addtoplaylist.AddToPlaylistViewModel
 import com.musicapp.ui.screens.album.AlbumViewModel
@@ -151,4 +152,5 @@ val appModule = module {
 
     viewModel { SettingsViewModel(get(), get(), get()) }
 
+    viewModel { BasePlaybackViewModel(get()) }
 }

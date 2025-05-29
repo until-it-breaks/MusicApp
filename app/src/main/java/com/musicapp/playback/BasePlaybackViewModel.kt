@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param mediaPlayerManager The MediaPlayerManager instance, in this case injected via Koin.
  */
-abstract class BasePlaybackViewModel(
+open class BasePlaybackViewModel(
     protected val mediaPlayerManager: MediaPlayerManager
 ) : ViewModel() {
 
