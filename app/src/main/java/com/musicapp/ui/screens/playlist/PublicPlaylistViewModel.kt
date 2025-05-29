@@ -1,7 +1,6 @@
 package com.musicapp.ui.screens.playlist
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.remote.deezer.DeezerDataSource
@@ -35,7 +34,8 @@ class PublicPlaylistViewModel(
     private val deezerDataSource: DeezerDataSource,
     private val auth: FirebaseAuth,
     private val likedTracksRepository: LikedTracksRepository,
-): ViewModel() {
+    mediaPlayerManager: MediaPlayerManager
+) : BasePlaybackViewModel(mediaPlayerManager) {
     private val _uiState = MutableStateFlow(PublicPlaylistState())
     val uiState: StateFlow<PublicPlaylistState> = _uiState.asStateFlow()
 
@@ -59,10 +59,11 @@ class PublicPlaylistViewModel(
 
     private fun loadTracks() {
         viewModelScope.launch {
-            val tracks = uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load only 20 tracks.
+            val tracks =
+                uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load only 20 tracks.
             _uiState.update { it.copy(showTracksLoading = true) }
             val allowExplicit = settingsRepository.allowExplicit.first()
-            for(track in tracks) {
+            for (track in tracks) {
                 try {
                     val detailedTrack: DeezerTrackDetailed = withContext(Dispatchers.IO) {
                         deezerDataSource.getTrackDetails(track.id)
