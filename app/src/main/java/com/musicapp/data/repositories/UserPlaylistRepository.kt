@@ -1,5 +1,7 @@
 package com.musicapp.data.repositories
 
+import android.content.Context
+import androidx.core.net.toUri
 import androidx.room.withTransaction
 import com.musicapp.data.database.MusicAppDatabase
 import com.musicapp.data.database.Playlist
@@ -8,9 +10,13 @@ import com.musicapp.data.database.Track
 import com.musicapp.data.database.UserPlaylistDAO
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.UserPlaylistModel
+import com.musicapp.util.combineBitmapsFromUris
+import com.musicapp.util.deleteImageFromInternalStorage
+import com.musicapp.util.saveBitmapToInternalStorage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -31,7 +37,8 @@ data class PlaylistWithTracksAndArtists(
 class UserPlaylistRepository(
     private val db: MusicAppDatabase,
     private val playlistDAO: UserPlaylistDAO,
-    private val trackRepository: TracksRepository
+    private val trackRepository: TracksRepository,
+    private val context: Context
 ) {
     fun getPlaylists(userId: String): Flow<List<Playlist>> {
         return playlistDAO.getPlaylists(userId)
@@ -65,7 +72,7 @@ class UserPlaylistRepository(
                 flowOf(null)
             } else {
                 val trackWithArtistFlows = tracks.map { track ->
-                    trackRepository.getTrackWithArtists(track.trackId) // Flow<TrackWithArtists>
+                    trackRepository.getTrackWithArtists(track.trackId)
                 }
 
                 if (trackWithArtistFlows.isEmpty()) {
@@ -98,6 +105,7 @@ class UserPlaylistRepository(
             playlistId = playlist.id,
             ownerId = playlist.ownerId,
             name = playlist.name,
+            pictureUri = null,
             lastEditTime = System.currentTimeMillis()
         )
         playlistDAO.insertPlaylist(playlist)
@@ -107,22 +115,39 @@ class UserPlaylistRepository(
         db.withTransaction {
             trackRepository.upsertTrack(track)
             playlistDAO.addTrackToPlaylist(PlaylistTrackCrossRef(playlistId, track.id, System.currentTimeMillis()))
+            updatePlaylistPicture(playlistId)
             playlistDAO.updateEditTime(playlistId)
         }
     }
 
     suspend fun removeTrackFromPlaylist(playlistId: String, trackId: Long) {
         playlistDAO.deleteTrackFromPlaylist(playlistId, trackId)
+        updatePlaylistPicture(playlistId)
+        playlistDAO.updateEditTime(playlistId)
     }
 
     suspend fun clearPlaylist(playlistId: String) {
         db.withTransaction {
             playlistDAO.clearPlaylist(playlistId)
+            updatePlaylistPicture(playlistId)
             playlistDAO.updateEditTime(playlistId)
         }
     }
 
     suspend fun deletePlaylist(playlistId: String) {
         playlistDAO.deletePlaylist(playlistId)
+    }
+
+    private suspend fun updatePlaylistPicture(playlistId: String) {
+        val tracks = playlistDAO.getTracksOfPlaylist(playlistId).first()
+        val uris = tracks.take(4).mapNotNull { it.mediumPictureUri?.toUri() }
+        val combined = combineBitmapsFromUris(context, uris)
+        val playlist = playlistDAO.getPlaylist(playlistId).first()
+        val oldUri = playlist?.pictureUri
+        if (combined != null) {
+            oldUri?.let { deleteImageFromInternalStorage(context, it) }
+            val uri = saveBitmapToInternalStorage(context, combined, playlistId)
+            playlistDAO.updatePlaylistPicture(playlistId, uri.toString())
+        }
     }
 }

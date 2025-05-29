@@ -108,6 +108,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
                 items(playlists.value) { playlist ->
                     UserPlaylistCard(
                         title = playlist.name,
+                        imageUri = playlist.playlistPictureUri,
                         onClick = { subNavController.navigate(MusicAppRoute.UserPlaylist(playlist.id)) }
                     )
                 }

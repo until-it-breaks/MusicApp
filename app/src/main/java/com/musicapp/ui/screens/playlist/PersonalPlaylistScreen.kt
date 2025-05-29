@@ -10,10 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -31,6 +28,7 @@ import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.EditPlaylistNameModal
+import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.SavedTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
@@ -83,10 +81,10 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Image,
+                    LoadableImage(
+                        imageUri = playlist.value?.playlistPictureUri,
                         contentDescription = null,
-                        modifier = Modifier.size(128.dp)
+                        modifier = Modifier.size(250.dp)
                     )
                     val timeInMillis = playlist.value?.lastEditTime
                     timeInMillis?.let {

@@ -15,9 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Explicit
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -93,28 +92,27 @@ fun UserPlaylistCard(
             when(playlistType) {
                 PlaylistType.DEFAULT -> LoadableImage(
                     imageUri = imageUri,
-                    contentDescription = "Playlist picture",
-                    modifier = Modifier.size(72.dp).padding(8.dp)
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp)
                 )
                 PlaylistType.LIKED -> Icon(
-                    imageVector = Icons.Outlined.Favorite,
-                    contentDescription = "Liked tracks",
-                    modifier = Modifier.size(72.dp).padding(8.dp)
+                    imageVector = Icons.Outlined.Star,
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp)
                 )
                 PlaylistType.HISTORY -> Icon(
                     imageVector = Icons.Outlined.History,
-                    contentDescription = "Track history",
-                    modifier = Modifier.size(72.dp).padding(8.dp)
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp)
                 )
             }
-
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
             )
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
@@ -224,6 +222,8 @@ fun TrackCard(
 @Composable
 fun PlaylistCardToAddTo(
     title: String,
+    imageUri: Uri = Uri.EMPTY,
+    playlistType: PlaylistType = PlaylistType.DEFAULT,
     onClick: () -> Unit,
     enabled: Boolean,
     showCheck: Boolean
@@ -236,14 +236,23 @@ fun PlaylistCardToAddTo(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Image,
-                contentDescription = "Playlist Picture",
-                modifier = Modifier.size(72.dp)
-            )
+            if (playlistType == PlaylistType.LIKED) {
+                Icon(
+                    imageVector = Icons.Outlined.Star,
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp)
+                )
+            } else {
+                LoadableImage(
+                    imageUri = imageUri,
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp)
+                )
+            }
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(horizontal = 8.dp)
             )
             Spacer(modifier = Modifier.weight(1f))
             if (showCheck || !enabled) {
