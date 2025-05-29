@@ -20,8 +20,8 @@ abstract class BasePlaybackViewModel(
         mediaPlayerManager.addTrackToQueue(track)
     }
 
-    fun setPlaybackQueue(queue: List<TrackModel>, index = 0) {
-
+    fun setPlaybackQueue(queue: List<TrackModel>, index: Int = 0) {
+        mediaPlayerManager.setPlaybackQueue(queue, index)
     }
 
     fun clearPlaybackQueue() {

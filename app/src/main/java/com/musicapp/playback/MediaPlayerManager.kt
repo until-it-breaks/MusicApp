@@ -20,11 +20,9 @@ data class PlaybackUiState(
     val playbackError: String? = null,
     val playbackQueue: List<TrackModel> = emptyList(),
     val currentQueueIndex: Int = -1
-    // Add other properties like currentPosition, duration, mediaTitle, mediaArtist if needed
+    // currentPosition, duration, mediaTitle, mediaArtist
 )
 
-// You'll likely need an application context for MediaPlayer if you set data source from file
-// For URL, it might not be strictly necessary, but good practice for future expansion.
 // @Suppress("ForbiddenEntryPoint") // Suppress warning for Application context usage if necessary
 // import android.content.Context
 
@@ -271,6 +269,29 @@ class MediaPlayerManager(
             }
         }
     }
+
+    fun setPlaybackQueue(newQueue: List<TrackModel>, startIndex: Int) {
+        scope.launch {
+            Log.d("MediaPlayerManager", "Setting new playback queue. Size: ${newQueue.size}, Start Index: $startIndex")
+            stop()
+
+            _playbackState.update {
+                it.copy(
+                    playbackQueue = newQueue,
+                    currentQueueIndex = startIndex
+                )
+            }
+
+            if (newQueue.isNotEmpty() && startIndex >= 0 && startIndex < newQueue.size) {
+                val trackToPlay = newQueue[startIndex]
+                playInternal(trackToPlay)
+            } else {
+                Log.e("MediaPlayerManager", "Invalid queue or start index provided. Queue empty or index out of bounds.")
+                stop()
+            }
+        }
+    }
+
 
     /**
      * Clears the entire playback queue and stops current playback.
