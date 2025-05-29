@@ -1,5 +1,7 @@
 package com.musicapp.playback
 
+import android.content.Context
+import android.content.Intent
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.runtime.currentRecomposeScope
@@ -20,16 +22,14 @@ data class PlaybackUiState(
     val playbackError: String? = null,
     val playbackQueue: List<TrackModel> = emptyList(),
     val currentQueueIndex: Int = -1
-    // Add other properties like currentPosition, duration, mediaTitle, mediaArtist if needed
+    // currentPosition, duration, mediaTitle, mediaArtist
 )
 
-// You'll likely need an application context for MediaPlayer if you set data source from file
-// For URL, it might not be strictly necessary, but good practice for future expansion.
 // @Suppress("ForbiddenEntryPoint") // Suppress warning for Application context usage if necessary
 // import android.content.Context
 
 class MediaPlayerManager(
-    // private val appContext: Context // If you need context for MediaPlayer initialization later
+    private val appContext: Context
 ) {
     private var mediaPlayer: MediaPlayer? = null
 
@@ -106,7 +106,7 @@ class MediaPlayerManager(
                     it.copy(currentQueueIndex = nextIndex)
                 }
                 playInternal(nextTrack)
-            } else if (nextIndex >= currentState.playbackQueue.size){
+            } else if (nextIndex >= currentState.playbackQueue.size && currentState.playbackQueue.size != 1){
                 Log.d("MediaPlayerManager", "End of queue reached.")
                 // No more tracks in queue, reset state
                 stop()
@@ -165,10 +165,15 @@ class MediaPlayerManager(
                 playbackError = null
             )
         }
+
+        val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
+        appContext.startService(serviceIntent)
+        Log.d("MediaPlayerManager", "Started MediaPlaybackService for track: ${track.title}")
+
         mediaPlayer?.apply {
             try {
-                reset() // Reset to idle state
-                setDataSource(track.previewUri.toString()) // Set the URL
+                reset()
+                setDataSource(track.previewUri.toString())
                 prepareAsync() // Prepare in background
             } catch (e: Exception) {
                 Log.e(
@@ -211,7 +216,7 @@ class MediaPlayerManager(
         }
     }
 
-    private fun pause() {
+    fun pause() {
         mediaPlayer?.apply {
             if (isPlaying) {
                 pause()
@@ -220,11 +225,14 @@ class MediaPlayerManager(
         }
     }
 
-    private fun resume() {
+    fun resume() {
         mediaPlayer?.apply {
             if (!isPlaying) {
                 start()
                 _playbackState.update { it.copy(isPlaying = true) }
+                val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
+                appContext.startService(serviceIntent)
+                Log.d("MediaPlayerManager", "Resumed playback and ensured MediaPlaybackService is running.")
             }
         }
     }
@@ -245,6 +253,9 @@ class MediaPlayerManager(
                     playbackQueue = emptyList()
                 )
             }
+            val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
+            appContext.stopService(serviceIntent)
+            Log.d("MediaPlayerManager", "Stopped playback and MediaPlaybackService.")
         }
     }
 
@@ -271,6 +282,29 @@ class MediaPlayerManager(
             }
         }
     }
+
+    fun setPlaybackQueue(newQueue: List<TrackModel>, startIndex: Int) {
+        scope.launch {
+            Log.d("MediaPlayerManager", "Setting new playback queue. Size: ${newQueue.size}, Start Index: $startIndex")
+            stop()
+
+            _playbackState.update {
+                it.copy(
+                    playbackQueue = newQueue,
+                    currentQueueIndex = startIndex
+                )
+            }
+
+            if (newQueue.isNotEmpty() && startIndex >= 0 && startIndex < newQueue.size) {
+                val trackToPlay = newQueue[startIndex]
+                playInternal(trackToPlay)
+            } else {
+                Log.e("MediaPlayerManager", "Invalid queue or start index provided. Queue empty or index out of bounds.")
+                stop()
+            }
+        }
+    }
+
 
     /**
      * Clears the entire playback queue and stops current playback.

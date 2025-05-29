@@ -1,6 +1,5 @@
 package com.musicapp.ui.screens.search
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.musicapp.data.remote.deezer.DeezerDataSource
@@ -20,7 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 import android.util.Log
-import com.musicapp.ui.viewmodels.BasePlaybackViewModel
+import com.musicapp.playback.BasePlaybackViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 

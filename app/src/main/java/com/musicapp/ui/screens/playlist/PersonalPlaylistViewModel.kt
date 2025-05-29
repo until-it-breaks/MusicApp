@@ -1,14 +1,12 @@
 package com.musicapp.ui.screens.playlist
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.playback.MediaPlayerManager
-import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.UserPlaylistModel
 import com.musicapp.ui.models.toModel
-import com.musicapp.ui.viewmodels.BasePlaybackViewModel
+import com.musicapp.playback.BasePlaybackViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

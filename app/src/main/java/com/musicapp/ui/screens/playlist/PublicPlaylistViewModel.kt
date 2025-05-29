@@ -7,11 +7,11 @@ import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
 import com.musicapp.data.repositories.LikedTracksRepository
 import com.musicapp.data.repositories.SettingsRepository
+import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
-import com.musicapp.ui.viewmodels.BasePlaybackViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -62,11 +62,18 @@ class PublicPlaylistViewModel(
 
     private fun loadTracks() {
         viewModelScope.launch {
-            val tracks = uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load only 20 tracks.
-            _uiState.update { it.copy(showTracksLoading = true, trackError = null, tracks = emptyList()) }
+            val tracks =
+                uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load only 20 tracks.
+            _uiState.update {
+                it.copy(
+                    showTracksLoading = true,
+                    trackError = null,
+                    tracks = emptyList()
+                )
+            }
             val allowExplicit = settingsRepository.allowExplicit.first()
-            val failedTracks = mutableListOf<Long>()
 
+            val failedTracks = mutableListOf<Long>()
             for (track in tracks) {
                 try {
                     val detailedTrack: DeezerTrackDetailed = withContext(Dispatchers.IO) {

@@ -12,6 +12,7 @@ import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.data.repositories.TracksRepository
 import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.data.repositories.UserRepository
+import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.screens.addtoplaylist.AddToPlaylistViewModel
 import com.musicapp.ui.screens.album.AlbumViewModel
@@ -19,7 +20,6 @@ import com.musicapp.ui.screens.artist.ArtistViewModel
 import com.musicapp.ui.screens.home.HomeViewModel
 import com.musicapp.ui.screens.library.LibraryViewModel
 import com.musicapp.ui.screens.login.LoginViewModel
-import com.musicapp.ui.screens.main.MainViewModel
 import com.musicapp.ui.screens.password.PasswordRecoveryViewModel
 import com.musicapp.ui.screens.playlist.LikedTracksViewModel
 import com.musicapp.ui.screens.playlist.PersonalPlaylistViewModel
@@ -29,11 +29,11 @@ import com.musicapp.ui.screens.profile.ProfileScreenViewModel
 import com.musicapp.ui.screens.search.SearchViewModel
 import com.musicapp.ui.screens.settings.SettingsViewModel
 import com.musicapp.ui.screens.signup.SignUpViewModel
-import com.musicapp.ui.viewmodels.BasePlaybackViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -116,9 +116,7 @@ val appModule = module {
     single { DeezerDataSource(get()) }
 
     // Media player
-    single { MediaPlayerManager() }
-    // ViewModels
-
+    single { MediaPlayerManager(androidApplication()) }
 
     // ViewModels
     viewModel { SignUpViewModel(get(), get()) }
@@ -153,5 +151,5 @@ val appModule = module {
 
     viewModel { SettingsViewModel(get(), get(), get()) }
 
-    viewModel { MainViewModel(get()) }
+    viewModel { BasePlaybackViewModel(get()) }
 }

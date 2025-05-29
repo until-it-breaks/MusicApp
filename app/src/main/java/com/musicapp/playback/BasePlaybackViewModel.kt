@@ -1,9 +1,6 @@
-// app/src/main/java/com/musicapp/ui/viewmodels/BasePlaybackViewModel.kt (or a similar path)
-package com.musicapp.ui.viewmodels
+package com.musicapp.playback
 
 import androidx.lifecycle.ViewModel
-import com.musicapp.playback.MediaPlayerManager
-import com.musicapp.playback.PlaybackUiState
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.flow.StateFlow
 
@@ -13,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param mediaPlayerManager The MediaPlayerManager instance, in this case injected via Koin.
  */
-abstract class BasePlaybackViewModel(
+open class BasePlaybackViewModel(
     protected val mediaPlayerManager: MediaPlayerManager
 ) : ViewModel() {
 
@@ -23,6 +20,9 @@ abstract class BasePlaybackViewModel(
         mediaPlayerManager.addTrackToQueue(track)
     }
 
+    fun setPlaybackQueue(queue: List<TrackModel>, index: Int = 0) {
+        mediaPlayerManager.setPlaybackQueue(queue, index)
+    }
 
     fun clearPlaybackQueue() {
         mediaPlayerManager.clearQueue()

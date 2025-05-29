@@ -43,6 +43,7 @@ fun MusicBar(
 ) {
 
     val isVisible = playbackState.currentTrack != null
+    val track = playbackState.currentTrack
 
     if (isVisible) {
         Row(
@@ -55,6 +56,8 @@ fun MusicBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            
+            LoadableImage(track.mediumPictureUri, "Track picture", modifier = Modifier.size(48.dp), cornerRadius = 4.dp)
 
             // Left: Song Title and Artist
             Column(

@@ -76,4 +76,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     // Datastore preferences
     implementation(libs.androidx.datastore.preferences)
+
+    implementation(libs.androidx.media)
+    implementation(libs.coil)
+    implementation(libs.koin.android)
 }
