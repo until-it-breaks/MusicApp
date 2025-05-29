@@ -4,7 +4,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -19,7 +18,6 @@ import androidx.core.app.NotificationCompat
 import androidx.media.session.MediaButtonReceiver
 import coil.ImageLoader
 import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
 import com.musicapp.R
 import com.musicapp.MainActivity
 import com.musicapp.ui.models.TrackModel
@@ -46,16 +44,12 @@ class MediaPlaybackService : Service() {
         const val CHANNEL_ID = "music_playback_channel"
         const val CHANNEL_NAME = "Music Playback"
 
-        // Actions for MediaButtonReceiver
-        const val ACTION_PLAY_PAUSE = "com.musicapp.ACTION_PLAY_PAUSE"
-        const val ACTION_NEXT = "com.musicapp.ACTION_NEXT"
-        const val ACTION_PREVIOUS = "com.musicapp.ACTION_PREVIOUS"
     }
 
     override fun onCreate() {
         super.onCreate()
 
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannel()
 
         // Create a MediaSession
@@ -128,10 +122,7 @@ class MediaPlaybackService : Service() {
         Log.d("MediaPlaybackService", "MediaPlaybackService destroyed.")
         serviceJob.cancel() // Cancel all coroutines
         mediaSession?.release() // Release MediaSession resources
-        stopForeground(STOP_FOREGROUND_REMOVE) // Ensure notification is removed
-        // You might want to also call mediaPlayerManager.release() here if
-        // MediaPlayerManager's lifecycle is tied to this service.
-        // If MediaPlayerManager is an application-scoped singleton, then it's released by Koin later.
+        stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
     private fun createNotificationChannel() {
@@ -139,7 +130,7 @@ class MediaPlaybackService : Service() {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_LOW // Low importance so it doesn't interrupt, but is persistent
+                NotificationManager.IMPORTANCE_LOW
             ).apply {
                 description = "Notification for music playback control"
             }
@@ -190,7 +181,7 @@ class MediaPlaybackService : Service() {
             PlaybackStateCompat.Builder()
                 .setState(
                     playbackState,
-                    0L, // Position (update if you track current position)
+                    0L, // Position, update if need to track current position
                     1.0f // Playback speed
                 )
                 .setActions(actions)
