@@ -23,7 +23,7 @@ class UserRepository(
 
     suspend fun updateProfilePicture(profilePictureUri: Uri, userId: String) {
         val user = usersDAO.getUser(userId)
-        val currentProfilePicture = user.first().profilePictureUri // TODO maybe delete the current picture saved in memory
+        user.first().profilePictureUri // TODO maybe delete the current picture saved in memory
         usersDAO.updateProfilePicture(profilePictureUri.toString(), userId)
     }
 
