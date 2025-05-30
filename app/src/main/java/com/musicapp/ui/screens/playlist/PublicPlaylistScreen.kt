@@ -24,11 +24,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.CenteredCircularProgressIndicator
+import com.musicapp.ui.composables.CenteredLinearProgressIndicator
 import com.musicapp.ui.composables.ErrorSection
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
+import com.musicapp.ui.theme.AppPadding
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,8 +52,20 @@ fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .padding(contentPadding)
-                .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
+                .padding(AppPadding.ScaffoldContent)
         ) {
+            item {
+                if (uiState.showPlaylistDetailsLoading) {
+                    CenteredCircularProgressIndicator()
+                }
+                uiState.playlistErrorStringId?.let {
+                    ErrorSection(
+                        title = stringResource(R.string.failed_to_load_playlist),
+                        message = stringResource(it),
+                        onRetry = { viewModel.loadPlaylist(playlistId) }
+                    )
+                }
+            }
             item {
                 uiState.playlistDetails?.let { playlist ->
                     Column(
@@ -85,11 +100,14 @@ fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
                 }
             }
             item {
-                val trackError = uiState.trackError
-                if (trackError != null) {
+                if (uiState.showTracksLoading) {
+                    CenteredLinearProgressIndicator()
+                }
+                uiState.tracksErrorStringId?.let {
                     ErrorSection(
-                        message = trackError,
-                        onRetry = {}
+                        title = stringResource(R.string.failed_to_load_tracks),
+                        message = stringResource(it) + if (uiState.failedTracksCount > 0) " (${uiState.failedTracksCount} ${stringResource(R.string.tracks)})" else "",
+                        onRetry = { viewModel.loadTracks() }
                     )
                 }
             }
