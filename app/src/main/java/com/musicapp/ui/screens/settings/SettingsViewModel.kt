@@ -37,17 +37,16 @@ class SettingsViewModel(
             initialValue = null
         )
 
-    val allowExplicit: StateFlow<Boolean> =
-        settingsRepository.allowExplicit.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = true
-        )
+    val allowExplicit: StateFlow<Boolean> = settingsRepository.allowExplicit.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = true
+    )
 
     val theme: StateFlow<Theme> = settingsRepository.theme.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(),
-        Theme.Default
+         scope = viewModelScope,
+         started = SharingStarted.WhileSubscribed(),
+         initialValue = Theme.Default
     )
 
     fun setAllowExplicit(enabled: Boolean) {
