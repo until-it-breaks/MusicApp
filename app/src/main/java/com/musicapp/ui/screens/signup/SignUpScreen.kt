@@ -69,6 +69,25 @@ fun SignUpScreen(navController: NavController) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
+    uiState.errorMessageId?.let {
+        LaunchedEffect(it) {
+            val message = context.getString(it)
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Long,
+                withDismissAction = true
+            )
+        }
+    }
+
+    LaunchedEffect(uiState.navigateToMain) {
+        if (uiState.navigateToMain) {
+            navController.navigate(MusicAppRoute.Main) {
+                popUpTo(navController.graph.id) { inclusive = true }
+            }
+        }
+    }
+
     Scaffold(
         topBar = { TopBarWithBackButton(navController) },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -189,24 +208,7 @@ fun SignUpScreen(navController: NavController) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
 
-            uiState.errorMessageId?.let {
-                LaunchedEffect(it) {
-                    val message = context.getString(it)
-                    snackbarHostState.showSnackbar(
-                        message = message,
-                        duration = SnackbarDuration.Long,
-                        withDismissAction = true
-                    )
-                }
-            }
-
-            LaunchedEffect(uiState.navigateToMain) {
-                if (uiState.navigateToMain) {
-                    navController.navigate(MusicAppRoute.Main) {
-                        popUpTo(navController.graph.id) { inclusive = true }
-                    }
-                }
-            }
+            Spacer(modifier = Modifier.height(48.dp))
         }
     }
 }
