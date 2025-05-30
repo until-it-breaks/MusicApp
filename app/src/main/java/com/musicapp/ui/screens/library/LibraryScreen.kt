@@ -36,6 +36,7 @@ import com.musicapp.ui.composables.MainTopBar
 import com.musicapp.ui.composables.PlaylistCreationModal
 import com.musicapp.ui.composables.PlaylistType
 import com.musicapp.ui.composables.UserPlaylistCard
+import com.musicapp.ui.theme.AppPadding
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,7 +70,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .padding(contentPadding)
-                    .padding(12.dp)
+                    .padding(AppPadding.ScaffoldContent)
             ) {
                 item {
                     UserPlaylistCard(
@@ -123,7 +124,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
             AuthErrorMessage(
                 modifier = Modifier
                     .padding(contentPadding)
-                    .padding(12.dp)
+                    .padding(AppPadding.ScaffoldContent)
                     .fillMaxWidth(),
                 onClick = {
                     viewModel.logout()
