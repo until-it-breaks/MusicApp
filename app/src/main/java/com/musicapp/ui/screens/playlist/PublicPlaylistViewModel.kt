@@ -99,7 +99,7 @@ class PublicPlaylistViewModel(
             _uiState.update {
                 it.copy(
                     showTracksLoading = false,
-                    tracksErrorStringId = if (failedCount > 0) R.string.partial_track_load_error else null,
+                    tracksErrorStringId = if (failedCount > 0) R.string.track_load_error else null,
                     failedTracksCount = failedCount
                 )
             }
