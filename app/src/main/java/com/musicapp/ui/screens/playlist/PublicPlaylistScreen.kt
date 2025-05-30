@@ -36,6 +36,7 @@ import org.koin.androidx.compose.koinViewModel
 fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
     val viewModel = koinViewModel<PublicPlaylistViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(playlistId) {
         viewModel.loadPlaylist(playlistId)
@@ -97,6 +98,7 @@ fun PublicPlaylistScreen(navController: NavController, playlistId: Long) {
                 TrackCard(
                     track = track,
                     showPicture = true,
+                    playbackUiState = playbackUiState,
                     onTrackClick = { viewModel.setPlaybackQueue(uiState.tracks, index) },
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {

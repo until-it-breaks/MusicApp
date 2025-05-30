@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
@@ -31,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
@@ -44,8 +43,9 @@ fun SearchScreen(
     mainNavController: NavController,
     subNavController: NavController,
 ) {
-    val searchViewModel: SearchViewModel = koinViewModel()
-    val uiState by searchViewModel.uiState.collectAsState()
+    val viewModel: SearchViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+    val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
 
 
     Scaffold(
@@ -62,12 +62,12 @@ fun SearchScreen(
             // Search TextField
             OutlinedTextField(
                 value = uiState.searchText,
-                onValueChange = searchViewModel::onSearchTextChange,
+                onValueChange = viewModel::onSearchTextChange,
                 placeholder = { Text(stringResource(R.string.what_to_play)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 trailingIcon = {
-                    IconButton(onClick = searchViewModel::performSearch) {
+                    IconButton(onClick = viewModel::performSearch) {
                         Icon(
                             Icons.Outlined.Search,
                             stringResource(R.string.search_description)
@@ -109,7 +109,7 @@ fun SearchScreen(
                         itemsIndexed(uiState.searchResults.tracks) { index, track ->
 
                             if ((index >= uiState.searchResults.tracks.size - 1) && uiState.searchResults.hasNext) {
-                                searchViewModel.loadMoreTracks()
+                                viewModel.loadMoreTracks()
                             }
 // si bugga nice!
 //                            if (uiState.isLoadingMore){
@@ -123,13 +123,14 @@ fun SearchScreen(
                             TrackCard(
                                 track = track,
                                 showPicture = true,
-                                onTrackClick = searchViewModel::togglePlayback,
+                                playbackUiState = playbackUiState,
+                                onTrackClick = viewModel::togglePlayback,
                                 onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                                 extraMenu = {
                                     PublicTrackDropDownMenu(
                                         trackModel = track,
-                                        onLiked = searchViewModel::addToLiked, // TODO
-                                        onAddToQueue = searchViewModel::addTrackToQueue
+                                        onLiked = viewModel::addToLiked, // TODO
+                                        onAddToQueue = viewModel::addTrackToQueue
                                     )
                                 }
                             )

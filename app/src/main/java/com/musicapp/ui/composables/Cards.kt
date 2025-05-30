@@ -26,12 +26,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.musicapp.playback.PlaybackUiState
 import com.musicapp.ui.models.TrackModel
+import com.musicapp.ui.theme.playingColor
 
 enum class PlaylistType {
     DEFAULT,
@@ -160,6 +163,7 @@ fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: Uri? = nu
 fun TrackCard(
     track: TrackModel,
     showPicture: Boolean = false,
+    playbackUiState: PlaybackUiState,
     onTrackClick: (TrackModel) -> Unit,
     onArtistClick: (Long) -> Unit,
     extraMenu: @Composable () -> Unit
@@ -172,6 +176,7 @@ fun TrackCard(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.padding(8.dp)
         ) {
+            val isPlaying = playbackUiState.currentPlayingTrackId == track.id && playbackUiState.isPlaying
             if (showPicture) {
                 LoadableImage(track.mediumPictureUri, "Track picture", modifier = Modifier.size(48.dp), cornerRadius = 4.dp)
             }
@@ -181,6 +186,7 @@ fun TrackCard(
                 Text(
                     text = track.title,
                     style = MaterialTheme.typography.titleLarge,
+                    color = if (isPlaying) MaterialTheme.colorScheme.playingColor else MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

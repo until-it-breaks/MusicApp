@@ -42,6 +42,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
     val viewModel = koinViewModel<PersonalPlaylistViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val playlist = viewModel.playlist.collectAsStateWithLifecycle()
+    val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(playlistId) {
         viewModel.loadPlaylistTracks(playlistId)
@@ -98,6 +99,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                 TrackCard(
                     track = track,
                     showPicture = true,
+                    playbackUiState = playbackUiState,
                     onTrackClick = viewModel::togglePlayback,
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {

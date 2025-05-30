@@ -36,6 +36,7 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
     val viewModel = koinViewModel<TrackHistoryViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val playlist = viewModel.playlist.collectAsStateWithLifecycle()
+    val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -71,6 +72,7 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                     TrackCard(
                         track = track,
                         showPicture = true,
+                        playbackUiState = playbackUiState,
                         onTrackClick = viewModel::togglePlayback,
                         onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                         extraMenu = {

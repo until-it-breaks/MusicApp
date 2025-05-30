@@ -52,6 +52,7 @@ import java.time.LocalDate
 fun AlbumScreen(navController: NavController, albumId: Long) {
     val viewModel = koinViewModel<AlbumViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(albumId) {
         viewModel.loadAlbum(albumId)
@@ -129,6 +130,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
             itemsIndexed(uiState.tracks) { index, track ->
                 TrackCard(
                     track = track,
+                    playbackUiState = playbackUiState,
                     onTrackClick = { viewModel.setPlaybackQueue(uiState.tracks, index) },
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {

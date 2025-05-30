@@ -36,6 +36,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
     val viewModel = koinViewModel<LikedTracksViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val playlist = viewModel.playlist.collectAsStateWithLifecycle()
+    val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -71,6 +72,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                     TrackCard(
                         track = track,
                         showPicture = true,
+                        playbackUiState = playbackUiState,
                         onTrackClick = viewModel::togglePlayback,
                         onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                         extraMenu = {
