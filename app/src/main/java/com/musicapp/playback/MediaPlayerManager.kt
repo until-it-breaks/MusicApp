@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.util.Log
-import androidx.compose.runtime.currentRecomposeScope
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +12,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 data class PlaybackUiState(
     val currentPlayingTrackId: Long? = null,
@@ -21,8 +22,9 @@ data class PlaybackUiState(
     val isLoading: Boolean = false,
     val playbackError: String? = null,
     val playbackQueue: List<TrackModel> = emptyList(),
-    val currentQueueIndex: Int = -1
-    // currentPosition, duration, mediaTitle, mediaArtist
+    val currentQueueIndex: Int = -1,
+    val currentPositionMs: Long = 0L,
+    val trackDurationMs: Long = 30000L // The preview is only 30 seconds, it can be updated if needed
 )
 
 // @Suppress("ForbiddenEntryPoint") // Suppress warning for Application context usage if necessary
@@ -39,6 +41,9 @@ class MediaPlayerManager(
     // Using a separate scope for MediaPlayer callbacks/updates if they trigger coroutines
     private val scope = CoroutineScope(Dispatchers.Main) // Or Dispatchers.IO if heavy work
 
+    // Update the currentPositionMs
+    private var positionUpdateJob: Job? = null
+
     init {
         initializeMediaPlayer()
     }
@@ -52,19 +57,23 @@ class MediaPlayerManager(
                         it.copy(
                             isPlaying = true,
                             isLoading = false,
-                            playbackError = null
+                            playbackError = null,
+                            // trackDurationMs = mp.duration.toLong() // If you want to set the duration
                         )
                     }
+                    startPositionUpdates()
                 }
                 setOnCompletionListener { mp ->
                     Log.d("MediaPlayerManager", "Track completed. Playing next if available.")
                     mp.stop()
                     mp.reset() // Reset for next use
+                    stopPositionUpdates()
                     playNext() // Next in the queue
                 }
                 setOnErrorListener { mp, what, extra ->
                     Log.e("MediaPlayerManager", "MediaPlayer error: what=$what, extra=$extra")
                     mp.reset()
+                    stopPositionUpdates()
                     _playbackState.update {
                         it.copy(
                             isPlaying = false,
@@ -162,7 +171,9 @@ class MediaPlayerManager(
                 currentTrack = track,
                 isPlaying = false, // Will be true on prepare
                 isLoading = true,
-                playbackError = null
+                playbackError = null,
+                currentPositionMs = 0L,
+                // trackDurationMs = 0L
             )
         }
 
@@ -221,6 +232,7 @@ class MediaPlayerManager(
             if (isPlaying) {
                 pause()
                 _playbackState.update { it.copy(isPlaying = false) }
+                stopPositionUpdates()
             }
         }
     }
@@ -233,11 +245,13 @@ class MediaPlayerManager(
                 val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
                 appContext.startService(serviceIntent)
                 Log.d("MediaPlayerManager", "Resumed playback and ensured MediaPlaybackService is running.")
+                startPositionUpdates()
             }
         }
     }
 
     fun stop() {
+        stopPositionUpdates()
         mediaPlayer?.apply {
             if (isPlaying) {
                 stop()
@@ -250,7 +264,9 @@ class MediaPlayerManager(
                     currentTrack = null,
                     isLoading = false,
                     currentQueueIndex = -1,
-                    playbackQueue = emptyList()
+                    playbackQueue = emptyList(),
+                    currentPositionMs = 0L,
+                    // trackDurationMs = 0L
                 )
             }
             val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
@@ -313,6 +329,30 @@ class MediaPlayerManager(
         stop()
         Log.d("MediaPlayerManager", "Playback queue cleared.")
 
+    }
+
+    fun seekTo(positionMs: Long) {
+        mediaPlayer?.seekTo(positionMs.toInt())
+        _playbackState.update { it.copy(currentPositionMs = positionMs) }
+    }
+
+    private fun startPositionUpdates() {
+        positionUpdateJob?.cancel() // Cancel any existing job
+        positionUpdateJob = scope.launch {
+            while (_playbackState.value.isPlaying) {
+                mediaPlayer?.let { player ->
+                    _playbackState.update {
+                        it.copy(currentPositionMs = player.currentPosition.toLong())
+                    }
+                }
+                delay(1000L)
+            }
+        }
+    }
+
+    private fun stopPositionUpdates() {
+        positionUpdateJob?.cancel()
+        positionUpdateJob = null
     }
 
     fun release() {

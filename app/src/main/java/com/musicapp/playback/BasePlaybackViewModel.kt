@@ -57,4 +57,8 @@ open class BasePlaybackViewModel(
     fun playPreviousTrack() {
         mediaPlayerManager.playPrevious()
     }
+
+    fun seekTo(positionMs: Long) {
+        mediaPlayerManager.seekTo(positionMs)
+    }
 }

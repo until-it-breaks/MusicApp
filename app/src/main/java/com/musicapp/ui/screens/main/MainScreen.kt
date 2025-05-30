@@ -84,9 +84,10 @@ fun MainScreen(navController: NavController) {
                 onTogglePlayback = viewModel::togglePlayback,
                 onAddToList = { /* TODO */ }, // it does nothing for now
                 onBarClick = {
-                    // TODO: Implement navigation to a full "Now Playing" screen if desired
-                    // For now, log the click
-                    println("Now Playing Bar Clicked!")
+                    val currentTrackId = playbackUiState.currentTrack?.id
+                    if (currentTrackId != null) {
+                        navController.navigate(MusicAppRoute.TrackDetails(currentTrackId))
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

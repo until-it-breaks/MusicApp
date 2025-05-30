@@ -21,6 +21,7 @@ import com.musicapp.ui.screens.profile.ProfileScreen
 import com.musicapp.ui.screens.search.SearchScreen
 import com.musicapp.ui.screens.settings.SettingsScreen
 import com.musicapp.ui.screens.signup.SignUpScreen
+import com.musicapp.ui.screens.trackdetails.TrackDetailsScreen
 import kotlinx.serialization.Serializable
 
 sealed interface MusicAppRoute {
@@ -39,6 +40,7 @@ sealed interface MusicAppRoute {
     @Serializable data class Playlist(val id: Long): MusicAppRoute
     @Serializable data class Artist(val id: Long): MusicAppRoute
     @Serializable data class UserPlaylist(val uuid: String): MusicAppRoute
+    @Serializable data class TrackDetails(val id: Long): MusicAppRoute
 }
 
 @Composable
@@ -64,6 +66,10 @@ fun MusicAppNavGraph(navController: NavHostController, musicAppRoute: MusicAppRo
         }
         composable<MusicAppRoute.PasswordRecovery> {
             PasswordRecoveryScreen(navController)
+        }
+        composable<MusicAppRoute.TrackDetails> { backStackEntry ->
+            val route = backStackEntry.toRoute<MusicAppRoute.TrackDetails>()
+            TrackDetailsScreen(trackId = route.id, navController = navController)
         }
     }
 }
