@@ -36,6 +36,9 @@ class UserRepository(
         // TODO Delete firebase auth entry and maybe delete other related stuff too.
     }
 
+    /**
+     * Creates a new user and initializes his liked tracks and track history.
+     */
     suspend fun createNewUser(user: UserModel) {
         val now = System.currentTimeMillis()
         val userDb = User(

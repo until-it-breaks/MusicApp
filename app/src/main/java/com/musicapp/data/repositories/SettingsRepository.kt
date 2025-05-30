@@ -24,7 +24,7 @@ class SettingsRepository(
         }
     }
 
-    val allowExplicit: Flow<Boolean> = dataStore.data.map { it[ALLOW_EXPLICIT_KEY]?.toBoolean() ?: true }
+    val allowExplicit: Flow<Boolean> = dataStore.data.map { it[ALLOW_EXPLICIT_KEY]?.toBoolean() != false }
 
     suspend fun setTheme(theme: Theme) = dataStore.edit { preferences ->
         preferences[THEME_KEY] = theme.toString()

@@ -91,8 +91,12 @@ class AlbumViewModel(
     fun addToLiked(track: TrackModel) {
         viewModelScope.launch {
             auth.currentUser?.uid?.let {
-                withContext(Dispatchers.IO) {
-                    likedTracksRepository.addTrackToLikedTracks(it, track)
+                try {
+                    withContext(Dispatchers.IO) {
+                        likedTracksRepository.addTrackToLikedTracks(it, track)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, e.localizedMessage, e)
                 }
             }
         }

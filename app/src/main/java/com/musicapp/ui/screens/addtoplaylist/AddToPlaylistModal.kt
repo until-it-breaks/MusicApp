@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -84,17 +86,19 @@ fun AddTrackToPlaylistModal(
                 ) {
                     TrackCardToAdd(track)
                     Text(stringResource(R.string.select_playlists_to_add_track_to))
-                    Column(
+                    LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        PlaylistCardToAddTo(
-                            title = stringResource(R.string.liked_tracks),
-                            playlistType = PlaylistType.LIKED,
-                            onClick = { addToLiked = !addToLiked },
-                            enabled = likedPlaylist.value?.tracks?.none { it.id == track.id } == true,
-                            showCheck = addToLiked
-                        )
-                        for (playlist in playlists.value) {
+                        item {
+                            PlaylistCardToAddTo(
+                                title = stringResource(R.string.liked_tracks),
+                                playlistType = PlaylistType.LIKED,
+                                onClick = { addToLiked = !addToLiked },
+                                enabled = likedPlaylist.value?.tracks?.none { it.id == track.id } == true,
+                                showCheck = addToLiked
+                            )
+                        }
+                        items(playlists.value) { playlist ->
                             PlaylistCardToAddTo(
                                 title = playlist.name,
                                 imageUri = playlist.playlistPictureUri,

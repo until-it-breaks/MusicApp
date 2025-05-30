@@ -72,9 +72,8 @@ class TrackHistoryViewModel(
         if (userId == null) {
             _uiState.update { it.copy(showAuthError = true) }
             return
-        } else {
-            _userId.value = userId
         }
+        _userId.value = userId
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {

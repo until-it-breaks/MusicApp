@@ -101,8 +101,12 @@ class SignUpViewModel(
 
     private suspend fun createLocalUser(userId: String, username: String, email: String) {
         val user = UserModel(userId, username, email, Uri.EMPTY)
-        withContext(Dispatchers.IO) {
-            userRepository.createNewUser(user)
+        try {
+            withContext(Dispatchers.IO) {
+                userRepository.createNewUser(user)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, e.localizedMessage, e)
         }
     }
 }

@@ -64,10 +64,9 @@ class LoginViewModel(
         viewModelScope.launch {
             try {
                 val authResult = auth.signInWithEmailAndPassword(uiState.value.email.trim(), uiState.value.password.trim()).await()
-
                 /**
                  * Not ideal, but a user record is needed for the whole app to work.
-                 * Since there is no sync with a remote database, an user named "Unknown is created"
+                 * Since there is no sync with a remote database, an user named "Unknown" is created
                  */
                 val userId = authResult.user?.uid
                 val username = "Unknown"
@@ -99,8 +98,12 @@ class LoginViewModel(
 
     private suspend fun createLocalUser(userId: String, username: String, email: String) {
         val user = UserModel(userId, username, email, Uri.EMPTY)
-        withContext(Dispatchers.IO) {
-            userRepository.createNewUser(user)
+        try {
+            withContext(Dispatchers.IO) {
+                userRepository.createNewUser(user)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, e.localizedMessage, e)
         }
     }
 }

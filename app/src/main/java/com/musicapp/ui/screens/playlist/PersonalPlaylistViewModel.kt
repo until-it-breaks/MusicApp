@@ -102,10 +102,13 @@ class PersonalPlaylistViewModel(
         val name = _uiState.value.newName
         viewModelScope.launch {
             try {
-                userPlaylistRepository.editPlaylistName(playlistId, name)
-                dismissEditingName()
+                withContext(Dispatchers.IO) {
+                    userPlaylistRepository.editPlaylistName(playlistId, name)
+                }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
+            } finally {
+                dismissEditingName()
             }
         }
     }
