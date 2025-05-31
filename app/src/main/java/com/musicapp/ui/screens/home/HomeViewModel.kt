@@ -3,7 +3,6 @@ package com.musicapp.ui.screens.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.musicapp.R
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.repositories.SettingsRepository
 import com.musicapp.ui.models.AlbumModel
@@ -34,8 +33,8 @@ data class HomeState(
     val artists: List<ArtistModel> = emptyList(),
     val albums: List<AlbumModel> = emptyList(),
     val playlistErrorStringId: Int? = null,
-    val artistErrorStringId: Int? = null,
-    val albumErrorStringId: Int? = null
+    val artistsErrorStringId: Int? = null,
+    val albumsErrorStringId: Int? = null
 )
 
 class HomeViewModel(
@@ -57,8 +56,7 @@ class HomeViewModel(
                 _uiState.update { it.copy(playlists = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
-                val resId: Int = getErrorMessageResId(e) ?: R.string.failed_to_load_playlists
-                _uiState.update { it.copy(playlistErrorStringId = resId) }
+                _uiState.update { it.copy(playlistErrorStringId = getErrorMessageResId(e)) }
             } finally {
                 _uiState.update { it.copy(showPlaylistLoading = false) }
             }
@@ -67,14 +65,13 @@ class HomeViewModel(
 
     fun loadTopArtists() {
         viewModelScope.launch {
-            _uiState.update { it.copy(showArtistsLoading = true, artistErrorStringId = null) }
+            _uiState.update { it.copy(showArtistsLoading = true, artistsErrorStringId = null) }
             try {
                 val result = withContext(Dispatchers.IO) { deezerDataSource.getTopArtists() }
                 _uiState.update { it.copy(artists = result.map { it.toModel() }) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
-                val resId: Int = getErrorMessageResId(e) ?: R.string.failed_to_load_artists
-                _uiState.update { it.copy(artistErrorStringId = resId) }
+                _uiState.update { it.copy(artistsErrorStringId = getErrorMessageResId(e)) }
             } finally {
                 _uiState.update { it.copy(showArtistsLoading = false) }
             }
@@ -83,7 +80,7 @@ class HomeViewModel(
 
     fun loadTopAlbums() {
         viewModelScope.launch {
-            _uiState.update { it.copy(showAlbumsLoading = true, albumErrorStringId = null) }
+            _uiState.update { it.copy(showAlbumsLoading = true, albumsErrorStringId = null) }
             try {
                 val allowExplicit = settingsRepository.allowExplicit.first()
                 val result = withContext(Dispatchers.IO) { deezerDataSource.getTopAlbums() }
@@ -98,8 +95,7 @@ class HomeViewModel(
                 _uiState.update { it.copy(albums = albums) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
-                val resId: Int = getErrorMessageResId(e) ?: R.string.failed_to_load_albums
-                _uiState.update { it.copy(albumErrorStringId = resId) }
+                _uiState.update { it.copy(albumsErrorStringId = getErrorMessageResId(e)) }
             } finally {
                 _uiState.update { it.copy(showAlbumsLoading = false) }
             }

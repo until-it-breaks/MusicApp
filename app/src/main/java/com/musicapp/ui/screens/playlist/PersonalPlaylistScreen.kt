@@ -33,6 +33,7 @@ import com.musicapp.ui.composables.SavedTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.composables.UserPlaylistDropDownMenu
+import com.musicapp.ui.theme.AppPadding
 import com.musicapp.util.convertMillisToDateWithHourAndMinutes
 import org.koin.androidx.compose.koinViewModel
 
@@ -75,7 +76,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .padding(contentPadding)
-                .padding(12.dp)
+                .padding(AppPadding.ScaffoldContent)
         ) {
             item {
                 Column(

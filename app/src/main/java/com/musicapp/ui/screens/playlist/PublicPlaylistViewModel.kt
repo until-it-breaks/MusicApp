@@ -3,6 +3,7 @@ package com.musicapp.ui.screens.playlist
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.musicapp.R
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
 import com.musicapp.data.repositories.LikedTracksRepository
@@ -12,6 +13,7 @@ import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
+import com.musicapp.util.getErrorMessageResId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,8 +30,9 @@ data class PublicPlaylistState(
     val tracks: List<TrackModel> = emptyList(),
     val showPlaylistDetailsLoading: Boolean = false,
     val showTracksLoading: Boolean = false,
-    val playlistError: String? = null,
-    val trackError: String? = null
+    val playlistErrorStringId: Int? = null,
+    val tracksErrorStringId: Int? = null,
+    val failedTracksCount: Int = 0
 )
 
 class PublicPlaylistViewModel(
@@ -45,35 +48,35 @@ class PublicPlaylistViewModel(
     fun loadPlaylist(id: Long) {
         if (_uiState.value.playlistDetails?.id == id) return
         viewModelScope.launch {
-            _uiState.update { it.copy(showPlaylistDetailsLoading = true) }
+            _uiState.update { it.copy(showPlaylistDetailsLoading = true, playlistErrorStringId = null) }
             try {
                 val result = withContext(Dispatchers.IO) {
                     deezerDataSource.getPlaylistDetails(id)
                 }
                 _uiState.update { it.copy(playlistDetails = result.toModel()) }
-                loadTracks()
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
+                _uiState.update { it.copy(playlistErrorStringId = getErrorMessageResId(e)) }
             } finally {
                 _uiState.update { it.copy(showPlaylistDetailsLoading = false) }
+                loadTracks()
             }
         }
     }
 
-    private fun loadTracks() {
+    fun loadTracks() {
         viewModelScope.launch {
-            val tracks =
-                uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load only 20 tracks.
+            val tracks = uiState.value.playlistDetails?.tracks.orEmpty().take(20) // Load 20 tracks at most due to API limitations.
             _uiState.update {
                 it.copy(
                     showTracksLoading = true,
-                    trackError = null,
+                    tracksErrorStringId = null,
                     tracks = emptyList()
                 )
             }
             val allowExplicit = settingsRepository.allowExplicit.first()
 
-            val failedTracks = mutableListOf<Long>()
+            var failedCount = 0
             for (track in tracks) {
                 try {
                     val detailedTrack: DeezerTrackDetailed = withContext(Dispatchers.IO) {
@@ -90,24 +93,28 @@ class PublicPlaylistViewModel(
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, e.localizedMessage, e)
-                    failedTracks += track.id
+                    failedCount++
                 }
             }
-            if (failedTracks.isNotEmpty()) {
-                _uiState.update {
-                    it.copy(trackError = "Failed to load ${failedTracks.size} track(s).")
-                }
+            _uiState.update {
+                it.copy(
+                    showTracksLoading = false,
+                    tracksErrorStringId = if (failedCount > 0) R.string.track_load_error else null,
+                    failedTracksCount = failedCount
+                )
             }
-            _uiState.update { it.copy(showTracksLoading = false) }
         }
     }
 
     fun addToLiked(track: TrackModel) {
         viewModelScope.launch {
-            val userId = auth.currentUser?.uid
-            if (userId != null) {
-                withContext(Dispatchers.IO) {
-                    likedTracksRepository.addTrackToLikedTracks(userId, track)
+            auth.currentUser?.uid?.let {
+                try {
+                    withContext(Dispatchers.IO) {
+                        likedTracksRepository.addTrackToLikedTracks(it, track)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, e.localizedMessage, e)
                 }
             }
         }

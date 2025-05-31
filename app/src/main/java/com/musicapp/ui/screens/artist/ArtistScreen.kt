@@ -23,6 +23,7 @@ import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.CenteredCircularProgressIndicator
+import com.musicapp.ui.composables.CenteredLinearProgressIndicator
 import com.musicapp.ui.composables.ErrorSection
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.PlayListCard
@@ -52,10 +53,10 @@ fun ArtistScreen(navController: NavController, artistId: Long) {
                 if (uiState.showArtistLoading) {
                     CenteredCircularProgressIndicator()
                 }
-                val resId = uiState.artistErrorStringId
-                if (resId != null) {
+                uiState.artistErrorStringId?.let {
                     ErrorSection(
-                        message = stringResource(resId),
+                        title = stringResource(R.string.failed_to_load_artist),
+                        message = stringResource(it),
                         onRetry = { viewModel.loadArtist(artistId) }
                     )
                 }
@@ -81,12 +82,12 @@ fun ArtistScreen(navController: NavController, artistId: Long) {
                     style = MaterialTheme.typography.titleLarge
                 )
                 if (uiState.showAlbumsLoading) {
-                    CenteredCircularProgressIndicator()
+                    CenteredLinearProgressIndicator(modifier = Modifier.padding(vertical = 4.dp))
                 }
-                val resId = uiState.albumErrorStringId
-                if (resId != null) {
+                uiState.albumErrorStringId?.let {
                     ErrorSection(
-                        message = stringResource(resId),
+                        title = stringResource(R.string.failed_to_load_albums),
+                        message = stringResource(it),
                         onRetry = { viewModel.loadArtistAlbums(artistId) }
                     )
                 }

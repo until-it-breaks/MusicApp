@@ -17,7 +17,9 @@ data class TrackWithArtists(
 class TracksRepository(
     private val dao: TrackDAO,
 ) {
-
+    /**
+     * Returns a flow of tracks with artists.
+     */
     fun getTrackWithArtists(trackId: Long): Flow<TrackWithArtists> {
         val trackFlow = dao.getTrackFlow(trackId)
         val artistsFlow = dao.getTrackArtistsFlow(trackId)
@@ -27,6 +29,9 @@ class TracksRepository(
         }
     }
 
+    /**
+     * Upserts a track and eventually upserts its artists too if present.
+     */
     suspend fun upsertTrack(track: TrackModel) {
         dao.upsertTrack(track.toDbEntity())
         track.contributors.forEachIndexed { index, contributor ->

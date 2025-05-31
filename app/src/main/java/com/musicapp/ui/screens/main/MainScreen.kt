@@ -18,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
@@ -105,14 +104,12 @@ fun MainScreen(navController: NavController) {
                                     inclusive = false
                                 )
                             }
-
                             MainCategory.SEARCH -> {
                                 searchNavController.popBackStack(
                                     route = MusicAppRoute.Search,
                                     inclusive = false
                                 )
                             }
-
                             MainCategory.LIBRARY -> {
                                 libraryNavController.popBackStack(
                                     route = MusicAppRoute.Library,
@@ -125,9 +122,6 @@ fun MainScreen(navController: NavController) {
                     }
                 }
             )
-
-
-
         }
     }
 }

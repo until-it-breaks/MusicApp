@@ -68,6 +68,25 @@ fun LoginScreen(navController: NavController) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
+    LaunchedEffect(uiState.navigateToMain) {
+        if (uiState.navigateToMain) {
+            navController.navigate(MusicAppRoute.Main) {
+                popUpTo(navController.graph.id) { inclusive = true }
+            }
+        }
+    }
+
+    uiState.errorMessageId?.let {
+        LaunchedEffect(it) {
+            val message = context.getString(it)
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Long,
+                withDismissAction = true
+            )
+        }
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { contentPadding ->
@@ -168,25 +187,6 @@ fun LoginScreen(navController: NavController) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
 
-            uiState.errorMessageId?.let {
-                LaunchedEffect(it) {
-                    val message = context.getString(it)
-                    snackbarHostState.showSnackbar(
-                        message = message,
-                        duration = SnackbarDuration.Long,
-                        withDismissAction = true
-                    )
-                }
-            }
-
-            LaunchedEffect(uiState.navigateToMain) {
-                if (uiState.navigateToMain) {
-                    navController.navigate(MusicAppRoute.Main) {
-                        popUpTo(navController.graph.id) { inclusive = true }
-                    }
-                }
-            }
-
             TextButton(
                 onClick = {
                     viewModel.resetUiState()
@@ -198,6 +198,7 @@ fun LoginScreen(navController: NavController) {
             ) {
                 Text(stringResource(R.string.sign_up_now))
             }
+            Spacer(modifier = Modifier.height(48.dp))
         }
     }
 }

@@ -40,10 +40,16 @@ class UserPlaylistRepository(
     private val trackRepository: TracksRepository,
     private val context: Context
 ) {
+    /**
+     * Returns a flow of list of playlists. Tracks not included.
+     */
     fun getPlaylists(userId: String): Flow<List<Playlist>> {
         return playlistDAO.getPlaylists(userId)
     }
 
+    /**
+     *  Returns a flow of list of playlists along with their tracks.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getPlaylistsWithTracksFlow(userId: String): Flow<List<PlaylistWithTracks>> {
         return playlistDAO.getPlaylists(userId)
@@ -60,6 +66,9 @@ class UserPlaylistRepository(
             }
     }
 
+    /**
+     * Returns a flow of list of playlists along with tracks and their artists.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getPlaylistWithTracksAndArtists(playlistId: String): Flow<PlaylistWithTracksAndArtists?> {
         val playlistFlow = playlistDAO.getPlaylist(playlistId)
@@ -74,7 +83,6 @@ class UserPlaylistRepository(
                 val trackWithArtistFlows = tracks.map { track ->
                     trackRepository.getTrackWithArtists(track.trackId)
                 }
-
                 if (trackWithArtistFlows.isEmpty()) {
                     flowOf(PlaylistWithTracksAndArtists(playlist, emptyList()))
                 } else {
@@ -89,6 +97,9 @@ class UserPlaylistRepository(
         }
     }
 
+    /**
+     * Updates the name of a given playlist.
+     */
     suspend fun editPlaylistName(playlistId: String, name: String) {
         db.withTransaction {
             playlistDAO.editName(playlistId, name)
@@ -96,6 +107,9 @@ class UserPlaylistRepository(
         }
     }
 
+    /**
+     * Returns true if a given track is present inside a given playlist, false otherwise.
+     */
     suspend fun isTrackInPlaylist(playlistId: String, track: TrackModel): Boolean {
         return playlistDAO.getTrackFromPlaylist(playlistId, track.id) != null
     }
@@ -111,6 +125,10 @@ class UserPlaylistRepository(
         playlistDAO.insertPlaylist(playlist)
     }
 
+    /**
+     * Adds a track to a given playlist. If the track is not present in the database yet, it will
+     * be added accordingly.
+     */
     suspend fun addTrackToPlaylist(playlistId: String, track: TrackModel) {
         db.withTransaction {
             trackRepository.upsertTrack(track)
@@ -120,12 +138,18 @@ class UserPlaylistRepository(
         }
     }
 
+    /**
+     * Removes a track from a playlist. Calls for a picture update too.
+     */
     suspend fun removeTrackFromPlaylist(playlistId: String, trackId: Long) {
         playlistDAO.deleteTrackFromPlaylist(playlistId, trackId)
         updatePlaylistPicture(playlistId)
         playlistDAO.updateEditTime(playlistId)
     }
 
+    /**
+     * Remove all the playlist-track references of a given playlist.
+     */
     suspend fun clearPlaylist(playlistId: String) {
         db.withTransaction {
             playlistDAO.clearPlaylist(playlistId)
@@ -134,6 +158,9 @@ class UserPlaylistRepository(
         }
     }
 
+    /**
+     * Deletes a playlist entirely.
+     */
     suspend fun deletePlaylist(playlistId: String) {
         playlistDAO.deletePlaylist(playlistId)
     }

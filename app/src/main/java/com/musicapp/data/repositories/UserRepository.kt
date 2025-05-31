@@ -23,7 +23,7 @@ class UserRepository(
 
     suspend fun updateProfilePicture(profilePictureUri: Uri, userId: String) {
         val user = usersDAO.getUser(userId)
-        val currentProfilePicture = user.first().profilePictureUri // TODO maybe delete the current picture saved in memory
+        user.first().profilePictureUri // TODO maybe delete the current picture saved in memory
         usersDAO.updateProfilePicture(profilePictureUri.toString(), userId)
     }
 
@@ -36,6 +36,9 @@ class UserRepository(
         // TODO Delete firebase auth entry and maybe delete other related stuff too.
     }
 
+    /**
+     * Creates a new user and initializes his liked tracks and track history.
+     */
     suspend fun createNewUser(user: UserModel) {
         val now = System.currentTimeMillis()
         val userDb = User(

@@ -40,6 +40,7 @@ import com.musicapp.data.models.Theme
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.TopBarWithBackButton
+import com.musicapp.ui.theme.AppPadding
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -67,7 +68,7 @@ fun SettingsScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .padding(contentPadding)
-                .padding(12.dp)
+                .padding(AppPadding.ScaffoldContent)
                 .fillMaxSize()
         ) {
             Card(

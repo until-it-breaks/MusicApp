@@ -12,12 +12,14 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.musicapp.R
 import com.musicapp.data.repositories.UserRepository
 import com.musicapp.ui.models.UserModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 private const val TAG = "SignUpViewModel"
 
@@ -99,6 +101,12 @@ class SignUpViewModel(
 
     private suspend fun createLocalUser(userId: String, username: String, email: String) {
         val user = UserModel(userId, username, email, Uri.EMPTY)
-        userRepository.createNewUser(user)
+        try {
+            withContext(Dispatchers.IO) {
+                userRepository.createNewUser(user)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, e.localizedMessage, e)
+        }
     }
 }

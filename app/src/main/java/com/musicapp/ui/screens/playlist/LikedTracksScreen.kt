@@ -2,10 +2,8 @@ package com.musicapp.ui.screens.playlist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +26,7 @@ import com.musicapp.ui.composables.LikedTracksPlaylistDropDownMenu
 import com.musicapp.ui.composables.SavedTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
+import com.musicapp.ui.theme.AppPadding
 import com.musicapp.util.convertMillisToDateWithHourAndMinutes
 import org.koin.androidx.compose.koinViewModel
 
@@ -53,7 +52,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier
                     .padding(contentPadding)
-                    .padding(12.dp)
+                    .padding(AppPadding.ScaffoldContent)
             ) {
                 item {
                     Column(
@@ -62,9 +61,10 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                     ) {
                         val timeInMillis = playlist.value?.lastEditTime
                         timeInMillis?.let {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text("${stringResource(R.string.last_edited)}: ${convertMillisToDateWithHourAndMinutes(it)}")
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "${stringResource(R.string.last_edited)}: ${convertMillisToDateWithHourAndMinutes(it)}",
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
                         }
                     }
                 }
@@ -89,7 +89,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
             AuthErrorMessage(
                 modifier = Modifier
                     .padding(contentPadding)
-                    .padding(12.dp)
+                    .padding(AppPadding.ScaffoldContent)
                     .fillMaxWidth(),
                 onClick = {
                     viewModel.logout()

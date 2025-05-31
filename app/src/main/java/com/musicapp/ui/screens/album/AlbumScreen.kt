@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,10 +38,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.CenteredCircularProgressIndicator
+import com.musicapp.ui.composables.CenteredLinearProgressIndicator
+import com.musicapp.ui.composables.ErrorSection
 import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
+import com.musicapp.ui.theme.AppPadding
 import com.musicapp.util.convertDurationInSecondsToString
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
@@ -64,11 +67,19 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
     ) { contentPadding ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier
-                .padding(contentPadding)
-                .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
+            modifier = Modifier.padding(contentPadding).padding(AppPadding.ScaffoldContent)
         ) {
             item {
+                if (uiState.showAlbumDetailsLoading) {
+                    CenteredCircularProgressIndicator()
+                }
+                uiState.albumErrorStringId?.let {
+                    ErrorSection(
+                        title = stringResource(R.string.failed_to_load_album),
+                        message = stringResource(it),
+                        onRetry = { viewModel.loadAlbum(albumId) }
+                    )
+                }
                 uiState.albumDetails?.let { album ->
                     Column(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -127,6 +138,18 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                     }
                 }
             }
+            item {
+                if (uiState.showTracksLoading) {
+                    CenteredLinearProgressIndicator()
+                }
+                uiState.tracksErrorStringId?.let {
+                    ErrorSection(
+                        title = stringResource(R.string.failed_to_load_tracks),
+                        message = stringResource(it) + if (uiState.failedTracksCount > 0) " (${uiState.failedTracksCount} ${stringResource(R.string.tracks)})" else "",
+                        onRetry = viewModel::loadTracks
+                    )
+                }
+            }
             itemsIndexed(uiState.tracks) { index, track ->
                 TrackCard(
                     track = track,
@@ -143,16 +166,15 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 )
             }
             item {
-                val albumDetails = uiState.albumDetails
-                if (albumDetails != null) {
+                uiState.albumDetails?.let {
                     Row {
-                        Text("${albumDetails.trackCount} ${stringResource(R.string.tracks)}")
-                        albumDetails.duration?.let {
+                        Text("${it.trackCount} ${stringResource(R.string.tracks)}")
+                        it.duration?.let {
                             Text(" · ")
                             Text(convertDurationInSecondsToString(it))
                         }
                     }
-                    Text("${stringResource(R.string.album_label)}: ${albumDetails.label}")
+                    Text("${stringResource(R.string.album_label)}: ${it.label}")
                 }
             }
         }

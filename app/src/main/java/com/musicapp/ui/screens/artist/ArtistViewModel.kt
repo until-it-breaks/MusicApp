@@ -3,7 +3,6 @@ package com.musicapp.ui.screens.artist
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.musicapp.R
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.repositories.SettingsRepository
 import com.musicapp.ui.models.AlbumModel
@@ -50,8 +49,7 @@ class ArtistViewModel(
                 _uiState.update { it.copy(artist = result.toModel(), isArtistLoaded = true) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
-                val resId: Int = getErrorMessageResId(e) ?: R.string.failed_to_load_artist
-                _uiState.update { it.copy(artistErrorStringId = resId) }
+                _uiState.update { it.copy(artistErrorStringId = getErrorMessageResId(e)) }
             } finally {
                 _uiState.update { it.copy(showArtistLoading = false) }
             }
@@ -78,8 +76,7 @@ class ArtistViewModel(
                 _uiState.update { it.copy(artistAlbums = albums, areAlbumsLoaded = true) }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
-                val resId: Int = getErrorMessageResId(e) ?: R.string.failed_to_load_albums
-                _uiState.update { it.copy(albumErrorStringId = resId) }
+                _uiState.update { it.copy(albumErrorStringId = getErrorMessageResId(e)) }
             } finally {
                 _uiState.update { it.copy(showAlbumsLoading = false) }
             }

@@ -64,10 +64,10 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                     if (uiState.showPlaylistLoading) {
                         CenteredCircularProgressIndicator()
                     }
-                    val resId = uiState.playlistErrorStringId
-                    if (resId != null) {
+                    uiState.playlistErrorStringId?.let {
                         ErrorSection(
-                            message = stringResource(resId),
+                            title = stringResource(R.string.failed_to_load_playlists),
+                            message = stringResource(it),
                             onRetry = viewModel::loadTopPlaylist
                         )
                     }
@@ -97,10 +97,10 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                     if (uiState.showArtistsLoading) {
                         CenteredCircularProgressIndicator()
                     }
-                    val resId = uiState.artistErrorStringId
-                    if (resId != null) {
+                    uiState.artistsErrorStringId?.let {
                         ErrorSection(
-                            message = stringResource(resId),
+                            title = stringResource(R.string.failed_to_load_artists),
+                            message = stringResource(it),
                             onRetry = viewModel::loadTopArtists
                         )
                     }
@@ -124,10 +124,10 @@ fun HomeScreen(mainNavController: NavController, subNavController: NavController
                     if (uiState.showAlbumsLoading) {
                         CenteredCircularProgressIndicator()
                     }
-                    val resId = uiState.albumErrorStringId
-                    if (resId != null) {
+                    uiState.albumsErrorStringId?.let {
                         ErrorSection(
-                            message = stringResource(resId),
+                            title = stringResource(R.string.failed_to_load_albums),
+                            message = stringResource(it),
                             onRetry = viewModel::loadTopAlbums
                         )
                     }

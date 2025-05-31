@@ -48,6 +48,7 @@ fun AuthErrorMessage(modifier: Modifier = Modifier, onClick: () -> Unit) {
 
 @Composable
 fun ErrorSection(
+    title: String,
     message: String,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
@@ -61,6 +62,9 @@ fun ErrorSection(
             imageVector = Icons.Filled.Warning,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.error
+        )
+        Text(
+            text = title
         )
         Text(
             text = message,
