@@ -126,6 +126,15 @@ class MediaPlayerManager(
         }
     }
 
+    override fun onPositionDiscontinuity(
+        oldPosition: Player.PositionInfo,
+        newPosition: Player.PositionInfo,
+        reason: Int
+    ) {
+        Log.d("MediaPlayerManager", "Manager: onPositionDiscontinuity: Old ${oldPosition.positionMs}, New ${newPosition.positionMs}, Reason: $reason")
+        _playbackState.update { it.copy(currentPositionMs = newPosition.positionMs) }
+    }
+
     override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
         Log.e("MediaPlayerManager", "Manager: ExoPlayer error: ${error.message}", error)
         _playbackState.update {
@@ -190,7 +199,9 @@ class MediaPlayerManager(
      */
     fun playPrevious() {
         scope.launch {
-            if (exoPlayer?.hasPreviousMediaItem() == true) {
+            val hasPrevious = exoPlayer?.hasPreviousMediaItem() == true
+
+            if (hasPrevious) {
                 exoPlayer?.seekToPreviousMediaItem()
                 _playbackState.update { it.copy(isLoading = true, playbackError = null) }
             } else {
