@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,7 +28,17 @@ import com.musicapp.ui.models.TrackModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
+import com.musicapp.ui.composables.MainTopBar
+import com.musicapp.ui.composables.TopBarWithBackButton
+import com.musicapp.ui.composables.TopBarWithBackButtonAndMoreVert
 import java.util.Locale
+
+enum class RepeatMode {
+    OFF,
+    ON,
+    ONE,
+    ONCE
+}
 
 @OptIn(ExperimentalMaterial3Api::class) // For TopAppBar
 @UnstableApi
@@ -65,11 +76,10 @@ fun TrackDetailsScreen(
 
     Scaffold(
         topBar = {
-            TrackDetailsTopBar(
-                track = currentTrack,
-                onBackClick = { navController.popBackStack() },
-                onMoreClick = { /* TODO */ }
-            )
+            TopBarWithBackButtonAndMoreVert(
+                navController = navController,
+                title = stringResource(R.string.trackDetails),
+                onMoreVertClick = { /*TODO*/ })
         },
         bottomBar = {
             TrackDetailsPlayerControls(
@@ -98,47 +108,6 @@ fun TrackDetailsScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
         )
-    }
-}
-
-@Composable
-fun TrackDetailsTopBar(
-    track: TrackModel,
-    onBackClick: () -> Unit,
-    onMoreClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            IconButton(onClick = onBackClick) {
-                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Back")
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "NOW PLAYING FROM ALBUM",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    letterSpacing = 1.sp
-                )
-                Text(
-                    text = track.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            IconButton(onClick = onMoreClick) {
-                Icon(Icons.Default.MoreVert, contentDescription = "More options")
-            }
-        }
     }
 }
 
@@ -216,6 +185,7 @@ fun TrackDetailsContent(
 }
 
 
+// bottom bar with controls buttons
 @Composable
 fun TrackDetailsPlayerControls(
     playbackUiState: PlaybackUiState,
@@ -230,6 +200,9 @@ fun TrackDetailsPlayerControls(
     val isPlaying = playbackUiState.isPlaying
     val track = playbackUiState.currentTrack
 
+    var isShuffleOn by remember { mutableStateOf(false) }
+    var currentRepeatMode by remember { mutableStateOf(RepeatMode.OFF) }
+
     if (track == null) {
         Spacer(modifier = Modifier.height(100.dp))
         return
@@ -239,7 +212,8 @@ fun TrackDetailsPlayerControls(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
-            .padding(16.dp),
+            .padding(16.dp)
+            .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Seek Bar (Progress Bar)
@@ -282,17 +256,21 @@ fun TrackDetailsPlayerControls(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Shuffle
-            IconButton(onClick = { /* TODO */ }) {
+            IconButton(onClick = {
+                isShuffleOn = !isShuffleOn
+                // TODO Handle shuffle
+            }) {
                 Icon(
-                    painterResource(R.drawable.ic_shuffle), contentDescription = "Shuffle",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    painterResource(if (isShuffleOn) R.drawable.ic_shuffle_on else R.drawable.ic_shuffle),
+                    contentDescription = "Shuffle",
+                    tint = if (isShuffleOn) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             // Previous
             IconButton(onClick = onPreviousClick) {
                 Icon(
-                    painterResource(R.drawable.ic_previous), contentDescription = "Previous",
+                    painterResource(R.drawable.ic_skip_previous), contentDescription = "Previous",
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
@@ -311,17 +289,35 @@ fun TrackDetailsPlayerControls(
             // Next
             IconButton(onClick = onNextClick) {
                 Icon(
-                    painterResource(R.drawable.ic_next), contentDescription = "Next",
+                    painterResource(R.drawable.ic_skip_next), contentDescription = "Next",
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
             // Repeat
-            IconButton(onClick = { /* Handle Repeat */ }) {
+            IconButton(onClick = {
+                currentRepeatMode = when (currentRepeatMode) {
+                    RepeatMode.OFF -> RepeatMode.ON
+                    RepeatMode.ON -> RepeatMode.ONE
+                    RepeatMode.ONE -> RepeatMode.ONCE
+                    RepeatMode.ONCE -> RepeatMode.OFF
+                }
+                // TODO Handle repeat
+            }) {
+                val iconResource = when (currentRepeatMode) {
+                    RepeatMode.OFF -> R.drawable.ic_repeat
+                    RepeatMode.ON -> R.drawable.ic_repeat_on
+                    RepeatMode.ONE -> R.drawable.ic_repeat_one_on
+                    RepeatMode.ONCE -> R.drawable.ic_play_one
+                }
+                val iconTint =
+                    if (currentRepeatMode != RepeatMode.OFF) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+
                 Icon(
-                    painterResource(R.drawable.ic_repeat), contentDescription = "Repeat",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    painterResource(iconResource),
+                    contentDescription = "Repeat",
+                    tint = iconTint
                 )
             }
         }
