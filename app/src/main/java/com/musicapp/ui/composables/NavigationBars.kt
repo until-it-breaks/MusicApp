@@ -1,10 +1,10 @@
 package com.musicapp.ui.composables
 
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.runtime.Composable
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.musicapp.ui.screens.main.MainCategory
@@ -17,7 +17,7 @@ fun MainNavBar(
     onCategorySelected: (MainCategory) -> Unit
 ) {
     NavigationBar(
-        modifier = modifier,
+        modifier = modifier
     ) {
         categories.forEach { item ->
             NavigationBarItem(
