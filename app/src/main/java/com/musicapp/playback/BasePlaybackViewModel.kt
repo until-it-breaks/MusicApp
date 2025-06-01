@@ -1,6 +1,7 @@
 package com.musicapp.playback
 
 import androidx.lifecycle.ViewModel
+import androidx.media3.common.util.UnstableApi
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.flow.StateFlow
 
@@ -10,7 +11,9 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param mediaPlayerManager The MediaPlayerManager instance, in this case injected via Koin.
  */
-open class BasePlaybackViewModel(
+@UnstableApi
+open class BasePlaybackViewModel
+    (
     protected val mediaPlayerManager: MediaPlayerManager
 ) : ViewModel() {
 

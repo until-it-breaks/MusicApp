@@ -149,4 +149,6 @@
     <string name="what_to_play">What do you want to play?</string>
 
     <string name="your_playlists">Your playlists</string>
+    <string name="channel_name" translatable="false">Music Playback</string>
+    <string name="channel_description" translatable="false">Notifications for ongoing music playback controls</string>
 </resources>

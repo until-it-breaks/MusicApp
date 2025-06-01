@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.compose.rememberNavController
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.data.models.Theme
@@ -16,6 +17,7 @@ import com.musicapp.ui.theme.MusicAppTheme
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 
+@UnstableApi
 class MainActivity : ComponentActivity() {
     private val mediaPlayerManager: MediaPlayerManager by inject()
     // destroy the media player when the activity is destroyed
