@@ -2,6 +2,7 @@ package com.musicapp.ui.screens.playlist
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.util.UnstableApi
 import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.UserPlaylistModel
@@ -31,6 +32,7 @@ data class PersonalPlaylistState(
     val canSubmitNameChange = newName.isNotBlank()
 }
 
+@UnstableApi
 class PersonalPlaylistViewModel(
     private val userPlaylistRepository: UserPlaylistRepository,
     mediaPlayerManager: MediaPlayerManager

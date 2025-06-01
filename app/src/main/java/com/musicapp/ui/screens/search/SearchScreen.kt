@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
@@ -38,6 +39,7 @@ import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.TrackCard
 import org.koin.androidx.compose.koinViewModel
 
+@UnstableApi
 @Composable
 fun SearchScreen(
     mainNavController: NavController,

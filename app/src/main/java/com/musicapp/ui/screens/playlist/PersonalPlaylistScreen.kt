@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
@@ -37,6 +38,7 @@ import com.musicapp.ui.theme.AppPadding
 import com.musicapp.util.convertMillisToDateWithHourAndMinutes
 import org.koin.androidx.compose.koinViewModel
 
+@UnstableApi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {

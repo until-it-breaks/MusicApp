@@ -1,6 +1,7 @@
 package com.musicapp.ui.screens.trackdetails
 
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.util.UnstableApi
 import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.TrackModel
@@ -15,6 +16,7 @@ sealed class TrackDetailsUiState {
     data class Error(val message: String) : TrackDetailsUiState()
 }
 
+@UnstableApi
 class TrackDetailsViewModel(
     mediaPlayerManager: MediaPlayerManager,
 ) : BasePlaybackViewModel(mediaPlayerManager) {

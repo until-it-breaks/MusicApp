@@ -2,6 +2,7 @@ package com.musicapp.ui.screens.album
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.util.UnstableApi
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.R
 import com.musicapp.data.remote.deezer.DeezerDataSource
@@ -33,6 +34,7 @@ data class AlbumState(
     val failedTracksCount: Int = 0
 )
 
+@UnstableApi
 class AlbumViewModel(
     private val deezerDataSource: DeezerDataSource,
     private val likedTracksRepository: LikedTracksRepository,

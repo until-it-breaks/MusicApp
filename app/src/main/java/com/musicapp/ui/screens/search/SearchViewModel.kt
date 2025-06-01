@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 import android.util.Log
+import androidx.media3.common.util.UnstableApi
 import com.musicapp.playback.BasePlaybackViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -41,6 +42,7 @@ data class SearchUiState(
     val playbackState: PlaybackUiState = PlaybackUiState()
 )
 
+@UnstableApi
 class SearchViewModel(
     private val deezerDataSource: DeezerDataSource,
     mediaPlayerManager: MediaPlayerManager

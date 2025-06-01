@@ -2,6 +2,7 @@ package com.musicapp.ui.screens.playlist
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.util.UnstableApi
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.LikedTracksRepository
 import com.musicapp.playback.MediaPlayerManager
@@ -26,6 +27,7 @@ private const val TAG = "LikedTracksViewModel"
 
 data class LikedTracksState(val showAuthError: Boolean = false)
 
+@UnstableApi
 class LikedTracksViewModel(
     private val auth: FirebaseAuth,
     private val likedTracksRepository: LikedTracksRepository,

@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
@@ -50,6 +51,7 @@ import com.musicapp.util.convertDurationInSecondsToString
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 
+@UnstableApi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlbumScreen(navController: NavController, albumId: Long) {

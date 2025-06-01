@@ -26,9 +26,11 @@ import com.musicapp.playback.PlaybackUiState
 import com.musicapp.ui.models.TrackModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.util.UnstableApi
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class) // For TopAppBar
+@UnstableApi
 @Composable
 fun TrackDetailsScreen(
     trackId: Long,
