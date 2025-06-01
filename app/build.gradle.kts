@@ -77,6 +77,7 @@ dependencies {
     // Datastore preferences
     implementation(libs.androidx.datastore.preferences)
 
+    // MediaPlayer
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.media3.ui)
