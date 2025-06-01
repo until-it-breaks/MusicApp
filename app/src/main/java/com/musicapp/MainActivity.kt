@@ -19,11 +19,13 @@ import com.musicapp.ui.MusicAppNavGraph
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.theme.MusicAppTheme
 import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
 
 @UnstableApi
 class MainActivity : ComponentActivity() {
     private val mediaPlayerManager: MediaPlayerManager by inject()
+
     // destroy the media player when the activity is destroyed
     override fun onDestroy() {
         super.onDestroy()
@@ -34,26 +36,28 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val viewModel = koinViewModel<MainActivityViewModel>()
-            val theme = viewModel.theme.collectAsStateWithLifecycle()
-            val navController = rememberNavController()
+            KoinAndroidContext {
+                val viewModel = koinViewModel<MainActivityViewModel>()
+                val theme = viewModel.theme.collectAsStateWithLifecycle()
+                val navController = rememberNavController()
 
-            val initialRoute = remember {
-                if (viewModel.isSessionActive()) MusicAppRoute.Main else MusicAppRoute.Login
-            }
-
-            MusicAppTheme(
-                darkTheme = when (theme.value) {
-                    Theme.Light -> false
-                    Theme.Dark -> true
-                    else -> isSystemInDarkTheme()
+                val initialRoute = remember {
+                    if (viewModel.isSessionActive()) MusicAppRoute.Main else MusicAppRoute.Login
                 }
-            ) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.surface
+
+                MusicAppTheme(
+                    darkTheme = when (theme.value) {
+                        Theme.Light -> false
+                        Theme.Dark -> true
+                        else -> isSystemInDarkTheme()
+                    }
                 ) {
-                    MusicAppNavGraph(navController, initialRoute)
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.surface
+                    ) {
+                        MusicAppNavGraph(navController, initialRoute)
+                    }
                 }
             }
         }
