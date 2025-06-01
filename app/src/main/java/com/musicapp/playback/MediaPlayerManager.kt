@@ -284,7 +284,7 @@ class MediaPlayerManager(
             appContext.startService(serviceIntent)
             Log.d("MediaPlayerManager", "Started MediaPlaybackService for new queue.")
 
-            // race condition, wait for service to bind (Pain.)
+            // race condition, wait for service to bind
             _isExoPlayerReady.first { it }
 
             exoPlayer?.apply {
@@ -362,11 +362,16 @@ class MediaPlayerManager(
         positionUpdateJob = null
     }
 
+    fun resetIsExoPlayerReady() {
+        _isExoPlayerReady.value = false
+    }
+
     fun release() {
         Log.d("MediaPlayerManager", "Releasing ExoPlayer resources.")
         stopPositionUpdates()
         exoPlayer?.release()
         exoPlayer = null
+        _isExoPlayerReady.value = false
         _playbackState.value = PlaybackUiState()
         val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
         appContext.stopService(serviceIntent)

@@ -220,6 +220,7 @@ class MediaPlaybackService : MediaSessionService() {
         super.onDestroy()
         Log.d("MediaPlaybackService", "MediaPlaybackService destroyed.")
         cleanupResources()
+        mediaPlayerManager.resetIsExoPlayerReady()
     }
 
     private fun cleanupResources() {
