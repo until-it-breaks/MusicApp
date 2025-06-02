@@ -2,6 +2,7 @@ package com.musicapp.ui.screens.trackdetails
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,6 +48,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,6 +63,7 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.musicapp.R
 import com.musicapp.playback.PlaybackUiState
+import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.TopBarWithBackButtonAndMoreVert
 import com.musicapp.ui.models.TrackModel
 import org.koin.androidx.compose.koinViewModel
@@ -134,6 +137,7 @@ fun TrackDetailsScreen(
     ) { paddingValues ->
         TrackDetailsContent(
             track = currentTrack!!,
+            navController = navController,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
@@ -144,6 +148,7 @@ fun TrackDetailsScreen(
 @Composable
 fun TrackDetailsContent(
     track: TrackModel,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -228,15 +233,18 @@ fun TrackDetailsContent(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
             }
-            Text(
-                text = track.contributors.joinToString { it.name },
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
+            track.contributors.forEachIndexed { index, contributor ->
+                Text(
+                    text = contributor.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textDecoration = TextDecoration.Underline,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.clickable(onClick = {
+                        var artistId = contributor.id
+                        navController.navigate(MusicAppRoute.Artist(artistId)) })
+                )
+            }
             Spacer(modifier = Modifier.weight(1f))
         }
     }
