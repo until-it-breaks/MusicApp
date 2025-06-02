@@ -3,6 +3,7 @@ package com.musicapp.ui.screens.trackdetails
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.MoreVert
@@ -186,6 +187,7 @@ fun TrackDetailsContent(
 
 
 // bottom bar with controls buttons
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackDetailsPlayerControls(
     playbackUiState: PlaybackUiState,
@@ -235,7 +237,15 @@ fun TrackDetailsPlayerControls(
                 activeTrackColor = MaterialTheme.colorScheme.primary,
                 inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            thumb = {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
+
+                )
+            },
         )
 
         // Time indicators
