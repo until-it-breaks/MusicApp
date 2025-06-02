@@ -2,18 +2,47 @@ package com.musicapp.ui.screens.trackdetails
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Explicit
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,17 +50,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import com.musicapp.R
-import com.musicapp.playback.PlaybackUiState
-import com.musicapp.ui.models.TrackModel
-import org.koin.androidx.compose.koinViewModel
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
-import com.musicapp.ui.composables.MainTopBar
-import com.musicapp.ui.composables.TopBarWithBackButton
+import androidx.navigation.NavController
+import androidx.palette.graphics.Palette
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
+import com.musicapp.R
+import com.musicapp.playback.PlaybackUiState
 import com.musicapp.ui.composables.TopBarWithBackButtonAndMoreVert
+import com.musicapp.ui.models.TrackModel
+import org.koin.androidx.compose.koinViewModel
 import java.util.Locale
 
 enum class RepeatMode {
@@ -114,31 +146,47 @@ fun TrackDetailsContent(
     track: TrackModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    var dominantBackgroundColor by remember { mutableStateOf(Color.Black) }
+
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(context)
+            .data(track.bigPictureUri)
+            .size(Size.ORIGINAL)
+            .allowHardware(false)
+            .build()
+    )
+
+    LaunchedEffect(painter.state) {
+        if (painter.state is AsyncImagePainter.State.Success) {
+            val bitmap =
+                (painter.state as AsyncImagePainter.State.Success).result.drawable.toBitmap()
+            Palette.from(bitmap).generate { palette ->
+                palette?.let {
+                    // try to get dominant color else use vibrant or muted
+                    dominantBackgroundColor = it.dominantSwatch?.rgb?.let { color -> Color(color) }
+                        ?: it.vibrantSwatch?.rgb?.let { color -> Color(color) }
+                                ?: it.mutedSwatch?.rgb?.let { color -> Color(color) }
+                                ?: Color.Black
+                }
+            }
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black) // Or dynamic background based on album art
+            .background(dominantBackgroundColor)
     ) {
-        // Blurred background image (optional, mimicking Spotify)
-        Image(
-            painter = rememberAsyncImagePainter(
-                model = track.bigPictureUri,
-                contentScale = ContentScale.Crop,
-
-                //transformations = listOf(BlurTransformation(LocalContext.current, radius = 25f))
-            ),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize()
-            //.alpha(0.3f) //alpha for blur effect
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.5f)),
+                        colors = listOf(
+                            dominantBackgroundColor.copy(alpha = 0f),
+                            Color.Black.copy(alpha = 0.5f)
+                        ),
                         startY = 0.5f
                     )
                 ),
@@ -149,28 +197,40 @@ fun TrackDetailsContent(
 
             // Main Album Art
             Image(
-                painter = rememberAsyncImagePainter(model = track.bigPictureUri),
+                painter = painter,
                 contentDescription = "Album Art",
                 modifier = Modifier
                     .size(300.dp)
                     .aspectRatio(1f)
                     .padding(16.dp)
+                    .clip(RoundedCornerShape(12.dp))
             )
 
             // Track Title and Artist
-            Text(
-                text = track.title,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                track.isExplicit?.let {
+                    if (it) {
+                        Icon(
+                            imageVector = Icons.Filled.Explicit,
+                            contentDescription = null
+                        )
+                    }
+                }
+
+                Text(
+                    text = track.title,
+                    color = Color.White,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+            }
             Text(
                 text = track.contributors.joinToString { it.name },
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = Color.White.copy(alpha = 0.7f),
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
@@ -180,6 +240,7 @@ fun TrackDetailsContent(
             Spacer(modifier = Modifier.weight(1f))
         }
     }
+
 }
 
 
@@ -216,11 +277,12 @@ fun TrackDetailsPlayerControls(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Seek Bar (Progress Bar)
-        val playbackProgress = remember(playbackUiState.currentPositionMs, playbackUiState.trackDurationMs) {
-            if (playbackUiState.trackDurationMs > 0)
-                playbackUiState.currentPositionMs.toFloat() / playbackUiState.trackDurationMs.toFloat()
-            else 0f
-        }
+        val playbackProgress =
+            remember(playbackUiState.currentPositionMs, playbackUiState.trackDurationMs) {
+                if (playbackUiState.trackDurationMs > 0)
+                    playbackUiState.currentPositionMs.toFloat() / playbackUiState.trackDurationMs.toFloat()
+                else 0f
+            }
         var sliderPosition by remember { mutableFloatStateOf(playbackProgress) }
         var isDragging by remember { mutableStateOf(false) }
         LaunchedEffect(playbackProgress, isDragging) {
