@@ -30,8 +30,16 @@ data class PlaybackUiState(
     val currentQueueIndex: Int = -1,
     val currentPositionMs: Long = 0L,
     val trackDurationMs: Long = 30000L, // Default preview duration, can be updated
-    val isShuffleModeEnabled: Boolean = false
+    val isShuffleModeEnabled: Boolean = false,
+    val repeatMode: RepeatMode = RepeatMode.OFF
 )
+
+enum class RepeatMode {
+    OFF,
+    ON,
+    ONE,
+    ONCE
+}
 
 @UnstableApi
 class MediaPlayerManager(
@@ -95,8 +103,7 @@ class MediaPlayerManager(
             currentState.copy(isLoading = newIsLoading)
         }
         if (playbackState == Player.STATE_ENDED) {
-            Log.d("MediaPlayerManager", "ExoPlayer: Track ended naturally.")
-            // exoplayer will automatically move to next item if available in its queue.
+            Log.d("MediaPlayerManager", "ExoPlayer: Queue ended naturally.")
         }
     }
 
@@ -112,15 +119,23 @@ class MediaPlayerManager(
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         val currentState = _playbackState.value
+        val previousTrackId = currentState.currentPlayingTrackId
         val trackId = mediaItem?.mediaId?.toLongOrNull()
         val originalTrackModel = currentState.playbackQueue.find { it.id == trackId }
         val newIndex = currentState.playbackQueue.indexOf(originalTrackModel)
+
+        if (currentState.repeatMode == RepeatMode.ONCE && previousTrackId != trackId) {
+            stop()
+            return
+        }
 
         Log.d(
             "MediaPlayerManager",
             "Manager: Media item transition to ${originalTrackModel?.title}, new index: $newIndex"
         )
-        val startPosition = if (currentState.currentPlayingTrackId == originalTrackModel?.id) { currentState.currentPositionMs} else 0L
+        val startPosition = if (currentState.currentPlayingTrackId == originalTrackModel?.id) {
+            currentState.currentPositionMs
+        } else 0L
         _playbackState.update {
             it.copy(
                 currentPlayingTrackId = originalTrackModel?.id,
@@ -445,6 +460,26 @@ class MediaPlayerManager(
 
     fun resetIsExoPlayerReady() {
         _isExoPlayerReady.value = false
+    }
+
+    fun toggleRepeatMode() {
+        _playbackState.update { currentState ->
+            val nextRepeatMode = when (currentState.repeatMode) {
+                RepeatMode.OFF -> RepeatMode.ON
+                RepeatMode.ON -> RepeatMode.ONE
+                RepeatMode.ONE -> RepeatMode.ONCE
+                RepeatMode.ONCE -> RepeatMode.OFF
+            }
+
+            exoPlayer?.repeatMode = when (nextRepeatMode) {
+                RepeatMode.OFF, RepeatMode.ONCE -> Player.REPEAT_MODE_OFF
+                RepeatMode.ON -> Player.REPEAT_MODE_ALL
+                RepeatMode.ONE -> Player.REPEAT_MODE_ONE
+            }
+
+            Log.d("MediaPlayerManager", "Repeat mode changed to: $nextRepeatMode")
+            currentState.copy(repeatMode = nextRepeatMode)
+        }
     }
 
     fun release() {

@@ -59,6 +59,10 @@ open class BasePlaybackViewModel
         mediaPlayerManager.playPrevious()
     }
 
+    fun toggleRepeatMode(){
+        mediaPlayerManager.toggleRepeatMode()
+    }
+
     fun seekTo(positionMs: Long) {
         mediaPlayerManager.seekTo(positionMs)
     }

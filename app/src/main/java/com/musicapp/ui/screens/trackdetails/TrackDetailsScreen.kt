@@ -32,7 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -64,18 +63,12 @@ import coil.size.Size
 import com.musicapp.R
 import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.PlaybackUiState
+import com.musicapp.playback.RepeatMode
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.TopBarWithBackButtonAndMoreVert
 import com.musicapp.ui.models.TrackModel
 import org.koin.androidx.compose.koinViewModel
 import java.util.Locale
-
-enum class RepeatMode {
-    OFF,
-    ON,
-    ONE,
-    ONCE
-}
 
 @OptIn(ExperimentalMaterial3Api::class) // For TopAppBar
 @UnstableApi
@@ -111,11 +104,11 @@ fun TrackDetailsScreen(
             TrackDetailsPlayerControls(
                 playbackUiState = playbackUiState,
                 onTogglePlayPause = {
-                    if (playbackUiState.currentTrack?.id == currentTrack?.id) {
-                        viewModel.togglePlayback(currentTrack!!)
+                    if (playbackUiState.currentTrack?.id == currentTrack.id) {
+                        viewModel.togglePlayback(currentTrack)
                     } else {
                         viewModel.setPlaybackQueue(
-                            listOf(currentTrack!!),
+                            listOf(currentTrack),
                             0
                         )
                     }
@@ -123,6 +116,7 @@ fun TrackDetailsScreen(
                 onPreviousClick = viewModel::playPreviousTrack,
                 onNextClick = viewModel::playNextTrack,
                 onShuffleClick = viewModel::toggleShuffleMode,
+                onRepeatModeClick = viewModel::toggleRepeatMode,
                 onSeek = viewModel::seekTo,
                 currentPosition = playbackUiState.currentPositionMs,
                 trackDuration = playbackUiState.trackDurationMs
@@ -130,7 +124,7 @@ fun TrackDetailsScreen(
         }
     ) { paddingValues ->
         TrackDetailsContent(
-            track = currentTrack!!,
+            track = currentTrack,
             navController = navController,
             modifier = Modifier
                 .padding(paddingValues)
@@ -255,6 +249,7 @@ fun TrackDetailsPlayerControls(
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
     onShuffleClick: () -> Unit,
+    onRepeatModeClick: () -> Unit,
     onSeek: (Long) -> Unit,
     currentPosition: Long,
     trackDuration: Long,
@@ -263,8 +258,8 @@ fun TrackDetailsPlayerControls(
     val isPlaying = playbackUiState.isPlaying
     val track = playbackUiState.currentTrack
 
-    var isShuffleOn = playbackUiState.isShuffleModeEnabled
-    var currentRepeatMode by remember { mutableStateOf(RepeatMode.OFF) }
+    val isShuffleOn = playbackUiState.isShuffleModeEnabled
+    var currentRepeatMode = playbackUiState.repeatMode
 
     if (track == null) {
         Spacer(modifier = Modifier.height(100.dp))
@@ -385,15 +380,7 @@ fun TrackDetailsPlayerControls(
             }
 
             // Repeat
-            IconButton(onClick = {
-                currentRepeatMode = when (currentRepeatMode) {
-                    RepeatMode.OFF -> RepeatMode.ON
-                    RepeatMode.ON -> RepeatMode.ONE
-                    RepeatMode.ONE -> RepeatMode.ONCE
-                    RepeatMode.ONCE -> RepeatMode.OFF
-                }
-                // TODO Handle repeat
-            }) {
+            IconButton(onClick = onRepeatModeClick) {
                 val iconResource = when (currentRepeatMode) {
                     RepeatMode.OFF -> R.drawable.ic_repeat
                     RepeatMode.ON -> R.drawable.ic_repeat_on
