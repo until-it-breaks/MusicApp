@@ -24,6 +24,7 @@ media3Session = "1.7.1"
 media3Ui = "1.7.1"
 navigationCompose = "2.9.0"
 ksp = "2.1.21-2.0.1"
+paletteKtx = "1.0.0"
 room = "2.7.1"
 uiTextGoogleFonts = "1.8.2"
 
@@ -38,6 +39,7 @@ androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", versi
 androidx-media3-session = { module = "androidx.media3:media3-session", version.ref = "media3Session" }
 androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3Ui" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-palette-ktx = { module = "androidx.palette:palette-ktx", version.ref = "paletteKtx" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-kt-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeVersion" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
