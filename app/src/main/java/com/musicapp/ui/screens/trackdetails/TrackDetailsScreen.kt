@@ -62,6 +62,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.musicapp.R
+import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.PlaybackUiState
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.TopBarWithBackButtonAndMoreVert
@@ -83,7 +84,7 @@ fun TrackDetailsScreen(
     trackId: Long,
     navController: NavController,
 ) {
-    val viewModel: TrackDetailsViewModel = koinViewModel()
+    val viewModel: BasePlaybackViewModel = koinViewModel()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
 
     val currentTrack: TrackModel? by remember(playbackUiState.currentTrack, trackId) {
@@ -96,6 +97,7 @@ fun TrackDetailsScreen(
         }
     }
 
+    // maybe not needed since the track is already loaded in the viewModel
     LaunchedEffect(trackId) {
         // viewModel.loadTrackDetails(trackId)
     }
@@ -129,6 +131,7 @@ fun TrackDetailsScreen(
                 },
                 onPreviousClick = viewModel::playPreviousTrack,
                 onNextClick = viewModel::playNextTrack,
+                onShuffleClick = viewModel::toggleShuffleMode,
                 onSeek = viewModel::seekTo,
                 currentPosition = playbackUiState.currentPositionMs,
                 trackDuration = playbackUiState.trackDurationMs
@@ -260,6 +263,7 @@ fun TrackDetailsPlayerControls(
     onTogglePlayPause: () -> Unit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
+    onShuffleClick: () -> Unit,
     onSeek: (Long) -> Unit,
     currentPosition: Long,
     trackDuration: Long,
@@ -268,7 +272,7 @@ fun TrackDetailsPlayerControls(
     val isPlaying = playbackUiState.isPlaying
     val track = playbackUiState.currentTrack
 
-    var isShuffleOn by remember { mutableStateOf(false) }
+    var isShuffleOn = playbackUiState.isShuffleModeEnabled
     var currentRepeatMode by remember { mutableStateOf(RepeatMode.OFF) }
 
     if (track == null) {
@@ -353,10 +357,7 @@ fun TrackDetailsPlayerControls(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Shuffle
-            IconButton(onClick = {
-                isShuffleOn = !isShuffleOn
-                // TODO Handle shuffle
-            }) {
+            IconButton(onClick = onShuffleClick) {
                 Icon(
                     painterResource(if (isShuffleOn) R.drawable.ic_shuffle_on else R.drawable.ic_shuffle),
                     contentDescription = "Shuffle",

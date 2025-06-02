@@ -90,7 +90,7 @@ class SearchViewModel(
         )
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L), // Strategy for sharing the state
+        started = SharingStarted.WhileSubscribed(5000L),
         initialValue = SearchUiState()
     )
 

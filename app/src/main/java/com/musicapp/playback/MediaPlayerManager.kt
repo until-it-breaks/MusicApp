@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.CoroutineScope
@@ -15,11 +16,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import androidx.media3.common.util.UnstableApi
-import kotlinx.coroutines.flow.first
-import java.util.Collections
 
 data class PlaybackUiState(
     val currentPlayingTrackId: Long? = null,
@@ -112,20 +111,22 @@ class MediaPlayerManager(
     }
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+        val currentState = _playbackState.value
         val trackId = mediaItem?.mediaId?.toLongOrNull()
-        val originalTrackModel = _playbackState.value.playbackQueue.find { it.id == trackId }
-        val newIndex = _playbackState.value.playbackQueue.indexOf(originalTrackModel)
+        val originalTrackModel = currentState.playbackQueue.find { it.id == trackId }
+        val newIndex = currentState.playbackQueue.indexOf(originalTrackModel)
 
         Log.d(
             "MediaPlayerManager",
             "Manager: Media item transition to ${originalTrackModel?.title}, new index: $newIndex"
         )
+        val startPosition = if (currentState.currentPlayingTrackId == originalTrackModel?.id) { currentState.currentPositionMs} else 0L
         _playbackState.update {
             it.copy(
                 currentPlayingTrackId = originalTrackModel?.id,
                 currentTrack = originalTrackModel,
                 currentQueueIndex = newIndex,
-                currentPositionMs = 0L, // Reset position on new track
+                currentPositionMs = startPosition,
                 // default duration, can be updated
                 trackDurationMs = 30000L
             )
@@ -272,6 +273,7 @@ class MediaPlayerManager(
             )
         }
         setPlaybackQueueInternal(newQueue, startIndex)
+
     }
 
     /**
@@ -348,9 +350,14 @@ class MediaPlayerManager(
                     .build()
             }
 
-            val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
-            appContext.startService(serviceIntent)
-            Log.d("MediaPlayerManager", "Started MediaPlaybackService for new queue.")
+            if (exoPlayer == null) {
+                val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
+                appContext.startService(serviceIntent)
+                Log.d("MediaPlayerManager", "Started MediaPlaybackService for new queue.")
+            } else {
+                Log.d("MediaPlayerManager", "Updated MediaPlaybackService for new queue.")
+            }
+
 
             // race condition, wait for service to bind
             _isExoPlayerReady.first { it }
