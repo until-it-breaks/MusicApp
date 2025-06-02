@@ -97,8 +97,8 @@ fun DeezerTrackSummary.toModel(): TrackModel {
         isExplicit = this.explicitLyrics,
         previewUri = this.preview.toUri(),
         smallPictureUri = this.album.smallCover?.toUri() ?: Uri.EMPTY,
-        mediumPictureUri = this.album.bigCover?.toUri() ?: Uri.EMPTY,
-        bigPictureUri = this.album.smallCover?.toUri() ?: Uri.EMPTY,
+        mediumPictureUri = this.album.mediumCover?.toUri() ?: Uri.EMPTY,
+        bigPictureUri = this.album.bigCover?.toUri() ?: Uri.EMPTY,
         contributors = listOf(this.artist.toModel())
     )
 }
