@@ -49,23 +49,20 @@ fun TrackDetailsScreen(
     navController: NavController,
 ) {
     val viewModel: TrackDetailsViewModel = koinViewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
 
-    val currentTrack = remember(uiState, playbackUiState) {
-        // Prioritize the currently playing track if it matches the screen's trackId
-        if (playbackUiState.currentTrack?.id == trackId) {
-            playbackUiState.currentTrack
-        } else {
-            when (uiState) {
-                is TrackDetailsUiState.Success -> (uiState as TrackDetailsUiState.Success).track
-                else -> null
+    val currentTrack: TrackModel? by remember(playbackUiState.currentTrack, trackId) {
+        derivedStateOf {
+            if (playbackUiState.currentTrack?.id == trackId) {
+                playbackUiState.currentTrack
+            } else {
+                null
             }
         }
     }
 
     LaunchedEffect(trackId) {
-        viewModel.loadTrackDetails(trackId)
+        // viewModel.loadTrackDetails(trackId)
     }
 
     if (currentTrack == null) {
@@ -86,11 +83,11 @@ fun TrackDetailsScreen(
             TrackDetailsPlayerControls(
                 playbackUiState = playbackUiState,
                 onTogglePlayPause = {
-                    if (playbackUiState.currentTrack?.id == currentTrack.id) {
-                        viewModel.togglePlayback(currentTrack)
+                    if (playbackUiState.currentTrack?.id == currentTrack?.id) {
+                        viewModel.togglePlayback(currentTrack!!)
                     } else {
                         viewModel.setPlaybackQueue(
-                            listOf(currentTrack),
+                            listOf(currentTrack!!),
                             0
                         )
                     }
@@ -104,7 +101,7 @@ fun TrackDetailsScreen(
         }
     ) { paddingValues ->
         TrackDetailsContent(
-            track = currentTrack,
+            track = currentTrack!!,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
@@ -214,21 +211,32 @@ fun TrackDetailsPlayerControls(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
-            .padding(16.dp)
+            .padding(8.dp)
             .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Seek Bar (Progress Bar)
-        val progress =
-            if (trackDuration > 0) currentPosition.toFloat() / trackDuration.toFloat() else 0f
-        var sliderPosition by remember { mutableFloatStateOf(progress) }
+        val playbackProgress = remember(playbackUiState.currentPositionMs, playbackUiState.trackDurationMs) {
+            if (playbackUiState.trackDurationMs > 0)
+                playbackUiState.currentPositionMs.toFloat() / playbackUiState.trackDurationMs.toFloat()
+            else 0f
+        }
+        var sliderPosition by remember { mutableFloatStateOf(playbackProgress) }
+        var isDragging by remember { mutableStateOf(false) }
+        LaunchedEffect(playbackProgress, isDragging) {
+            if (!isDragging) {
+                sliderPosition = playbackProgress
+            }
+        }
 
         Slider(
             value = sliderPosition,
             onValueChange = { newValue ->
+                isDragging = true
                 sliderPosition = newValue
             },
             onValueChangeFinished = {
+                isDragging = false
                 val targetPositionMs = (sliderPosition * playbackUiState.trackDurationMs).toLong()
                 onSeek(targetPositionMs)
             },
@@ -237,15 +245,26 @@ fun TrackDetailsPlayerControls(
                 activeTrackColor = MaterialTheme.colorScheme.primary,
                 inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
             ),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             thumb = {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .offset(y = 2.dp)
+                        .size(12.dp)
                         .background(MaterialTheme.colorScheme.primary, CircleShape)
-
                 )
             },
+            track = { sliderState ->
+                SliderDefaults.Track(
+                    sliderState = sliderState,
+                    modifier = Modifier.height(4.dp),
+                    colors = SliderDefaults.colors(
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                    )
+                )
+            }
         )
 
         // Time indicators
@@ -256,8 +275,6 @@ fun TrackDetailsPlayerControls(
             Text(text = formatDuration(currentPosition), style = MaterialTheme.typography.bodySmall)
             Text(text = formatDuration(trackDuration), style = MaterialTheme.typography.bodySmall)
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Control Buttons
         Row(
