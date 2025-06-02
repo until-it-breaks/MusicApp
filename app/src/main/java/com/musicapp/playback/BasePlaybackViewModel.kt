@@ -43,6 +43,10 @@ open class BasePlaybackViewModel
         mediaPlayerManager.togglePlayback(track)
     }
 
+    fun toggleShuffleMode(){
+        mediaPlayerManager.toggleShuffleMode()
+    }
+
     fun stopMusic() {
         mediaPlayerManager.stop()
     }
