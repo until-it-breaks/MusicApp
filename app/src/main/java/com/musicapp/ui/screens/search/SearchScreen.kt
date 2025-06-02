@@ -113,14 +113,6 @@ fun SearchScreen(
                             if ((index >= uiState.searchResults.tracks.size - 1) && uiState.searchResults.hasNext) {
                                 viewModel.loadMoreTracks()
                             }
-// si bugga nice!
-//                            if (uiState.isLoadingMore){
-//                                CircularProgressIndicator(
-//                                    modifier = Modifier
-//                                        .align(Alignment.CenterHorizontally)
-//                                        .padding(16.dp)
-//                                )
-//                            }
 
                             TrackCard(
                                 track = track,

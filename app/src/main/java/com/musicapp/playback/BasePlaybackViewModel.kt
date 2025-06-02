@@ -47,16 +47,10 @@ open class BasePlaybackViewModel
         mediaPlayerManager.stop()
     }
 
-    /**
-     * Plays the next track in the queue.
-     */
     fun playNextTrack() {
         mediaPlayerManager.playNext()
     }
 
-    /**
-     * Plays the previous track in the queue.
-     */
     fun playPreviousTrack() {
         mediaPlayerManager.playPrevious()
     }
