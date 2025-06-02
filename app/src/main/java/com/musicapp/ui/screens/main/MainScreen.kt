@@ -85,10 +85,7 @@ fun MainScreen(navController: NavController) {
                 onTogglePlayback = viewModel::togglePlayback,
                 onAddToList = { /* TODO */ }, // it does nothing for now
                 onBarClick = {
-                    val currentTrackId = playbackUiState.currentTrack?.id
-                    if (currentTrackId != null) {
-                        navController.navigate(MusicAppRoute.TrackDetails(currentTrackId))
-                    }
+                    navController.navigate(MusicAppRoute.TrackDetails)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -106,12 +103,14 @@ fun MainScreen(navController: NavController) {
                                     inclusive = false
                                 )
                             }
+
                             MainCategory.SEARCH -> {
                                 searchNavController.popBackStack(
                                     route = MusicAppRoute.Search,
                                     inclusive = false
                                 )
                             }
+
                             MainCategory.LIBRARY -> {
                                 libraryNavController.popBackStack(
                                     route = MusicAppRoute.Library,

@@ -81,25 +81,16 @@ enum class RepeatMode {
 @UnstableApi
 @Composable
 fun TrackDetailsScreen(
-    trackId: Long,
     navController: NavController,
 ) {
     val viewModel: BasePlaybackViewModel = koinViewModel()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
 
-    val currentTrack: TrackModel? by remember(playbackUiState.currentTrack, trackId) {
-        derivedStateOf {
-            if (playbackUiState.currentTrack?.id == trackId) {
-                playbackUiState.currentTrack
-            } else {
-                null
-            }
-        }
-    }
+    val currentTrack: TrackModel? = playbackUiState.currentTrack
 
     // maybe not needed since the track is already loaded in the viewModel
-    LaunchedEffect(trackId) {
-        // viewModel.loadTrackDetails(trackId)
+    LaunchedEffect(currentTrack) {
+        //viewModel.loadCurrentTrack()
     }
 
     if (currentTrack == null) {

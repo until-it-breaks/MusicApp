@@ -1,6 +1,8 @@
 package com.musicapp.ui
 
+import androidx.annotation.OptIn
 import androidx.compose.runtime.Composable
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -36,13 +38,15 @@ sealed interface MusicAppRoute {
     @Serializable data object Library: MusicAppRoute
     @Serializable data object LikedSongs: MusicAppRoute
     @Serializable data object TrackHistory: MusicAppRoute
+    @Serializable data object TrackDetails: MusicAppRoute
     @Serializable data class Album(val id: Long): MusicAppRoute
     @Serializable data class Playlist(val id: Long): MusicAppRoute
     @Serializable data class Artist(val id: Long): MusicAppRoute
     @Serializable data class UserPlaylist(val uuid: String): MusicAppRoute
-    @Serializable data class TrackDetails(val id: Long): MusicAppRoute
+
 }
 
+@OptIn(UnstableApi::class)
 @Composable
 fun MusicAppNavGraph(navController: NavHostController, musicAppRoute: MusicAppRoute) {
     NavHost(
@@ -68,12 +72,12 @@ fun MusicAppNavGraph(navController: NavHostController, musicAppRoute: MusicAppRo
             PasswordRecoveryScreen(navController)
         }
         composable<MusicAppRoute.TrackDetails> { backStackEntry ->
-            val route = backStackEntry.toRoute<MusicAppRoute.TrackDetails>()
-            TrackDetailsScreen(trackId = route.id, navController = navController)
+            TrackDetailsScreen(navController = navController)
         }
     }
 }
 
+@OptIn(UnstableApi::class)
 @Composable
 fun HomeNavGraph(mainNavController: NavController, subNavController: NavHostController) {
     NavHost(
@@ -102,6 +106,7 @@ fun HomeNavGraph(mainNavController: NavController, subNavController: NavHostCont
     }
 }
 
+@OptIn(UnstableApi::class)
 @Composable
 fun SearchNavGraph(mainNavController: NavController, subNavController: NavHostController) {
     NavHost(
@@ -130,6 +135,7 @@ fun SearchNavGraph(mainNavController: NavController, subNavController: NavHostCo
     }
 }
 
+@OptIn(UnstableApi::class)
 @Composable
 fun LibraryNavGraph(mainNavController: NavController, subNavController: NavHostController) {
     NavHost(
