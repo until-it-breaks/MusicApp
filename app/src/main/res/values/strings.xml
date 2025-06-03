@@ -151,5 +151,4 @@
     <string name="your_playlists">Your playlists</string>
     <string name="channel_name" translatable="false">Music Playback</string>
     <string name="channel_description" translatable="false">Notifications for ongoing music playback controls</string>
-    <string name="trackDetails">Track Details</string>
 </resources>

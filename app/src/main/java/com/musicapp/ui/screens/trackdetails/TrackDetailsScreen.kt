@@ -93,11 +93,17 @@ fun TrackDetailsScreen(
         return
     }
 
+    val maxLength = 30
+    var title : String = currentTrack.title
+    if (currentTrack.title.length >= maxLength) {
+        title = currentTrack.title.take(maxLength) + "..."
+    }
+
     Scaffold(
         topBar = {
             TopBarWithBackButtonAndMoreVert(
                 navController = navController,
-                title = stringResource(R.string.trackDetails),
+                title = title,
                 onMoreVertClick = { /*TODO*/ })
         },
         bottomBar = {
@@ -117,6 +123,9 @@ fun TrackDetailsScreen(
                 onNextClick = viewModel::playNextTrack,
                 onShuffleClick = viewModel::toggleShuffleMode,
                 onRepeatModeClick = viewModel::toggleRepeatMode,
+                onQueueClick = { /*TODO*/ },
+                onLikeClick = { /*TODO*/ },
+                onPlusClick = { /*TODO*/ },
                 onSeek = viewModel::seekTo,
                 currentPosition = playbackUiState.currentPositionMs,
                 trackDuration = playbackUiState.trackDurationMs
@@ -224,13 +233,15 @@ fun TrackDetailsContent(
             track.contributors.forEachIndexed { index, contributor ->
                 Text(
                     text = contributor.name,
+                    color = Color.White,
                     style = MaterialTheme.typography.bodyMedium,
                     textDecoration = TextDecoration.Underline,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.clickable(onClick = {
                         var artistId = contributor.id
-                        navController.navigate(MusicAppRoute.Artist(artistId)) })
+                        navController.navigate(MusicAppRoute.Artist(artistId))
+                    })
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -250,6 +261,9 @@ fun TrackDetailsPlayerControls(
     onNextClick: () -> Unit,
     onShuffleClick: () -> Unit,
     onRepeatModeClick: () -> Unit,
+    onQueueClick: () -> Unit,
+    onLikeClick: () -> Unit,
+    onPlusClick: () -> Unit,
     onSeek: (Long) -> Unit,
     currentPosition: Long,
     trackDuration: Long,
@@ -274,6 +288,40 @@ fun TrackDetailsPlayerControls(
             .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Three icons at the top
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // queue
+            IconButton(onClick = onQueueClick) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_queue),
+                    contentDescription = "Queue",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            // like
+            IconButton(onClick = onLikeClick) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_heart), // TODO: show filled heart if liked
+                    contentDescription = "Like",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            // plus
+            IconButton(onClick = onPlusClick) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_add),
+                    contentDescription = "Add",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+
         // Seek Bar (Progress Bar)
         val playbackProgress =
             remember(playbackUiState.currentPositionMs, playbackUiState.trackDurationMs) {
@@ -354,7 +402,8 @@ fun TrackDetailsPlayerControls(
             // Previous
             IconButton(onClick = onPreviousClick) {
                 Icon(
-                    painterResource(R.drawable.ic_skip_previous), contentDescription = "Previous",
+                    painterResource(R.drawable.ic_skip_previous),
+                    contentDescription = "Previous",
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
