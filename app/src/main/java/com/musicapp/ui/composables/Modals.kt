@@ -38,8 +38,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import com.musicapp.R
+import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.PlaybackUiState
 import com.musicapp.ui.models.TrackModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -156,22 +158,22 @@ fun EditPlaylistNameModal(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@UnstableApi // Mark as unstable if it uses unstable Media3 APIs
+@UnstableApi
 @Composable
 fun QueueBottomSheet(
     playbackUiState: PlaybackUiState,
     onDismissRequest: () -> Unit,
-    onTrackClick: (TrackModel, Int) -> Unit // Callback when a track in the queue is clicked
+    onTrackClick: (TrackModel, Int) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true // Makes it fully expanded or hidden
+        skipPartiallyExpanded = true
     )
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surface, // Use surface color for the sheet background
-        contentColor = MaterialTheme.colorScheme.onSurface // Use onSurface for text/icons
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
     ) {
         Column(
             modifier = Modifier
@@ -181,7 +183,7 @@ fun QueueBottomSheet(
         ) {
             // Title
             Text(
-                text = stringResource(R.string.queue_title), // Define R.string.queue_title
+                text = stringResource(R.string.queue_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -195,7 +197,7 @@ fun QueueBottomSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.playing_now), // Define R.string.playing_now
+                    text = stringResource(R.string.playing_now),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -213,21 +215,19 @@ fun QueueBottomSheet(
 
             // List of tracks in the queue
             if (playbackUiState.playbackQueue.isNotEmpty()) {
+                val viewModel: BasePlaybackViewModel = koinViewModel()
                 LazyColumn {
                     itemsIndexed(playbackUiState.playbackQueue) { index, track ->
                         TrackCard(
                             track = track,
-                            showPicture = true, // Show picture as in original QueueTrackItem
+                            showPicture = true,
                             playbackUiState = playbackUiState,
                             onTrackClick = { clickedTrack ->
-                                // Pass the track and its index back to the parent
                                 onTrackClick(clickedTrack, index)
                             },
-                            onArtistClick = { /* Ignored as requested */ },
+                            onArtistClick = { },
                             extraMenu = {
-                                // Re-add the play button for each item in the queue if desired
                                 if (track.id == playbackUiState.currentTrack?.id) {
-
                                     IconButton(onClick = { onTrackClick(track, index) }) {
                                         Icon(
                                             painter = painterResource(
@@ -237,15 +237,22 @@ fun QueueBottomSheet(
                                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
+                                } else {
+                                    PublicTrackDropDownMenu(
+                                        trackModel = track,
+                                        onLiked = { /*TODO*/ },
+                                        onAddToQueue = viewModel::removeTrackFromQueue,
+                                        removeFromQueue = true
+                                    )
                                 }
                             }
                         )
-                        Spacer(modifier = Modifier.height(8.dp)) // Add spacing between cards
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             } else {
                 Text(
-                    text = stringResource(R.string.empty_queue_message), // Define R.string.empty_queue_message
+                    text = stringResource(R.string.empty_queue_message),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 24.dp)

@@ -417,6 +417,18 @@ class MediaPlayerManager(
         }
     }
 
+    fun removeTrackFromQueue(track: TrackModel) {
+        scope.launch {
+            val currentQueue = _playbackState.value.playbackQueue.toMutableList()
+            val index = currentQueue.indexOf(track)
+            currentQueue.remove(track)
+            _playbackState.update { it.copy(playbackQueue = currentQueue) }
+
+            exoPlayer?.removeMediaItem(index)
+            Log.d("MediaPlayerManager", "Removed track '${track.title}' from queue. New queue size: ${currentQueue.size}")
+        }
+    }
+
     /**
      * Clears the entire playback queue and stops current playback.
      */

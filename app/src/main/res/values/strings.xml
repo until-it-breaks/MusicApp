@@ -154,4 +154,5 @@
     <string name="queue_title">Queue</string>
     <string name="playing_now">Playing: </string>
     <string name="empty_queue_message">The queue is empty</string>
+    <string name="remove_from_queue">Remove from queue</string>
 </resources>

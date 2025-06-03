@@ -108,7 +108,8 @@ fun PublicTrackDropDownMenu(
     trackModel: TrackModel,
     onAddToQueue: (track: TrackModel) -> Unit,
     onLiked: (track: TrackModel) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    removeFromQueue: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -127,8 +128,9 @@ fun PublicTrackDropDownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = !expanded }
         ) {
+            val text = if (removeFromQueue) { stringResource(R.string.remove_from_queue) } else { stringResource(R.string.add_to_queue)}
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.add_to_queue)) },
+                text = { Text(text) },
                 leadingIcon = { Icon(Icons.Outlined.QueuePlayNext, contentDescription = null)},
                 onClick = {
                     expanded = !expanded
