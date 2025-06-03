@@ -107,7 +107,6 @@ class SearchViewModel(
             _searchResultsState.value = SearchResultsUiState()
             _error.value = false
             _paginationError.value = false
-            mediaPlayerManager.stop()
             return
         }
 
@@ -115,7 +114,6 @@ class SearchViewModel(
             _isLoading.value = true
             _error.value = false
             _paginationError.value = false
-            mediaPlayerManager.stop()
 
             try {
                 val results: DeezerSearchResponse =
