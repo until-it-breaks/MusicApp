@@ -71,8 +71,16 @@ fun MusicAppNavGraph(navController: NavHostController, musicAppRoute: MusicAppRo
         composable<MusicAppRoute.PasswordRecovery> {
             PasswordRecoveryScreen(navController)
         }
-        composable<MusicAppRoute.TrackDetails> { backStackEntry ->
-            TrackDetailsScreen(navController = navController)
+        composable<MusicAppRoute.TrackDetails> {
+            TrackDetailsScreen(navController)
+        }
+        composable<MusicAppRoute.Artist> { backStackEntry ->
+            val route = backStackEntry.toRoute<MusicAppRoute.Artist>()
+            ArtistScreen(navController, route.id)
+        }
+        composable<MusicAppRoute.Album> { backStackEntry ->
+            val route = backStackEntry.toRoute<MusicAppRoute.Album>()
+            AlbumScreen(navController, route.id)
         }
     }
 }
