@@ -160,6 +160,30 @@ class MediaPlayerManager(
         _playbackState.update { it.copy(currentPositionMs = newPosition.positionMs) }
     }
 
+    override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+        _playbackState.update { it.copy(isShuffleModeEnabled = shuffleModeEnabled) }
+        Log.d("MediaPlayerManager", "Manager: ExoPlayer shuffle mode changed: $shuffleModeEnabled")
+    }
+
+    override fun onRepeatModeChanged(@Player.RepeatMode repeatMode: Int) {
+        _playbackState.update { currentState ->
+            val newRepeatMode = when (repeatMode) {
+                Player.REPEAT_MODE_OFF -> {
+                    if (currentState.repeatMode == RepeatMode.ONCE) RepeatMode.ONCE else RepeatMode.OFF
+                }
+
+                Player.REPEAT_MODE_ONE -> RepeatMode.ONE
+                Player.REPEAT_MODE_ALL -> RepeatMode.ON
+                else -> currentState.repeatMode
+            }
+            Log.d(
+                "MediaPlayerManager",
+                "Manager: ExoPlayer repeat mode changed to $repeatMode, internal state to $newRepeatMode"
+            )
+            currentState.copy(repeatMode = newRepeatMode)
+        }
+    }
+
     override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
         Log.e("MediaPlayerManager", "Manager: ExoPlayer error: ${error.message}", error)
         _playbackState.update {
@@ -298,42 +322,9 @@ class MediaPlayerManager(
      */
     fun toggleShuffleMode() {
         val currentState = _playbackState.value
-        val currentTrack = currentState.currentTrack
-
-        _playbackState.update {
-            it.copy(isShuffleModeEnabled = !currentState.isShuffleModeEnabled)
-        }
-        val newShuffleState = _playbackState.value.isShuffleModeEnabled
-
-        Log.d("MediaPlayerManager", "Shuffle mode toggled. New state: $newShuffleState")
-
-        if (currentTrack == null) {
-            Log.w("MediaPlayerManager", "Cannot toggle shuffle: current track is null.")
-            return
-        }
-
-        scope.launch {
-            if (newShuffleState) {
-                // Shuffle ON
-                val remainingTracks =
-                    currentState.playbackQueue.toMutableList().also { it.remove(currentTrack) }
-                remainingTracks.shuffle()
-                val newShuffledQueue = listOf(currentTrack) + remainingTracks
-
-                // did not updated the playback state, just updated the exoplayer queue.
-                // reason: the user queue is not touched
-                setPlaybackQueueInternal(newShuffledQueue, 0, currentState.currentPositionMs)
-
-            } else {
-                // Shuffle OFF
-                val newStartIndex = currentState.playbackQueue.indexOf(currentTrack)
-                setPlaybackQueueInternal(
-                    currentState.playbackQueue,
-                    newStartIndex,
-                    currentState.currentPositionMs
-                )
-            }
-        }
+        val newShuffleMode = !currentState.isShuffleModeEnabled
+        exoPlayer?.shuffleModeEnabled = newShuffleMode
+        Log.d("MediaPlayerManager", "Shuffle mode toggled to: $newShuffleMode")
     }
 
     private fun setPlaybackQueueInternal(
@@ -463,23 +454,23 @@ class MediaPlayerManager(
     }
 
     fun toggleRepeatMode() {
-        _playbackState.update { currentState ->
-            val nextRepeatMode = when (currentState.repeatMode) {
-                RepeatMode.OFF -> RepeatMode.ON
-                RepeatMode.ON -> RepeatMode.ONE
-                RepeatMode.ONE -> RepeatMode.ONCE
-                RepeatMode.ONCE -> RepeatMode.OFF
-            }
+        val currentState = _playbackState.value
 
-            exoPlayer?.repeatMode = when (nextRepeatMode) {
-                RepeatMode.OFF, RepeatMode.ONCE -> Player.REPEAT_MODE_OFF
-                RepeatMode.ON -> Player.REPEAT_MODE_ALL
-                RepeatMode.ONE -> Player.REPEAT_MODE_ONE
-            }
-
-            Log.d("MediaPlayerManager", "Repeat mode changed to: $nextRepeatMode")
-            currentState.copy(repeatMode = nextRepeatMode)
+        val nextRepeatMode = when (currentState.repeatMode) {
+            RepeatMode.OFF -> RepeatMode.ON
+            RepeatMode.ON -> RepeatMode.ONE
+            RepeatMode.ONE -> RepeatMode.ONCE
+            RepeatMode.ONCE -> RepeatMode.OFF
         }
+
+        exoPlayer?.repeatMode = when (nextRepeatMode) {
+            RepeatMode.OFF, RepeatMode.ONCE -> Player.REPEAT_MODE_OFF
+            RepeatMode.ON -> Player.REPEAT_MODE_ALL
+            RepeatMode.ONE -> Player.REPEAT_MODE_ONE
+        }
+
+        Log.d("MediaPlayerManager", "Repeat mode changed to: $nextRepeatMode")
+
     }
 
     fun release() {
