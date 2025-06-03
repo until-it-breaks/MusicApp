@@ -449,10 +449,6 @@ class MediaPlayerManager(
         positionUpdateJob = null
     }
 
-    fun resetIsExoPlayerReady() {
-        _isExoPlayerReady.value = false
-    }
-
     fun toggleRepeatMode() {
         val currentState = _playbackState.value
 
@@ -474,7 +470,7 @@ class MediaPlayerManager(
     }
 
     fun release() {
-        Log.d("MediaPlayerManager", "Releasing ExoPlayer resources.")
+        Log.d("MediaPlayerManager", "Releasing ExoPlayer resources and resetting state.")
         stopPositionUpdates()
         exoPlayer?.release()
         exoPlayer = null
