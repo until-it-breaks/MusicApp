@@ -151,4 +151,7 @@
     <string name="your_playlists">Your playlists</string>
     <string name="channel_name" translatable="false">Music Playback</string>
     <string name="channel_description" translatable="false">Notifications for ongoing music playback controls</string>
+    <string name="queue_title">Queue</string>
+    <string name="playing_now">Playing: </string>
+    <string name="empty_queue_message">The queue is empty</string>
 </resources>

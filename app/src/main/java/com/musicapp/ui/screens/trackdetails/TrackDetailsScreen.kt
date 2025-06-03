@@ -64,6 +64,7 @@ import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.PlaybackUiState
 import com.musicapp.playback.RepeatMode
 import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.QueueBottomSheet
 import com.musicapp.ui.composables.TopBarWithBackButtonAndMoreVert
 import com.musicapp.ui.models.TrackModel
 import org.koin.androidx.compose.koinViewModel
@@ -80,6 +81,8 @@ fun TrackDetailsScreen(
 
     val currentTrack: TrackModel? = playbackUiState.currentTrack
 
+    var showQueueBottomSheet by remember { mutableStateOf(false) }
+
     // maybe not needed since the track is already loaded in the viewModel
     LaunchedEffect(currentTrack) {
         //viewModel.loadCurrentTrack()
@@ -93,7 +96,7 @@ fun TrackDetailsScreen(
     }
 
     val maxLength = 30
-    var title : String = currentTrack.title
+    var title: String = currentTrack.title
     if (currentTrack.title.length >= maxLength) {
         title = currentTrack.title.take(maxLength) + "..."
     }
@@ -122,7 +125,7 @@ fun TrackDetailsScreen(
                 onNextClick = viewModel::playNextTrack,
                 onShuffleClick = viewModel::toggleShuffleMode,
                 onRepeatModeClick = viewModel::toggleRepeatMode,
-                onQueueClick = { /*TODO*/ },
+                onQueueClick = { showQueueBottomSheet = true },
                 onLikeClick = { /*TODO*/ },
                 onPlusClick = { /*TODO*/ },
                 onSeek = viewModel::seekTo,
@@ -137,6 +140,19 @@ fun TrackDetailsScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+        )
+    }
+    if (showQueueBottomSheet) {
+        QueueBottomSheet(
+            playbackUiState = playbackUiState,
+            onDismissRequest = { showQueueBottomSheet = false },
+            onTrackClick = { clickedTrack, index ->
+                if (clickedTrack.id == currentTrack.id) {
+                    viewModel.togglePlayback(currentTrack)
+                } else {
+                    viewModel.setPlaybackQueue(playbackUiState.playbackQueue, index)
+                }
+            }
         )
     }
 }
