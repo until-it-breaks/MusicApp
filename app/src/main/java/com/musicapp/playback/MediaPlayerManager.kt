@@ -166,22 +166,10 @@ class MediaPlayerManager(
     }
 
     override fun onRepeatModeChanged(@Player.RepeatMode repeatMode: Int) {
-        _playbackState.update { currentState ->
-            val newRepeatMode = when (repeatMode) {
-                Player.REPEAT_MODE_OFF -> {
-                    if (currentState.repeatMode == RepeatMode.ONCE) RepeatMode.ONCE else RepeatMode.OFF
-                }
-
-                Player.REPEAT_MODE_ONE -> RepeatMode.ONE
-                Player.REPEAT_MODE_ALL -> RepeatMode.ON
-                else -> currentState.repeatMode
-            }
-            Log.d(
-                "MediaPlayerManager",
-                "Manager: ExoPlayer repeat mode changed to $repeatMode, internal state to $newRepeatMode"
-            )
-            currentState.copy(repeatMode = newRepeatMode)
-        }
+        Log.d(
+            "MediaPlayerManager",
+            "Manager: ExoPlayer repeat mode changed to $repeatMode"
+        )
     }
 
     override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
@@ -425,7 +413,10 @@ class MediaPlayerManager(
             _playbackState.update { it.copy(playbackQueue = currentQueue) }
 
             exoPlayer?.removeMediaItem(index)
-            Log.d("MediaPlayerManager", "Removed track '${track.title}' from queue. New queue size: ${currentQueue.size}")
+            Log.d(
+                "MediaPlayerManager",
+                "Removed track '${track.title}' from queue. New queue size: ${currentQueue.size}"
+            )
         }
     }
 
@@ -478,7 +469,7 @@ class MediaPlayerManager(
         }
 
         Log.d("MediaPlayerManager", "Repeat mode changed to: $nextRepeatMode")
-
+        _playbackState.update { it.copy(repeatMode = nextRepeatMode) }
     }
 
     fun release() {
