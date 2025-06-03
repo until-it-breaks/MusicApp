@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -31,6 +32,7 @@ import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.SearchNavGraph
 import com.musicapp.ui.composables.MainNavBar
 import com.musicapp.ui.composables.MusicBar
+import com.musicapp.ui.composables.QueueBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
 enum class MainCategory(
@@ -67,6 +69,8 @@ fun MainScreen(navController: NavController) {
     // view model for the music player
     val viewModel: BasePlaybackViewModel = koinViewModel()
     val playbackUiState by viewModel.playbackUiState.collectAsState()
+    var showQueueBottomSheet by remember { mutableStateOf(false) }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -84,6 +88,7 @@ fun MainScreen(navController: NavController) {
                 playbackState = playbackUiState,
                 onTogglePlayback = viewModel::togglePlayback,
                 onAddToList = { /* TODO */ }, // it does nothing for now
+                onQueueClick = { showQueueBottomSheet = true  },
                 onBarClick = {
                     navController.navigate(MusicAppRoute.TrackDetails)
                 },
@@ -123,6 +128,20 @@ fun MainScreen(navController: NavController) {
                     }
                 }
             )
+            if (showQueueBottomSheet) {
+                val currentTrack = viewModel.playbackUiState.collectAsState().value.currentTrack
+                QueueBottomSheet(
+                    playbackUiState = playbackUiState,
+                    onDismissRequest = { showQueueBottomSheet = false },
+                    onTrackClick = { clickedTrack, index ->
+                        if (clickedTrack.id == currentTrack?.id) {
+                            viewModel.togglePlayback(currentTrack)
+                        } else {
+                            viewModel.setPlaybackQueue(playbackUiState.playbackQueue, index)
+                        }
+                    }
+                )
+            }
         }
     }
 }

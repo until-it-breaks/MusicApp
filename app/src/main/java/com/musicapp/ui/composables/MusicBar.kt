@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,9 +21,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.musicapp.R
 import com.musicapp.playback.PlaybackUiState
 import com.musicapp.ui.models.TrackModel
 
@@ -33,8 +33,9 @@ import com.musicapp.ui.models.TrackModel
 fun MusicBar(
     playbackState: PlaybackUiState,
     onTogglePlayback: (TrackModel) -> Unit,
-    onAddToList: (TrackModel) -> Unit, // Action for the plus button
-    onBarClick: () -> Unit, // open the track screen
+    onAddToList: (TrackModel) -> Unit,
+    onQueueClick: () -> Unit,
+    onBarClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -45,9 +46,9 @@ fun MusicBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp) // Fixed height for the bar
-                .background(MaterialTheme.colorScheme.surfaceVariant) // A subtle background color
-                .clickable { onBarClick() } // Make the whole bar clickable
+                .height(64.dp)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .clickable { onBarClick() }
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -83,9 +84,10 @@ fun MusicBar(
                 }
             }
 
-            // Right: Plus and Play/Pause buttons
+            // Right
             Row(verticalAlignment = Alignment.CenterVertically) {
                 playbackState.currentTrack.let { track ->
+                    // plus
                     IconButton(onClick = { onAddToList(track) }) {
                         Icon(
                             imageVector = Icons.Filled.Add,
@@ -96,6 +98,7 @@ fun MusicBar(
 
                     Spacer(Modifier.width(8.dp))
 
+                    // play/pause
                     if (playbackState.isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
@@ -105,16 +108,25 @@ fun MusicBar(
                     } else {
                         IconButton(onClick = { onTogglePlayback(track) }) {
                             Icon(
-                                imageVector = if (playbackState.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                painter = painterResource(if (playbackState.isPlaying) R.drawable.ic_pause else R.drawable.ic_play),
                                 contentDescription = if (playbackState.isPlaying) "Pause" else "Play",
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
+
+                    Spacer(Modifier.width(8.dp))
+
+                    IconButton(onClick = onQueueClick) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_queue),
+                            contentDescription = "Queue",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
 
-            Spacer(Modifier.width(48.dp)) // Placeholder for balance, adjust as needed
         }
     }
 }
