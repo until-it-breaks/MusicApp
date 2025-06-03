@@ -33,6 +33,7 @@ import com.musicapp.ui.models.TrackModel
 fun MusicBar(
     playbackState: PlaybackUiState,
     onTogglePlayback: (TrackModel) -> Unit,
+    onStopClick: () -> Unit,
     onAddToList: (TrackModel) -> Unit,
     onQueueClick: () -> Unit,
     onBarClick: () -> Unit,
@@ -96,8 +97,6 @@ fun MusicBar(
                         )
                     }
 
-                    Spacer(Modifier.width(8.dp))
-
                     // play/pause
                     if (playbackState.isLoading) {
                         CircularProgressIndicator(
@@ -115,8 +114,15 @@ fun MusicBar(
                         }
                     }
 
-                    Spacer(Modifier.width(8.dp))
+                    IconButton(onClick = onStopClick) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_stop),
+                            contentDescription = "Queue",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
 
+                    // queue
                     IconButton(onClick = onQueueClick) {
                         Icon(
                             painter = painterResource(R.drawable.ic_queue),
