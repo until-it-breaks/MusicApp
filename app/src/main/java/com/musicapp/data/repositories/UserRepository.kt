@@ -21,7 +21,7 @@ class UserRepository(
 ) {
     fun getUser(userId: String): Flow<User> = usersDAO.getUser(userId)
 
-    suspend fun updateProfilePicture(profilePictureUri: Uri, userId: String) {
+    suspend fun updateProfilePicture(profilePictureUri: Uri?, userId: String) {
         val user = usersDAO.getUser(userId)
         user.first().profilePictureUri // TODO maybe delete the current picture saved in memory
         usersDAO.updateProfilePicture(profilePictureUri.toString(), userId)

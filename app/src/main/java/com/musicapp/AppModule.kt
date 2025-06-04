@@ -1,5 +1,6 @@
 package com.musicapp
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
@@ -40,6 +41,7 @@ import org.koin.dsl.module
 
 val Context.dataStore by preferencesDataStore("settings")
 
+@SuppressLint("UnsafeOptInUsageError")
 val appModule = module {
 
     // Firebase Auth
@@ -126,7 +128,7 @@ val appModule = module {
 
     viewModel { PasswordRecoveryViewModel(get()) }
 
-    viewModel { ProfileScreenViewModel(get()) }
+    viewModel { ProfileScreenViewModel(get(), get()) }
 
     viewModel { MainActivityViewModel(get(), get()) }
 
