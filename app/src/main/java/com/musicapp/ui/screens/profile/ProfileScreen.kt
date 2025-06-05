@@ -83,18 +83,14 @@ fun ProfileScreen(navController: NavController) {
         ) {
             // user Image
             Image(
-                painter = if (uiState.currentProfilePictureUri != null && uiState.currentProfilePictureUri != Uri.EMPTY) {
-                    rememberAsyncImagePainter(uiState.currentProfilePictureUri)
-                } else {
-                    rememberAsyncImagePainter(model = uiState.currentProfilePictureUri)
-                },
+                painter = rememberAsyncImagePainter(uiState.currentProfilePictureUri),
                 contentDescription = "User image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(128.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(if (uiState.currentProfilePictureUri == null || uiState.currentProfilePictureUri == Uri.EMPTY) 36.dp else 0.dp)
+                    .padding(if (uiState.currentProfilePictureUri == Uri.EMPTY) 36.dp else 0.dp)
             )
             TextButton(onClick = { viewModel.showProfilePictureOptions() }) {
                 Text("Edit photo")
@@ -130,17 +126,21 @@ fun ProfileScreen(navController: NavController) {
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
+                // change password
                 Button(
                     modifier = Modifier.weight(1f),
-                    onClick = { /* TODO */ }
+                    onClick = { navController.navigate(MusicAppRoute.PasswordRecovery) }
                 ) {
                     Text(stringResource(R.string.change_password))
                 }
                 Spacer(modifier = Modifier.width(24.dp))
+
+                // delete account
                 Button(
                     modifier = Modifier.weight(1f),
                     onClick = { /* TODO */ },
@@ -152,6 +152,7 @@ fun ProfileScreen(navController: NavController) {
                     Text(stringResource(R.string.delete_profile))
                 }
                 Spacer(modifier = Modifier.width(24.dp))
+                // log out
                 Button(
                     modifier = Modifier.weight(1f),
                     onClick = {

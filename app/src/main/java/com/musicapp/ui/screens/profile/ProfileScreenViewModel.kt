@@ -131,7 +131,7 @@ class ProfileScreenViewModel(
         _showProfilePictureOptions.value = false
     }
 
-    fun updateProfilePicture(uri: Uri?) {
+    fun updateProfilePicture(uri: Uri) {
         val userId = auth.currentUser?.uid
         if (userId == null) {
             dismissProfilePictureOptions()
@@ -157,7 +157,7 @@ class ProfileScreenViewModel(
 
         viewModelScope.launch {
             try {
-                userRepository.updateProfilePicture(null, userId)
+                userRepository.updateProfilePicture(Uri.EMPTY, userId)
                 dismissProfilePictureOptions()
             } catch (e: Exception) {
                 dismissProfilePictureOptions()
