@@ -125,7 +125,8 @@ class MediaPlayerManager(
         val newIndex = currentState.playbackQueue.indexOf(originalTrackModel)
 
         if (currentState.repeatMode == RepeatMode.ONCE && previousTrackId != trackId) {
-            stop()
+            playPrevious()
+            pause()
             return
         }
 
