@@ -146,4 +146,19 @@
     <string name="what_to_play">Cosa vuoi ascoltare?</string>
 
     <string name="your_playlists">Le tue playlist</string>
+    <string name="queue_title">Coda</string>
+    <string name="playing_now">"In riproduzione: "</string>
+    <string name="empty_queue_message">La coda è vuota</string>
+    <string name="remove_from_queue">Rimuovi dalla Coda</string>
+    <string name="no_username">Nessun username trovato</string>
+    <string name="change_username">Cambia username</string>
+    <string name="new_username">Nuovo username</string>
+    <string name="save">salva</string>
+    <string name="take_photo_now">Scatta una foto</string>
+    <string name="choose_from_gallery">Scegli una foto</string>
+    <string name="remove_current_photo">Rimuovi la foto corrente</string>
+    <string name="edit_photo">modifica foto profilo</string>
+    <string name="confirm_delete_account">Elimina Account</string>
+    <string name="delete_account_warning">Questa azione è irreversibile, sei sicuro di continuare?</string>
+    <string name="empty_search_message">Nessun risultato.</string>
 </resources>
