@@ -1,5 +1,6 @@
 package com.musicapp.ui.screens.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,8 +8,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
@@ -31,6 +35,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -75,13 +81,23 @@ fun SettingsScreen(navController: NavController) {
                 onClick = { navController.navigate(MusicAppRoute.Profile) }
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 8.dp)
                 ) {
+                    Spacer(modifier = Modifier.width(8.dp))
+
                     LoadableImage(
                         imageUri = user?.profilePictureUri,
                         contentDescription = null,
-                        modifier = Modifier.size(72.dp)
+                        contentScale = ContentScale.Crop,
+                        cornerRadius = 12.dp,
+                        modifier = Modifier
+                            .size(50.dp)
+                            .padding(0.dp)
                     )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
                     Column {
                         Text(
                             text = user?.username ?: stringResource(R.string.unknown_user),
@@ -102,7 +118,12 @@ fun SettingsScreen(navController: NavController) {
             }
             Column {
                 Card(
-                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 0.dp, bottomEnd = 0.dp)
+                    shape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomStart = 0.dp,
+                        bottomEnd = 0.dp
+                    )
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -114,10 +135,12 @@ fun SettingsScreen(navController: NavController) {
                         Column {
                             Text(
                                 text = stringResource(R.string.allow_explicit),
-                                style = MaterialTheme.typography.titleMedium)
+                                style = MaterialTheme.typography.titleMedium
+                            )
                             Text(
                                 text = stringResource(R.string.allow_explicit_description),
-                                style = MaterialTheme.typography.bodyMedium)
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
                         Switch(
                             checked = allowExplicit,
@@ -127,7 +150,12 @@ fun SettingsScreen(navController: NavController) {
                 }
                 HorizontalDivider()
                 Card(
-                    shape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 16.dp, bottomEnd = 16.dp),
+                    shape = RoundedCornerShape(
+                        topStart = 0.dp,
+                        topEnd = 0.dp,
+                        bottomStart = 16.dp,
+                        bottomEnd = 16.dp
+                    ),
                 ) {
                     var expanded by remember { mutableStateOf(false) }
                     Row(
@@ -151,7 +179,11 @@ fun SettingsScreen(navController: NavController) {
                         }
                         Box {
                             TextButton(onClick = { expanded = true }) {
-                                Text(text = stringResource(id = themeOptions[currentTheme] ?: R.string.theme_default))
+                                Text(
+                                    text = stringResource(
+                                        id = themeOptions[currentTheme] ?: R.string.theme_default
+                                    )
+                                )
                                 Icon(
                                     imageVector = Icons.Default.ArrowDropDown,
                                     contentDescription = null

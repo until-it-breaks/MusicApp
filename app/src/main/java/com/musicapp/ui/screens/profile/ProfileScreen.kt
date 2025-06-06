@@ -39,6 +39,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.LoadableImage
 import com.musicapp.ui.composables.TopBarWithBackButton
 import org.koin.androidx.compose.koinViewModel
 
@@ -82,15 +83,14 @@ fun ProfileScreen(navController: NavController) {
                 .padding(12.dp)
         ) {
             // user Image
-            Image(
-                painter = rememberAsyncImagePainter(uiState.currentProfilePictureUri),
-                contentDescription = "User image",
+            LoadableImage(
+                imageUri = uiState.currentProfilePictureUri,
+                contentDescription = "User Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(128.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(if (uiState.currentProfilePictureUri == Uri.EMPTY) 36.dp else 0.dp)
+                    .padding(0.dp)
             )
             TextButton(onClick = { viewModel.showProfilePictureOptions() }) {
                 Text("Edit photo")
