@@ -1,6 +1,7 @@
 package com.musicapp.ui.screens.profile
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -143,6 +144,7 @@ class ProfileScreenViewModel(
                 userRepository.updateProfilePicture(uri, userId)
                 dismissProfilePictureOptions()
             } catch (e: Exception) {
+                Log.e("ProfileScreenViewModel", "Error updating profile picture", e)
                 dismissProfilePictureOptions()
             }
         }
@@ -157,9 +159,10 @@ class ProfileScreenViewModel(
 
         viewModelScope.launch {
             try {
-                userRepository.deleteInternalProfilePicture(userId)
+                userRepository.removeProfilePicture(userId)
                 dismissProfilePictureOptions()
             } catch (e: Exception) {
+                Log.e("ProfileScreenViewModel", "Error removing profile picture", e)
                 dismissProfilePictureOptions()
             }
         }

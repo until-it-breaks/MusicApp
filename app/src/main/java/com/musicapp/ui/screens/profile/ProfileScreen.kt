@@ -3,8 +3,6 @@ package com.musicapp.ui.screens.profile
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,7 +34,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.LoadableImage
@@ -83,7 +80,6 @@ fun ProfileScreen(navController: NavController) {
                 .padding(12.dp)
         ) {
             // user Image
-            Text(uiState.currentProfilePictureUri.toString())
             LoadableImage(
                 imageUri = uiState.currentProfilePictureUri,
                 contentDescription = "User Image",
