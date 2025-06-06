@@ -157,7 +157,7 @@ class ProfileScreenViewModel(
 
         viewModelScope.launch {
             try {
-                userRepository.updateProfilePicture(Uri.EMPTY, userId)
+                userRepository.deleteInternalProfilePicture(userId)
                 dismissProfilePictureOptions()
             } catch (e: Exception) {
                 dismissProfilePictureOptions()

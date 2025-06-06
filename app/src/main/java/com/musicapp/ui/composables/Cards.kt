@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Explicit
@@ -199,8 +200,9 @@ fun TrackCard(
                 LoadableImage(
                     track.mediumPictureUri,
                     "Track picture",
-                    modifier = Modifier.size(48.dp),
-                    cornerRadius = 4.dp
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(4.dp)),
                 )
             }
             Column(

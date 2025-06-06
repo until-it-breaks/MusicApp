@@ -83,6 +83,7 @@ fun ProfileScreen(navController: NavController) {
                 .padding(12.dp)
         ) {
             // user Image
+            Text(uiState.currentProfilePictureUri.toString())
             LoadableImage(
                 imageUri = uiState.currentProfilePictureUri,
                 contentDescription = "User Image",

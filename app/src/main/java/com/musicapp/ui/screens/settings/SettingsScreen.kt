@@ -90,10 +90,11 @@ fun SettingsScreen(navController: NavController) {
                         imageUri = user?.profilePictureUri,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        cornerRadius = 12.dp,
                         modifier = Modifier
-                            .size(50.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .size(48.dp)
                             .padding(0.dp)
+
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))

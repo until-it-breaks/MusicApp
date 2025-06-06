@@ -97,7 +97,8 @@ val appModule = module {
             get<MusicAppDatabase>().userDAO(),
             get<MusicAppDatabase>().likedPlaylistDAO(),
             get<MusicAppDatabase>().trackHistoryDAO(),
-            get()
+            get(),
+            get<Context>()
         )
     }
 
