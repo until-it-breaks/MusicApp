@@ -30,7 +30,6 @@ import com.musicapp.ui.screens.profile.ProfileScreenViewModel
 import com.musicapp.ui.screens.search.SearchViewModel
 import com.musicapp.ui.screens.settings.SettingsViewModel
 import com.musicapp.ui.screens.signup.SignUpViewModel
-import com.musicapp.ui.screens.trackdetails.TrackDetailsViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -155,6 +154,4 @@ val appModule = module {
     viewModel { SettingsViewModel(get(), get(), get()) }
 
     viewModel { BasePlaybackViewModel(get()) }
-
-    viewModel { TrackDetailsViewModel(get()) }
 }
