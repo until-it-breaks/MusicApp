@@ -85,9 +85,16 @@ fun ProfileScreen(navController: NavController) {
         onResult = { uri: Uri? ->
             if (uri != null) {
                 try {
-                    context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    context.contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
                 } catch (e: SecurityException) {
-                    Log.e("ProfileScreen", "Failed to take persistable URI permission for gallery image", e)
+                    Log.e(
+                        "ProfileScreen",
+                        "Failed to take persistable URI permission for gallery image",
+                        e
+                    )
                 }
                 viewModel.updateProfilePicture(uri)
             }
@@ -102,6 +109,7 @@ fun ProfileScreen(navController: NavController) {
                     cameraOutputUri = event.uri
                     takePictureLauncher.launch(event.uri)
                 }
+
                 is ProfileUiEvent.RequestCameraPermission -> {
                     requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                 }
@@ -183,7 +191,7 @@ fun ProfileScreen(navController: NavController) {
                 // delete account
                 Button(
                     modifier = Modifier.weight(1f),
-                    onClick = { /* TODO */ },
+                    onClick = { viewModel.showConfirmDelete() },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onError
@@ -267,6 +275,32 @@ fun ProfileScreen(navController: NavController) {
                     }
                 },
                 confirmButton = { }
+            )
+        }
+        // confirm delete account
+        if (uiState.showConfirmDelete) {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissConfirmDelete() },
+                title = { Text(text = stringResource(R.string.confirm_delete_account)) },
+                text = { Text(text = stringResource(R.string.delete_account_warning)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.dismissConfirmDelete()
+                        navController.navigate(MusicAppRoute.Login) {
+                            popUpTo(navController.graph.id) {
+                                inclusive = true
+                            } // Prevents going back to this screen
+                        }
+                        viewModel.deleteAccount()
+                    }) {
+                        Text(stringResource(R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.dismissConfirmDelete() }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
             )
         }
     }

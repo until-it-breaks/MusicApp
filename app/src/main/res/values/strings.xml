@@ -163,4 +163,6 @@
     <string name="choose_from_gallery">Choose a photo</string>
     <string name="remove_current_photo">Remove current Photo</string>
     <string name="edit_photo">Edit profile photo</string>
+    <string name="confirm_delete_account">Delete Account</string>
+    <string name="delete_account_warning">The delete action is unreversible, are you sure to delete your account?</string>
 </resources>

@@ -78,7 +78,8 @@ class UserRepository(
 
     suspend fun deleteUser(user: User) {
         usersDAO.deleteUser(user)
-        // TODO Delete firebase auth entry and maybe delete other related stuff too.
+        likedDAO.clearLikedTracks(user.userId)
+        historyDAO.clearTrackHistory(user.userId)
     }
 
     /**

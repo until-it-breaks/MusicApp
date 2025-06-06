@@ -32,8 +32,9 @@ import java.util.Locale
 data class ProfileUiState(
     val currentUser: User? = null,
     val showChangeUsernameDialog: Boolean = false,
-    val newUsernameInput: String = "",
     val showProfilePictureOptions: Boolean = false,
+    val showConfirmDelete: Boolean = false,
+    val newUsernameInput: String = "",
     val currentProfilePictureUri: Uri? = null,
     val isDefaultProfilePicture: Boolean = true
 )
@@ -60,8 +61,9 @@ class ProfileScreenViewModel(
         MutableStateFlow(null)
     }
     private val _showChangeUsernameDialog = MutableStateFlow(false)
-    private val _newUsernameInput = MutableStateFlow("")
     private val _showProfilePictureOptions = MutableStateFlow(false)
+    private val _showConfirmDelete = MutableStateFlow(false)
+    private val _newUsernameInput = MutableStateFlow("")
 
     private val _events = Channel<ProfileUiEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
@@ -88,6 +90,7 @@ class ProfileScreenViewModel(
             _showChangeUsernameDialog,
             _newUsernameInput,
             _showProfilePictureOptions,
+            _showConfirmDelete,
             _derivedProfilePictureUri,
             _derivedIsDefaultProfilePicture
         )
@@ -97,14 +100,16 @@ class ProfileScreenViewModel(
         val showUsernameDialog = values[1] as Boolean
         val newUsername = values[2] as String
         val showPhotoOptions = values[3] as Boolean
-        val profileUri = values[4] as Uri?
-        val isDefault = values[5] as Boolean
+        val showConfirmDelete = values[4] as Boolean
+        val profileUri = values[5] as Uri?
+        val isDefault = values[6] as Boolean
 
         ProfileUiState(
             currentUser = user,
             showChangeUsernameDialog = showUsernameDialog,
             newUsernameInput = newUsername,
             showProfilePictureOptions = showPhotoOptions,
+            showConfirmDelete = showConfirmDelete,
             currentProfilePictureUri = profileUri,
             isDefaultProfilePicture = isDefault
         )
@@ -113,7 +118,6 @@ class ProfileScreenViewModel(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = ProfileUiState()
     )
-
 
 
     fun onNewUsernameChanged(username: String) {
@@ -153,6 +157,14 @@ class ProfileScreenViewModel(
         _showProfilePictureOptions.value = false
     }
 
+    fun showConfirmDelete() {
+        _showConfirmDelete.value = true
+    }
+
+    fun dismissConfirmDelete() {
+        _showConfirmDelete.value = false
+    }
+
     fun updateProfilePicture(uri: Uri) {
         val userId = auth.currentUser?.uid
         if (userId == null) {
@@ -165,7 +177,8 @@ class ProfileScreenViewModel(
                 userRepository.updateProfilePicture(uri, userId)
             } catch (e: Exception) {
                 Log.e("ProfileScreenViewModel", "Error updating profile picture", e)
-                Toast.makeText(appContext, "Error updating profile picture", Toast.LENGTH_SHORT).show()
+                Toast.makeText(appContext, "Error updating profile picture", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -183,7 +196,8 @@ class ProfileScreenViewModel(
                 dismissProfilePictureOptions()
             } catch (e: Exception) {
                 Log.e("ProfileScreenViewModel", "Error removing profile picture", e)
-                Toast.makeText(appContext, "Error removing profile picture", Toast.LENGTH_SHORT).show()
+                Toast.makeText(appContext, "Error removing profile picture", Toast.LENGTH_SHORT)
+                    .show()
                 dismissProfilePictureOptions()
             }
         }
@@ -223,7 +237,10 @@ class ProfileScreenViewModel(
                     _events.send(ProfileUiEvent.LaunchCamera(tempUri))
                 }
             } else {
-                Log.e("ProfileScreenViewModel", "Failed to create temporary URI after permission granted.")
+                Log.e(
+                    "ProfileScreenViewModel",
+                    "Failed to create temporary URI after permission granted."
+                )
                 dismissProfilePictureOptions()
             }
         } else {
@@ -233,7 +250,20 @@ class ProfileScreenViewModel(
         }
     }
 
+    fun deleteAccount() {
+        val user = auth.currentUser
+        if (user == null) {
+            return
+        }
+        auth.currentUser?.delete()
+        //userRepository.deleteUser(uiState.value.currentUser!!)
+    }
+
     fun logout() {
+        val user = auth.currentUser
+        if (user == null) {
+            return
+        }
         auth.signOut()
     }
 
@@ -254,7 +284,11 @@ class ProfileScreenViewModel(
                 photoFile
             )
         } catch (e: Exception) {
-            Log.e("ProfileScreenViewModel", "Error creating temporary image file URI: ${e.message}", e)
+            Log.e(
+                "ProfileScreenViewModel",
+                "Error creating temporary image file URI: ${e.message}",
+                e
+            )
             null
         }
     }
