@@ -15,6 +15,7 @@ import com.musicapp.data.database.UserDAO
 import com.musicapp.ui.models.UserModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -30,7 +31,8 @@ class UserRepository(
 
     suspend fun saveProfilePictureToInternalStorage(uri: Uri, userId: String): Uri? {
         return withContext(Dispatchers.IO) {
-            val fileName = "profile_picture_$userId.jpg"
+            val timestamp = System.currentTimeMillis()
+            val fileName = "profile_picture_${userId}_${timestamp}.jpg"
             val file = File(context.filesDir, fileName)
 
             try {
@@ -49,6 +51,13 @@ class UserRepository(
     }
 
     suspend fun updateProfilePicture(uri: Uri, userId: String) {
+        // delete old picture if available
+        val oldUri = usersDAO.getUser(userId).first().profilePictureUri
+        if (oldUri != null && oldUri.isNotEmpty() && oldUri != Uri.EMPTY.toString()){
+            removeProfilePicture(userId)
+        }
+
+        // save picture to internal storage
         val newInternalUri = saveProfilePictureToInternalStorage(uri, userId)
         if (newInternalUri != null) {
             usersDAO.updateProfilePicture(newInternalUri.toString(), userId)
@@ -61,7 +70,7 @@ class UserRepository(
 
     suspend fun removeProfilePicture(userId: String) {
         withContext(Dispatchers.IO) {
-            val fileName = "profile_picture_$userId.jpg"
+            val fileName = usersDAO.getUser(userId).first().profilePictureUri!!
             val file = File(context.filesDir, fileName)
             if (file.exists()) {
                 file.delete()
@@ -77,6 +86,7 @@ class UserRepository(
     }
 
     suspend fun deleteUser(user: User) {
+        removeProfilePicture(user.userId)
         usersDAO.deleteUser(user)
         likedDAO.clearLikedTracks(user.userId)
         historyDAO.clearTrackHistory(user.userId)
