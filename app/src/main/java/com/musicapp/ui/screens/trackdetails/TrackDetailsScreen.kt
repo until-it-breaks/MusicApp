@@ -79,7 +79,7 @@ fun TrackDetailsScreen(
     val viewModel: BasePlaybackViewModel = koinViewModel()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
 
-    val currentTrack: TrackModel? = playbackUiState.currentTrack
+    val currentTrack: TrackModel? = playbackUiState.currentQueueItem?.track
 
     var showQueueBottomSheet by remember { mutableStateOf(false) }
 
@@ -111,16 +111,7 @@ fun TrackDetailsScreen(
         bottomBar = {
             TrackDetailsPlayerControls(
                 playbackUiState = playbackUiState,
-                onTogglePlayPause = {
-                    if (playbackUiState.currentTrack?.id == currentTrack.id) {
-                        viewModel.togglePlayback(currentTrack)
-                    } else {
-                        viewModel.setPlaybackQueue(
-                            listOf(currentTrack),
-                            0
-                        )
-                    }
-                },
+                onTogglePlayPause = { viewModel.togglePlayback(currentTrack) },
                 onPreviousClick = viewModel::playPreviousTrack,
                 onNextClick = viewModel::playNextTrack,
                 onShuffleClick = viewModel::toggleShuffleMode,
@@ -150,7 +141,10 @@ fun TrackDetailsScreen(
                 if (clickedTrack.id == currentTrack.id) {
                     viewModel.togglePlayback(currentTrack)
                 } else {
-                    viewModel.setPlaybackQueue(playbackUiState.playbackQueue, index)
+                    val trackQueue = playbackUiState.playbackQueue.map { queueItem ->
+                        queueItem.track
+                    }
+                    viewModel.setPlaybackQueue(trackQueue, index)
                 }
             }
         )
@@ -285,7 +279,7 @@ fun TrackDetailsPlayerControls(
     modifier: Modifier = Modifier
 ) {
     val isPlaying = playbackUiState.isPlaying
-    val track = playbackUiState.currentTrack
+    val track = playbackUiState.currentQueueItem
 
     val isShuffleOn = playbackUiState.isShuffleModeEnabled
     var currentRepeatMode = playbackUiState.repeatMode

@@ -203,7 +203,7 @@ fun QueueBottomSheet(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = playbackUiState.currentTrack?.title ?: "",
+                    text = playbackUiState.currentQueueItem?.track?.title ?: "",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -217,7 +217,8 @@ fun QueueBottomSheet(
             if (playbackUiState.playbackQueue.isNotEmpty()) {
                 val viewModel: BasePlaybackViewModel = koinViewModel()
                 LazyColumn {
-                    itemsIndexed(playbackUiState.playbackQueue) { index, track ->
+                    itemsIndexed(playbackUiState.playbackQueue) { index, queueItem ->
+                        val track = queueItem.track
                         TrackCard(
                             track = track,
                             showPicture = true,
@@ -227,7 +228,7 @@ fun QueueBottomSheet(
                             },
                             onArtistClick = { },
                             extraMenu = {
-                                if (track.id == playbackUiState.currentTrack?.id) {
+                                if (queueItem.id == playbackUiState.currentQueueItemId) {
                                     IconButton(onClick = { onTrackClick(track, index) }) {
                                         Icon(
                                             painter = painterResource(
@@ -241,7 +242,7 @@ fun QueueBottomSheet(
                                     PublicTrackDropDownMenu(
                                         trackModel = track,
                                         onLiked = { /*TODO*/ },
-                                        onAddToQueue = viewModel::removeTrackFromQueue,
+                                        onAddToQueue = { viewModel.removeTrackFromQueue(queueItem) },
                                         removeFromQueue = true
                                     )
                                 }

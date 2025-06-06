@@ -23,8 +23,8 @@ open class BasePlaybackViewModel
         mediaPlayerManager.addTrackToQueue(track)
     }
 
-    fun removeTrackFromQueue(track: TrackModel){
-        mediaPlayerManager.removeTrackFromQueue(track)
+    fun removeTrackFromQueue(queueItem: QueueItem){
+        mediaPlayerManager.removeTrackFromQueue(queueItem)
     }
 
     fun setPlaybackQueue(queue: List<TrackModel>, index: Int = 0) {

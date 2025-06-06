@@ -21,17 +21,22 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class PlaybackUiState(
-    val currentPlayingTrackId: Long? = null,
-    val currentTrack: TrackModel? = null,
+    val currentQueueItemId: Long? = null,
+    val currentQueueItem: QueueItem? = null,
     val isPlaying: Boolean = false,
     val isLoading: Boolean = false,
     val playbackError: String? = null,
-    val playbackQueue: List<TrackModel> = emptyList(),
+    val playbackQueue: List<QueueItem> = emptyList(),
     val currentQueueIndex: Int = -1,
     val currentPositionMs: Long = 0L,
     val trackDurationMs: Long = 30000L, // Default preview duration, can be updated
     val isShuffleModeEnabled: Boolean = false,
     val repeatMode: RepeatMode = RepeatMode.OFF
+)
+
+data class QueueItem(
+    val id: Long,
+    val track: TrackModel
 )
 
 enum class RepeatMode {
@@ -53,6 +58,7 @@ class MediaPlayerManager(
 
     private val scope = CoroutineScope(Dispatchers.Main)
     private var positionUpdateJob: Job? = null
+    private var _nextQueueId: Long = 0L
 
     fun setExoPlayerInstance(player: ExoPlayer?) {
         if (this.exoPlayer == player) {
@@ -73,16 +79,16 @@ class MediaPlayerManager(
                 val newIsPlaying = exoPlayer?.isPlaying == true
                 val newLoading = exoPlayer?.playbackState == Player.STATE_BUFFERING
                 val currentMediaItem = exoPlayer?.currentMediaItem
-                val currentTrackId = currentMediaItem?.mediaId?.toLongOrNull()
-                val currentTrackInQueue =
-                    currentState.playbackQueue.find { it.id == currentTrackId }
-                val newIndex = currentState.playbackQueue.indexOf(currentTrackInQueue)
+                val currentQueueItemId = currentMediaItem?.mediaId?.toLongOrNull()
+                val currentQueueItem =
+                    currentState.playbackQueue.find { it.id == currentQueueItemId }
+                val newIndex = currentState.playbackQueue.indexOf(currentQueueItem)
 
                 currentState.copy(
                     isPlaying = newIsPlaying,
                     isLoading = newLoading,
-                    currentPlayingTrackId = currentTrackInQueue?.id,
-                    currentTrack = currentTrackInQueue,
+                    currentQueueItemId = currentQueueItem?.id,
+                    currentQueueItem = currentQueueItem,
                     currentQueueIndex = newIndex,
                     currentPositionMs = exoPlayer?.currentPosition ?: 0L,
                     // default duration, can be updated
@@ -119,12 +125,12 @@ class MediaPlayerManager(
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         val currentState = _playbackState.value
-        val previousTrackId = currentState.currentPlayingTrackId
-        val trackId = mediaItem?.mediaId?.toLongOrNull()
-        val originalTrackModel = currentState.playbackQueue.find { it.id == trackId }
-        val newIndex = currentState.playbackQueue.indexOf(originalTrackModel)
+        val previousQueueItemId = currentState.currentQueueItemId
+        val newQueueItemId = mediaItem?.mediaId?.toLongOrNull()
+        val newQueueItem = currentState.playbackQueue.find { it.id == newQueueItemId }
+        val newIndex = currentState.playbackQueue.indexOf(newQueueItem)
 
-        if (currentState.repeatMode == RepeatMode.ONCE && previousTrackId != trackId) {
+        if (currentState.repeatMode == RepeatMode.ONCE && previousQueueItemId != newQueueItemId) {
             playPrevious()
             pause()
             return
@@ -132,15 +138,15 @@ class MediaPlayerManager(
 
         Log.d(
             "MediaPlayerManager",
-            "Manager: Media item transition to ${originalTrackModel?.title}, new index: $newIndex"
+            "Manager: Media item transition to ${newQueueItem?.track?.title}, new index: $newIndex"
         )
-        val startPosition = if (currentState.currentPlayingTrackId == originalTrackModel?.id) {
+        val startPosition = if (currentState.currentQueueItemId == newQueueItem?.id) {
             currentState.currentPositionMs
         } else 0L
         _playbackState.update {
             it.copy(
-                currentPlayingTrackId = originalTrackModel?.id,
-                currentTrack = originalTrackModel,
+                currentQueueItemId = newQueueItemId,
+                currentQueueItem = newQueueItem,
                 currentQueueIndex = newIndex,
                 currentPositionMs = startPosition,
                 // default duration, can be updated
@@ -178,8 +184,8 @@ class MediaPlayerManager(
         _playbackState.update {
             it.copy(
                 isPlaying = false,
-                currentPlayingTrackId = null,
-                currentTrack = null,
+                currentQueueItemId = null,
+                currentQueueItem = null,
                 isLoading = false,
                 playbackError = "Playback error: ${error.message}"
             )
@@ -202,7 +208,7 @@ class MediaPlayerManager(
      */
     fun togglePlayback(track: TrackModel) {
         val currentState = _playbackState.value
-        val currentTrackId = currentState.currentPlayingTrackId
+        val currentTrackId = currentState.currentQueueItem?.track?.id
 
         if (currentTrackId == track.id) {
             if (currentState.isPlaying) {
@@ -267,8 +273,8 @@ class MediaPlayerManager(
         _playbackState.update {
             it.copy(
                 isPlaying = false,
-                currentPlayingTrackId = null,
-                currentTrack = null,
+                currentQueueItemId = null,
+                currentQueueItem = null,
                 isLoading = false,
                 currentQueueIndex = -1,
                 playbackQueue = emptyList(),
@@ -286,21 +292,24 @@ class MediaPlayerManager(
     /**
      * Sets a new playback queue for ExoPlayer and immediately starts playing from the specified index.
      */
-    fun setPlaybackQueue(newQueue: List<TrackModel>, startIndex: Int) {
+    fun setPlaybackQueue(newTracks: List<TrackModel>, startIndex: Int) {
+        val newQueueItems = newTracks.map { track ->
+            QueueItem(id = _nextQueueId++, track = track)
+        }
         _playbackState.update {
             it.copy(
-                playbackQueue = newQueue,
+                playbackQueue = newQueueItems,
                 currentQueueIndex = startIndex,
                 isPlaying = false,
                 isLoading = true,
                 playbackError = null,
-                currentPlayingTrackId = newQueue.getOrNull(startIndex)?.id,
-                currentTrack = newQueue.getOrNull(startIndex),
+                currentQueueItemId = newQueueItems.getOrNull(startIndex)?.id,
+                currentQueueItem = newQueueItems.getOrNull(startIndex),
                 currentPositionMs = 0L,
                 trackDurationMs = 30000L
             )
         }
-        setPlaybackQueueInternal(newQueue, startIndex)
+        setPlaybackQueueInternal(newQueueItems, startIndex)
 
     }
 
@@ -317,7 +326,7 @@ class MediaPlayerManager(
     }
 
     private fun setPlaybackQueueInternal(
-        newQueue: List<TrackModel>,
+        newQueue: List<QueueItem>,
         startIndex: Int,
         currentTime: Long = 0L
     ) {
@@ -331,15 +340,15 @@ class MediaPlayerManager(
             stopPositionUpdates()
 
 
-            val mediaItems = newQueue.map { track ->
+            val mediaItems = newQueue.map { queueItem ->
                 MediaItem.Builder()
-                    .setMediaId(track.id.toString())
-                    .setUri(track.previewUri)
+                    .setMediaId(queueItem.id.toString())
+                    .setUri(queueItem.track.previewUri)
                     .setMediaMetadata(
                         MediaMetadata.Builder()
-                            .setTitle(track.title)
-                            .setArtist(track.contributors.joinToString(", ") { it.name })
-                            .setArtworkUri(track.bigPictureUri)
+                            .setTitle(queueItem.track.title)
+                            .setArtist(queueItem.track.contributors.joinToString(", ") { it.name })
+                            .setArtworkUri(queueItem.track.bigPictureUri)
                             .build()
                     )
                     .build()
@@ -376,17 +385,19 @@ class MediaPlayerManager(
      */
     fun addTrackToQueue(track: TrackModel) {
         scope.launch {
-            val currentQueue = _playbackState.value.playbackQueue.toMutableList()
+            val currentState = _playbackState.value
+            val currentQueue = currentState.playbackQueue.toMutableList()
+            val newQueueItem = QueueItem(id = _nextQueueId++, track = track)
 
             if (currentQueue.isEmpty()) {
                 Log.d("MediaPlayerManager", "Queue was empty. Playing new track: ${track.title}")
                 playTrack(track)
             } else {
-                currentQueue.add(track)
+                currentQueue.add(newQueueItem)
                 _playbackState.update { it.copy(playbackQueue = currentQueue) }
 
                 val mediaItemToAdd = MediaItem.Builder()
-                    .setMediaId(track.id.toString())
+                    .setMediaId(newQueueItem.id.toString())
                     .setUri(track.previewUri)
                     .setMediaMetadata(
                         MediaMetadata.Builder()
@@ -406,17 +417,17 @@ class MediaPlayerManager(
         }
     }
 
-    fun removeTrackFromQueue(track: TrackModel) {
+    fun removeTrackFromQueue(queueItem: QueueItem) {
         scope.launch {
             val currentQueue = _playbackState.value.playbackQueue.toMutableList()
-            val index = currentQueue.indexOf(track)
-            currentQueue.remove(track)
+            val index = currentQueue.indexOf(queueItem)
+            currentQueue.remove(queueItem)
             _playbackState.update { it.copy(playbackQueue = currentQueue) }
 
             exoPlayer?.removeMediaItem(index)
             Log.d(
                 "MediaPlayerManager",
-                "Removed track '${track.title}' from queue. New queue size: ${currentQueue.size}"
+                "Removed track '${queueItem.track.title}' from queue. New queue size: ${currentQueue.size}"
             )
         }
     }
@@ -426,6 +437,7 @@ class MediaPlayerManager(
      */
     fun clearQueue() {
         stop()
+        _nextQueueId = 0L
         Log.d("MediaPlayerManager", "Playback queue cleared.")
     }
 
@@ -480,6 +492,7 @@ class MediaPlayerManager(
         exoPlayer = null
         _isExoPlayerReady.value = false
         _playbackState.value = PlaybackUiState()
+        _nextQueueId = 0L
         val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
         appContext.stopService(serviceIntent)
     }

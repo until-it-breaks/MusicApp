@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -46,7 +45,12 @@ enum class PlaylistType {
  * Simple card for playlist/album home representation
  */
 @Composable
-fun PlayListCard(modifier: Modifier = Modifier, title: String, imageUri: Uri? = null, onClick: () -> Unit) {
+fun PlayListCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    imageUri: Uri? = null,
+    onClick: () -> Unit
+) {
     Card(
         onClick = onClick,
         modifier = modifier,
@@ -92,17 +96,19 @@ fun UserPlaylistCard(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            when(playlistType) {
+            when (playlistType) {
                 PlaylistType.DEFAULT -> LoadableImage(
                     imageUri = imageUri,
                     contentDescription = null,
                     modifier = Modifier.size(72.dp)
                 )
+
                 PlaylistType.LIKED -> Icon(
                     imageVector = Icons.Outlined.Star,
                     contentDescription = null,
                     modifier = Modifier.size(72.dp)
                 )
+
                 PlaylistType.HISTORY -> Icon(
                     imageVector = Icons.Outlined.History,
                     contentDescription = null,
@@ -115,7 +121,9 @@ fun UserPlaylistCard(
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp)
             )
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
@@ -130,12 +138,17 @@ fun UserPlaylistCard(
  * Simple card for artist home representation
  */
 @Composable
-fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: Uri? = null, onClick: () -> Unit) {
+fun ArtistCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    imageUrl: Uri? = null,
+    onClick: () -> Unit
+) {
     Card(
         onClick = onClick,
         modifier = modifier.width(96.dp)
     ) {
-        Column (
+        Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.fillMaxWidth()
@@ -163,6 +176,7 @@ fun ArtistCard(modifier: Modifier = Modifier, title: String, imageUrl: Uri? = nu
 fun TrackCard(
     track: TrackModel,
     showPicture: Boolean = false,
+    queueId: Long? = null,
     playbackUiState: PlaybackUiState,
     onTrackClick: (TrackModel) -> Unit,
     onArtistClick: (Long) -> Unit,
@@ -176,9 +190,18 @@ fun TrackCard(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.padding(8.dp)
         ) {
-            val isPlaying = playbackUiState.currentPlayingTrackId == track.id && playbackUiState.isPlaying
+            val isPlaying = if (queueId == null) {
+                playbackUiState.currentQueueItemId == track.id && playbackUiState.isPlaying
+            } else {
+                playbackUiState.currentQueueItemId == queueId
+            }
             if (showPicture) {
-                LoadableImage(track.mediumPictureUri, "Track picture", modifier = Modifier.size(48.dp), cornerRadius = 4.dp)
+                LoadableImage(
+                    track.mediumPictureUri,
+                    "Track picture",
+                    modifier = Modifier.size(48.dp),
+                    cornerRadius = 4.dp
+                )
             }
             Column(
                 modifier = Modifier.weight(1f)

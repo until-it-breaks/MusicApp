@@ -5,12 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,8 +38,8 @@ fun MusicBar(
     modifier: Modifier = Modifier
 ) {
 
-    val isVisible = playbackState.currentTrack != null
-    val track = playbackState.currentTrack
+    val isVisible = playbackState.currentQueueItem != null
+    val track = playbackState.currentQueueItem?.track
 
     if (isVisible) {
         Row(
@@ -55,7 +53,7 @@ fun MusicBar(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             
-            LoadableImage(track.mediumPictureUri, "Track picture", modifier = Modifier.size(48.dp), cornerRadius = 4.dp)
+            LoadableImage(track?.mediumPictureUri, "Track picture", modifier = Modifier.size(48.dp), cornerRadius = 4.dp)
 
             // Left: Song Title and Artist
             Column(
@@ -65,7 +63,7 @@ fun MusicBar(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                playbackState.currentTrack.let { track ->
+                playbackState.currentQueueItem.track.let { track ->
                     val artists = track.contributors.joinToString(separator = ",") { it.name }
                     Text(
                         text = track.title,
@@ -87,7 +85,7 @@ fun MusicBar(
 
             // Right
             Row(verticalAlignment = Alignment.CenterVertically) {
-                playbackState.currentTrack.let { track ->
+                playbackState.currentQueueItem.track.let { track ->
                     // plus
                     IconButton(onClick = { onAddToList(track) }) {
                         Icon(

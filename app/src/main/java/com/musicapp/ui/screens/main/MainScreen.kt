@@ -130,7 +130,7 @@ fun MainScreen(navController: NavController) {
                 }
             )
             if (showQueueBottomSheet) {
-                val currentTrack = viewModel.playbackUiState.collectAsState().value.currentTrack
+                val currentTrack = viewModel.playbackUiState.collectAsState().value.currentQueueItem?.track
                 QueueBottomSheet(
                     playbackUiState = playbackUiState,
                     onDismissRequest = { showQueueBottomSheet = false },
@@ -138,7 +138,10 @@ fun MainScreen(navController: NavController) {
                         if (clickedTrack.id == currentTrack?.id) {
                             viewModel.togglePlayback(currentTrack)
                         } else {
-                            viewModel.setPlaybackQueue(playbackUiState.playbackQueue, index)
+                            val trackQueue = playbackUiState.playbackQueue.map { queueItem ->
+                                queueItem.track
+                            }
+                            viewModel.setPlaybackQueue(trackQueue, index)
                         }
                     }
                 )

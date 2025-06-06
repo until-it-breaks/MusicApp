@@ -16,7 +16,6 @@ import androidx.media3.session.MediaSessionService
 import androidx.media3.ui.PlayerNotificationManager
 import com.musicapp.MainActivity
 import com.musicapp.R
-import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -147,16 +146,16 @@ class MediaPlaybackService : MediaSessionService() {
                     "MediaPlayerManager PlaybackUiState updated: $uiState"
                 )
 
-                val currentTrack = uiState.currentTrack
+                val currentQueueItem = uiState.currentQueueItem
                 val exoPlayerCurrentMediaItem = exoPlayer?.currentMediaItem
 
-                if (currentTrack != null) {
-                    val mediaItem = createMediaItem(currentTrack)
+                if (currentQueueItem != null) {
+                    val mediaItem = createMediaItem(currentQueueItem)
 
                     if (shouldUpdateMediaItem(exoPlayerCurrentMediaItem, mediaItem)) {
                         Log.d(
                             "MediaPlaybackService",
-                            "Setting new MediaItem for ExoPlayer: ${currentTrack.title}"
+                            "Setting new MediaItem for ExoPlayer: ${currentQueueItem.track.title}"
                         )
                         exoPlayer?.setMediaItem(mediaItem)
                         exoPlayer?.prepare()
@@ -245,15 +244,15 @@ class MediaPlaybackService : MediaSessionService() {
         )
     }
 
-    private fun createMediaItem(track: TrackModel): MediaItem {
+    private fun createMediaItem(queueItem: QueueItem): MediaItem {
         return MediaItem.Builder()
-            .setMediaId(track.id.toString())
-            .setUri(track.previewUri)
+            .setMediaId(queueItem.id.toString())
+            .setUri(queueItem.track.previewUri)
             .setMediaMetadata(
                 MediaMetadata.Builder()
-                    .setTitle(track.title)
-                    .setArtist(track.contributors.joinToString { it.name })
-                    .setArtworkUri(track.bigPictureUri)
+                    .setTitle(queueItem.track.title)
+                    .setArtist(queueItem.track.contributors.joinToString { it.name })
+                    .setArtworkUri(queueItem.track.bigPictureUri)
                     .build()
             )
             .build()

@@ -32,11 +32,11 @@ class PlaybackDescriptionAdapter(
     }
 
     override fun getCurrentContentTitle(player: Player): CharSequence {
-        return mediaPlayerManager.playbackState.value.currentTrack?.title ?: "Unknown Title"
+        return mediaPlayerManager.playbackState.value.currentQueueItem?.track?.title ?: "Unknown Title"
     }
 
     override fun getCurrentContentText(player: Player): CharSequence? {
-        return mediaPlayerManager.playbackState.value.currentTrack?.contributors?.joinToString { it.name }
+        return mediaPlayerManager.playbackState.value.currentQueueItem?.track?.contributors?.joinToString { it.name }
     }
 
     override fun createCurrentContentIntent(player: Player): PendingIntent? {
@@ -48,10 +48,10 @@ class PlaybackDescriptionAdapter(
         player: Player,
         callback: PlayerNotificationManager.BitmapCallback
     ): Bitmap? {
-        val currentTrack = mediaPlayerManager.playbackState.value.currentTrack
+        val currentTrack = mediaPlayerManager.playbackState.value.currentQueueItem?.track
         val defaultBitmap = getDefaultArtwork(context)
 
-        currentTrack?.bigPictureUri?.let { uri ->
+        currentTrack?.bigPictureUri.let { uri ->
             serviceScope.launch(Dispatchers.IO) {
                 try {
                     val imageRequest = ImageRequest.Builder(context)
@@ -79,9 +79,6 @@ class PlaybackDescriptionAdapter(
                     callback.onBitmap(defaultBitmap)
                 }
             }
-        } ?: run {
-            Log.d("PlaybackDescAdapter", "No current track or image URI to load for notification.")
-            callback.onBitmap(defaultBitmap)
         }
         return null
     }
