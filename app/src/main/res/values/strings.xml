@@ -165,4 +165,5 @@
     <string name="edit_photo">Edit profile photo</string>
     <string name="confirm_delete_account">Delete Account</string>
     <string name="delete_account_warning">The delete action is unreversible, are you sure to delete your account?</string>
+    <string name="empty_search_message">No results.</string>
 </resources>

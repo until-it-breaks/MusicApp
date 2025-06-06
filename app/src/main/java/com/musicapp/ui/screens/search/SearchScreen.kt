@@ -88,10 +88,16 @@ fun SearchScreen(
                 }
 
                 uiState.error -> {
+
+                    val lastSearch = uiState.lastSearchText
                     Text(
-                        text = stringResource(R.string.error_search),
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(8.dp)
+                        text = "${stringResource(R.string.search_results)} '${lastSearch}'",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+
+                    Text(
+                        text = stringResource(R.string.empty_search_message),
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
 
