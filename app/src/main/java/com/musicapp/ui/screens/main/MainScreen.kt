@@ -88,8 +88,9 @@ fun MainScreen(navController: NavController) {
                 playbackState = playbackUiState,
                 onTogglePlayback = viewModel::togglePlayback,
                 onStopClick = viewModel::stopMusic,
-                onAddToList = { /* TODO */ }, // it does nothing for now
-                onQueueClick = { showQueueBottomSheet = true  },
+                onQueueClick = { showQueueBottomSheet = true },
+                onAddToQueue = viewModel::addTrackToQueue,
+                onLikeClick = {/*TODO*/ },
                 onBarClick = {
                     navController.navigate(MusicAppRoute.TrackDetails)
                 },

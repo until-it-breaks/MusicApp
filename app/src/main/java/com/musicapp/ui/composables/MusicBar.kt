@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,8 +31,9 @@ import com.musicapp.ui.models.TrackModel
 fun MusicBar(
     playbackState: PlaybackUiState,
     onTogglePlayback: (TrackModel) -> Unit,
+    onAddToQueue: (TrackModel) -> Unit,
+    onLikeClick: (TrackModel) -> Unit,
     onStopClick: () -> Unit,
-    onAddToList: (TrackModel) -> Unit,
     onQueueClick: () -> Unit,
     onBarClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -95,13 +94,18 @@ fun MusicBar(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 playbackState.currentQueueItem.track.let { track ->
                     // plus
-                    IconButton(onClick = { onAddToList(track) }) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "Add to playlist",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    PublicTrackDropDownMenu(
+                        trackModel = playbackState.currentQueueItem.track,
+                        onAddToQueue = onAddToQueue,
+                        onLiked = onLikeClick,
+                        customIcon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_add),
+                                contentDescription = "Add",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    )
 
                     // play/pause
                     if (playbackState.isLoading) {
