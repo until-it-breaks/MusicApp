@@ -137,16 +137,6 @@ fun TrackDetailsScreen(
         QueueBottomSheet(
             playbackUiState = playbackUiState,
             onDismissRequest = { showQueueBottomSheet = false },
-            onTrackClick = { clickedTrack, index ->
-                if (clickedTrack.id == currentTrack.id) {
-                    viewModel.togglePlayback(currentTrack)
-                } else {
-                    val trackQueue = playbackUiState.playbackQueue.map { queueItem ->
-                        queueItem.track
-                    }
-                    viewModel.setPlaybackQueue(trackQueue, index)
-                }
-            }
         )
     }
 }

@@ -191,7 +191,7 @@ fun TrackCard(
             modifier = Modifier.padding(8.dp)
         ) {
             val isPlaying = if (queueId == null) {
-                playbackUiState.currentQueueItemId == track.id && playbackUiState.isPlaying
+                playbackUiState.currentQueueItem?.track?.id == track.id
             } else {
                 playbackUiState.currentQueueItemId == queueId
             }

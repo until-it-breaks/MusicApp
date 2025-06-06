@@ -26,7 +26,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.media3.common.util.UnstableApi
 import com.musicapp.R
+import com.musicapp.playback.QueueItem
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.screens.addtoplaylist.AddTrackToPlaylistModal
 
@@ -102,6 +104,7 @@ fun UserPlaylistDropDownMenu(
 /**
  * Drop-down menu for tracks retrieved via deezer API
  */
+@androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PublicTrackDropDownMenu(
@@ -109,7 +112,8 @@ fun PublicTrackDropDownMenu(
     onAddToQueue: (track: TrackModel) -> Unit,
     onLiked: (track: TrackModel) -> Unit,
     modifier: Modifier = Modifier,
-    removeFromQueue: Boolean = false
+    onRemoveFromQueue: (queueItem: QueueItem) -> Unit = {},
+    queueItem: QueueItem? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -128,15 +132,25 @@ fun PublicTrackDropDownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = !expanded }
         ) {
-            val text = if (removeFromQueue) { stringResource(R.string.remove_from_queue) } else { stringResource(R.string.add_to_queue)}
+
             DropdownMenuItem(
-                text = { Text(text) },
+                text = { Text(stringResource(R.string.add_to_queue)) },
                 leadingIcon = { Icon(Icons.Outlined.QueuePlayNext, contentDescription = null)},
                 onClick = {
                     expanded = !expanded
                     onAddToQueue(trackModel)
                 }
             )
+            if (queueItem != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.remove_from_queue)) },
+                    leadingIcon = { Icon(Icons.Outlined.QueuePlayNext, contentDescription = null)},
+                    onClick = {
+                        expanded = !expanded
+                        onRemoveFromQueue(queueItem)
+                    }
+                )
+            }
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.add_to_liked)) },
                 leadingIcon = { Icon(Icons.Outlined.Favorite, contentDescription = null)},

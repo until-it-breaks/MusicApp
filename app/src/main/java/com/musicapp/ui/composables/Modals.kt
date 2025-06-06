@@ -40,6 +40,7 @@ import androidx.media3.common.util.UnstableApi
 import com.musicapp.R
 import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.PlaybackUiState
+import com.musicapp.playback.QueueItem
 import com.musicapp.ui.models.TrackModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -163,7 +164,6 @@ fun EditPlaylistNameModal(
 fun QueueBottomSheet(
     playbackUiState: PlaybackUiState,
     onDismissRequest: () -> Unit,
-    onTrackClick: (TrackModel, Int) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -222,14 +222,27 @@ fun QueueBottomSheet(
                         TrackCard(
                             track = track,
                             showPicture = true,
+                            queueId = queueItem.id,
                             playbackUiState = playbackUiState,
                             onTrackClick = { clickedTrack ->
-                                onTrackClick(clickedTrack, index)
+                                trackClick(
+                                    queueItem,
+                                    playbackUiState,
+                                    viewModel,
+                                    clickedTrack,
+                                    index
+                                )
                             },
                             onArtistClick = { },
                             extraMenu = {
                                 if (queueItem.id == playbackUiState.currentQueueItemId) {
-                                    IconButton(onClick = { onTrackClick(track, index) }) {
+                                    IconButton(onClick = { trackClick(
+                                        queueItem,
+                                        playbackUiState,
+                                        viewModel,
+                                        queueItem.track,
+                                        index
+                                    ) }) {
                                         Icon(
                                             painter = painterResource(
                                                 if (playbackUiState.isPlaying) R.drawable.ic_pause else R.drawable.ic_play
@@ -242,8 +255,9 @@ fun QueueBottomSheet(
                                     PublicTrackDropDownMenu(
                                         trackModel = track,
                                         onLiked = { /*TODO*/ },
-                                        onAddToQueue = { viewModel.removeTrackFromQueue(queueItem) },
-                                        removeFromQueue = true
+                                        onAddToQueue = viewModel::addTrackToQueue,
+                                        onRemoveFromQueue = viewModel::removeTrackFromQueue,
+                                        queueItem = queueItem
                                     )
                                 }
                             }
@@ -260,5 +274,23 @@ fun QueueBottomSheet(
                 )
             }
         }
+    }
+}
+
+@androidx.annotation.OptIn(UnstableApi::class)
+private fun trackClick(
+    queueItem: QueueItem,
+    playbackUiState: PlaybackUiState,
+    viewModel: BasePlaybackViewModel,
+    clickedTrack: TrackModel,
+    index: Int
+) {
+    if (queueItem.id == playbackUiState.currentQueueItemId) {
+        viewModel.togglePlayback(clickedTrack)
+    } else {
+        val trackQueue = playbackUiState.playbackQueue.map { queueItem ->
+            queueItem.track
+        }
+        viewModel.setPlaybackQueue(trackQueue, index)
     }
 }
