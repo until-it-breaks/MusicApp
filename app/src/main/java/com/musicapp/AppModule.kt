@@ -35,6 +35,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -128,7 +129,7 @@ val appModule = module {
 
     viewModel { PasswordRecoveryViewModel(get()) }
 
-    viewModel { ProfileScreenViewModel(get(), get()) }
+    viewModel { ProfileScreenViewModel(get(), get(), androidContext()) }
 
     viewModel { MainActivityViewModel(get(), get()) }
 

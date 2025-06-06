@@ -1,8 +1,12 @@
 package com.musicapp.ui.screens.profile
 
+import android.Manifest
+import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,11 +30,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -44,16 +54,29 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileScreen(navController: NavController) {
     val viewModel: ProfileScreenViewModel = koinViewModel()
     val uiState = viewModel.uiState.collectAsState().value
+    val context = LocalContext.current
 
     val usernameToDisplay = uiState.currentUser?.username ?: stringResource(R.string.no_username)
+    var cameraOutputUri: Uri? by remember { mutableStateOf(null) }
 
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = { success ->
             if (success) {
-                /*TODO*/
+                cameraOutputUri?.let { uri ->
+                    viewModel.updateProfilePicture(uri)
+                }
+            } else {
+                Log.e("ProfileScreen", "Photo capture cancelled or failed.")
             }
             viewModel.dismissProfilePictureOptions()
+        }
+    )
+
+    val requestCameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted: Boolean ->
+            viewModel.onCameraPermissionResult(isGranted)
         }
     )
 
@@ -61,11 +84,30 @@ fun ProfileScreen(navController: NavController) {
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
             if (uri != null) {
+                try {
+                    context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                } catch (e: SecurityException) {
+                    Log.e("ProfileScreen", "Failed to take persistable URI permission for gallery image", e)
+                }
                 viewModel.updateProfilePicture(uri)
             }
             viewModel.dismissProfilePictureOptions()
         }
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is ProfileUiEvent.LaunchCamera -> {
+                    cameraOutputUri = event.uri
+                    takePictureLauncher.launch(event.uri)
+                }
+                is ProfileUiEvent.RequestCameraPermission -> {
+                    requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.profile)) }
@@ -88,6 +130,7 @@ fun ProfileScreen(navController: NavController) {
                     .size(128.dp)
                     .clip(CircleShape)
                     .padding(0.dp)
+                    .clickable { } //TODO show full picture?
             )
             TextButton(onClick = { viewModel.showProfilePictureOptions() }) {
                 Text("Edit photo")
@@ -204,7 +247,7 @@ fun ProfileScreen(navController: NavController) {
                 text = {
                     Column {
                         TextButton(onClick = {
-                            /*TODO*/
+                            viewModel.onTakePhotoClicked()
                         }) {
                             Text(stringResource(R.string.take_photo_now))
                         }
@@ -216,6 +259,7 @@ fun ProfileScreen(navController: NavController) {
                         if (!uiState.isDefaultProfilePicture) {
                             TextButton(onClick = {
                                 viewModel.removeProfilePicture()
+                                viewModel.dismissProfilePictureOptions()
                             }) {
                                 Text(stringResource(R.string.remove_current_photo))
                             }
