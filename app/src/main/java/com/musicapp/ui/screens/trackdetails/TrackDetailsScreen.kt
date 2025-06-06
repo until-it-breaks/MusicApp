@@ -64,6 +64,7 @@ import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.PlaybackUiState
 import com.musicapp.playback.RepeatMode
 import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.QueueBottomSheet
 import com.musicapp.ui.composables.TopBarWithBackButtonAndMoreVert
 import com.musicapp.ui.models.TrackModel
@@ -118,7 +119,7 @@ fun TrackDetailsScreen(
                 onRepeatModeClick = viewModel::toggleRepeatMode,
                 onQueueClick = { showQueueBottomSheet = true },
                 onLikeClick = { /*TODO*/ },
-                onPlusClick = { /*TODO*/ },
+                onAddToQueue = viewModel::addTrackToQueue,
                 onSeek = viewModel::seekTo,
                 currentPosition = playbackUiState.currentPositionMs,
                 trackDuration = playbackUiState.trackDurationMs
@@ -262,7 +263,7 @@ fun TrackDetailsPlayerControls(
     onRepeatModeClick: () -> Unit,
     onQueueClick: () -> Unit,
     onLikeClick: () -> Unit,
-    onPlusClick: () -> Unit,
+    onAddToQueue: (TrackModel) -> Unit,
     onSeek: (Long) -> Unit,
     currentPosition: Long,
     trackDuration: Long,
@@ -311,14 +312,20 @@ fun TrackDetailsPlayerControls(
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
+
             // plus
-            IconButton(onClick = onPlusClick) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_add),
-                    contentDescription = "Add",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            PublicTrackDropDownMenu(
+                trackModel = playbackUiState.currentQueueItem.track,
+                onAddToQueue = onAddToQueue,
+                onLiked = { } /*TODO*/,
+                customIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_add),
+                        contentDescription = "Add",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            )
         }
 
         // Seek Bar (Progress Bar)

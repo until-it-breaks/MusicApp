@@ -113,7 +113,8 @@ fun PublicTrackDropDownMenu(
     onLiked: (track: TrackModel) -> Unit,
     modifier: Modifier = Modifier,
     onRemoveFromQueue: (queueItem: QueueItem) -> Unit = {},
-    queueItem: QueueItem? = null
+    queueItem: QueueItem? = null,
+    customIcon: @Composable (() -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -123,10 +124,14 @@ fun PublicTrackDropDownMenu(
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = null
-            )
+            if (customIcon == null) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = null
+                )
+            } else {
+                customIcon()
+            }
         }
         DropdownMenu(
             expanded = expanded,
@@ -135,7 +140,7 @@ fun PublicTrackDropDownMenu(
 
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.add_to_queue)) },
-                leadingIcon = { Icon(Icons.Outlined.QueuePlayNext, contentDescription = null)},
+                leadingIcon = { Icon(Icons.Outlined.QueuePlayNext, contentDescription = null) },
                 onClick = {
                     expanded = !expanded
                     onAddToQueue(trackModel)
@@ -144,7 +149,7 @@ fun PublicTrackDropDownMenu(
             if (queueItem != null) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.remove_from_queue)) },
-                    leadingIcon = { Icon(Icons.Outlined.QueuePlayNext, contentDescription = null)},
+                    leadingIcon = { Icon(Icons.Outlined.QueuePlayNext, contentDescription = null) },
                     onClick = {
                         expanded = !expanded
                         onRemoveFromQueue(queueItem)
@@ -153,7 +158,7 @@ fun PublicTrackDropDownMenu(
             }
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.add_to_liked)) },
-                leadingIcon = { Icon(Icons.Outlined.Favorite, contentDescription = null)},
+                leadingIcon = { Icon(Icons.Outlined.Favorite, contentDescription = null) },
                 onClick = {
                     expanded = !expanded
                     onLiked(trackModel)
@@ -161,7 +166,7 @@ fun PublicTrackDropDownMenu(
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.add_to_playlist)) },
-                leadingIcon = { Icon(Icons.Outlined.Add, contentDescription = null)},
+                leadingIcon = { Icon(Icons.Outlined.Add, contentDescription = null) },
                 onClick = {
                     showBottomSheet = !showBottomSheet
                     expanded = !expanded
@@ -207,7 +212,7 @@ fun SavedTrackDropDownMenu(
         ) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.add_to_queue)) },
-                leadingIcon = { Icon(Icons.Outlined.QueuePlayNext, contentDescription = null)},
+                leadingIcon = { Icon(Icons.Outlined.QueuePlayNext, contentDescription = null) },
                 onClick = {
                     expanded = !expanded
                     onAddToQueue(track)
@@ -215,7 +220,7 @@ fun SavedTrackDropDownMenu(
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.add_to_playlist)) },
-                leadingIcon = { Icon(Icons.Outlined.Add, contentDescription = null)},
+                leadingIcon = { Icon(Icons.Outlined.Add, contentDescription = null) },
                 onClick = {
                     showBottomSheet = !showBottomSheet
                     expanded = !expanded
@@ -223,7 +228,7 @@ fun SavedTrackDropDownMenu(
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.remove_track)) },
-                leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
+                leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null) },
                 onClick = {
                     expanded = !expanded
                     onRemoveTrack(track)
@@ -263,7 +268,7 @@ fun LikedTracksPlaylistDropDownMenu(modifier: Modifier = Modifier, onClearTracks
         ) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.clear_tracks)) },
-                leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
+                leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null) },
                 onClick = {
                     expanded = !expanded
                     showConfirmDialog = true
@@ -320,7 +325,7 @@ fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () ->
         ) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.clear_tracks)) },
-                leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null)},
+                leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null) },
                 onClick = {
                     expanded = !expanded
                     showConfirmDialog = true
