@@ -233,7 +233,8 @@ class MediaPlayerManager(
             } else {
                 Log.d("MediaPlayerManager", "No next track available.")
                 // stop when reach the end of queue
-                stop()
+                seekTo(0L)
+                pause()
             }
         }
     }
@@ -270,19 +271,7 @@ class MediaPlayerManager(
         exoPlayer?.clearMediaItems()
         exoPlayer?.seekTo(0)
 
-        _playbackState.update {
-            it.copy(
-                isPlaying = false,
-                currentQueueItemId = null,
-                currentQueueItem = null,
-                isLoading = false,
-                currentQueueIndex = -1,
-                playbackQueue = emptyList(),
-                currentPositionMs = 0L,
-                trackDurationMs = 30000L,
-                isShuffleModeEnabled = false
-            )
-        }
+        _playbackState.value = PlaybackUiState()
 
         val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
         appContext.stopService(serviceIntent)
