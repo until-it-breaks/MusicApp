@@ -67,6 +67,7 @@ import com.musicapp.playback.RepeatMode
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.QueueBottomSheet
+import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TopBarWithBackButtonAndMoreVert
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.delay
@@ -107,18 +108,11 @@ fun TrackDetailsScreen(
         return
     }
 
-    val maxLength = 30
-    var title: String = currentTrack.title
-    if (currentTrack.title.length >= maxLength) {
-        title = currentTrack.title.take(maxLength) + "..."
-    }
-
     Scaffold(
         topBar = {
-            TopBarWithBackButtonAndMoreVert(
+            TopBarWithBackButton(
                 navController = navController,
-                title = title,
-                onMoreVertClick = { /*TODO*/ })
+                title = currentTrack.title)
         },
         bottomBar = {
             TrackDetailsPlayerControls(

@@ -236,9 +236,13 @@ fun ProfileScreen(navController: NavController) {
                     )
                 },
                 confirmButton = {
-                    TextButton(onClick = { viewModel.updateUsername() }) {
+                    TextButton(onClick = {
+                        viewModel.updateUsername()
+                        viewModel.dismissUsernameDialog()
+                    }) {
                         Text(stringResource(R.string.save))
                     }
+
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.dismissUsernameDialog() }) {

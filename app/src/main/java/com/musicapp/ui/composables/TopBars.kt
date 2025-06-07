@@ -34,7 +34,8 @@ fun TopBarWithBackButton(
         title = {
             Text(
                 text = title,
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
+                maxLines = 1
             )
         },
         expandedHeight = 48.dp,
