@@ -19,6 +19,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -36,6 +37,7 @@ import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.composables.UserPlaylistDropDownMenu
 import com.musicapp.ui.theme.AppPadding
 import com.musicapp.util.convertMillisToDateWithHourAndMinutes
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @UnstableApi
@@ -46,6 +48,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val playlist = viewModel.playlist.collectAsStateWithLifecycle()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(playlistId) {
         viewModel.loadPlaylistTracks(playlistId)
@@ -103,7 +106,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     track = track,
                     showPicture = true,
                     playbackUiState = playbackUiState,
-                    onTrackClick = viewModel::togglePlayback,
+                    onTrackClick = {scope.launch { viewModel.togglePlayback(track) } },
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
                         SavedTrackDropDownMenu(

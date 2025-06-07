@@ -196,7 +196,7 @@ class MediaPlayerManager(
     /**
      * Plays a new track, clearing the queue and setting this as the first.
      */
-    fun playTrack(track: TrackModel) {
+    suspend fun playTrack(track: TrackModel) {
         setPlaybackQueue(listOf(track), 0) // Sets a new queue with just this track and plays it
     }
 
@@ -206,7 +206,7 @@ class MediaPlayerManager(
      * If the track is currently paused, it resumes.
      * If a different track is playing, it stops and starts playing the new track.
      */
-    fun togglePlayback(track: TrackModel) {
+    suspend fun togglePlayback(track: TrackModel) {
         val currentState = _playbackState.value
         val currentTrackId = currentState.currentQueueItem?.track?.id
 
@@ -281,7 +281,7 @@ class MediaPlayerManager(
     /**
      * Sets a new playback queue for ExoPlayer and immediately starts playing from the specified index.
      */
-    fun setPlaybackQueue(newTracks: List<TrackModel>, startIndex: Int) {
+    suspend fun setPlaybackQueue(newTracks: List<TrackModel>, startIndex: Int) {
         val newQueueItems = newTracks.map { track ->
             QueueItem(id = _nextQueueId++, track = track)
         }
@@ -314,57 +314,55 @@ class MediaPlayerManager(
         Log.d("MediaPlayerManager", "Shuffle mode toggled to: $newShuffleMode")
     }
 
-    private fun setPlaybackQueueInternal(
+    private suspend fun setPlaybackQueueInternal(
         newQueue: List<QueueItem>,
         startIndex: Int,
         currentTime: Long = 0L
     ) {
 
-        scope.launch {
-            Log.d(
-                "MediaPlayerManager",
-                "Internal: Setting playback queue. Size: ${newQueue.size}, Start Index: $startIndex, Shuffle: ${_playbackState.value.isShuffleModeEnabled}"
-            )
+        Log.d(
+            "MediaPlayerManager",
+            "Internal: Setting playback queue. Size: ${newQueue.size}, Start Index: $startIndex, Shuffle: ${_playbackState.value.isShuffleModeEnabled}"
+        )
 
-            stopPositionUpdates()
-
-
-            val mediaItems = newQueue.map { queueItem ->
-                MediaItem.Builder()
-                    .setMediaId(queueItem.id.toString())
-                    .setUri(queueItem.track.previewUri)
-                    .setMediaMetadata(
-                        MediaMetadata.Builder()
-                            .setTitle(queueItem.track.title)
-                            .setArtist(queueItem.track.contributors.joinToString(", ") { it.name })
-                            .setArtworkUri(queueItem.track.bigPictureUri)
-                            .build()
-                    )
-                    .build()
-            }
-
-            if (exoPlayer == null) {
-                val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
-                appContext.startService(serviceIntent)
-                Log.d("MediaPlayerManager", "Started MediaPlaybackService for new queue.")
-            } else {
-                Log.d("MediaPlayerManager", "Updated MediaPlaybackService for new queue.")
-            }
+        stopPositionUpdates()
 
 
-            // race condition, wait for service to bind
-            _isExoPlayerReady.first { it }
-
-            exoPlayer?.apply {
-                setMediaItems(mediaItems, startIndex, currentTime)
-                prepare()
-                play()
-            } ?: run {
-                Log.e(
-                    "MediaPlayerManager",
-                    "ExoPlayer not available when trying to set queue. Service might not be ready."
+        val mediaItems = newQueue.map { queueItem ->
+            MediaItem.Builder()
+                .setMediaId(queueItem.id.toString())
+                .setUri(queueItem.track.previewUri)
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setTitle(queueItem.track.title)
+                        .setArtist(queueItem.track.contributors.joinToString(", ") { it.name })
+                        .setArtworkUri(queueItem.track.bigPictureUri)
+                        .build()
                 )
-            }
+                .build()
+        }
+
+        if (exoPlayer == null) {
+            val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
+            appContext.startService(serviceIntent)
+            Log.d("MediaPlayerManager", "Started MediaPlaybackService for new queue.")
+        } else {
+            Log.d("MediaPlayerManager", "Updated MediaPlaybackService for new queue.")
+        }
+
+
+        // race condition, wait for service to bind
+        _isExoPlayerReady.first { it }
+
+        exoPlayer?.apply {
+            setMediaItems(mediaItems, startIndex, currentTime)
+            prepare()
+            play()
+        } ?: run {
+            Log.e(
+                "MediaPlayerManager",
+                "ExoPlayer not available when trying to set queue. Service might not be ready."
+            )
         }
     }
 
@@ -422,17 +420,33 @@ class MediaPlayerManager(
     }
 
     /**
-     * Clears the entire playback queue and stops current playback.
+     * Clears the entire playback queue but the current track.
      */
     fun clearQueue() {
-        stop()
-        _nextQueueId = 0L
-        Log.d("MediaPlayerManager", "Playback queue cleared.")
+        scope.launch {
+            val currentState = _playbackState.value
+            val currentTrack = currentState.currentQueueItem.let { queueItem ->
+                queueItem!!.track
+            }
+            val currentPositionMs = currentState.currentPositionMs
+            val isPlaying = currentState.isPlaying
+
+            _nextQueueId = 0
+            setPlaybackQueue(listOf(currentTrack), 0)
+            seekTo(currentPositionMs)
+            _playbackState.update {
+                it.copy(
+                    isPlaying = isPlaying,
+                )
+            }
+            Log.d("MediaPlayerManager", "Playback queue cleared.")
+        }
     }
 
     fun seekTo(positionMs: Long) {
         exoPlayer?.seekTo(positionMs)
         _playbackState.update { it.copy(currentPositionMs = positionMs) }
+        Log.d("MediaPlayerManager", "CurrentPositionMs set to $positionMs")
     }
 
     private fun startPositionUpdates() {

@@ -27,7 +27,7 @@ open class BasePlaybackViewModel
         mediaPlayerManager.removeTrackFromQueue(queueItem)
     }
 
-    fun setPlaybackQueue(queue: List<TrackModel>, index: Int = 0) {
+    suspend fun setPlaybackQueue(queue: List<TrackModel>, index: Int = 0) {
         mediaPlayerManager.setPlaybackQueue(queue, index)
     }
 
@@ -43,7 +43,7 @@ open class BasePlaybackViewModel
      * If a different track, it stops current playback and starts playing the new track,
      * replacing the current queue with just this track.
      */
-    fun togglePlayback(track: TrackModel) {
+    suspend fun togglePlayback(track: TrackModel) {
         mediaPlayerManager.togglePlayback(track)
     }
 

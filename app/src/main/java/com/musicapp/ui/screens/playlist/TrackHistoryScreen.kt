@@ -13,6 +13,7 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,6 +30,7 @@ import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.composables.TrackHistoryDropDownMenu
 import com.musicapp.ui.theme.AppPadding
 import com.musicapp.util.convertMillisToDateWithHourAndMinutes
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @UnstableApi
@@ -38,6 +40,7 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val playlist = viewModel.playlist.collectAsStateWithLifecycle()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -64,7 +67,11 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                         val timeInMillis = playlist.value?.lastEditTime
                         timeInMillis?.let {
                             Text(
-                                text = "${stringResource(R.string.last_edited)}: ${convertMillisToDateWithHourAndMinutes(it)}",
+                                text = "${stringResource(R.string.last_edited)}: ${
+                                    convertMillisToDateWithHourAndMinutes(
+                                        it
+                                    )
+                                }",
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
                         }
@@ -75,8 +82,14 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                         track = track,
                         showPicture = true,
                         playbackUiState = playbackUiState,
-                        onTrackClick = viewModel::togglePlayback,
-                        onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
+                        onTrackClick = { scope.launch { viewModel.togglePlayback(track) } },
+                        onArtistClick = { artistId ->
+                            subNavController.navigate(
+                                MusicAppRoute.Artist(
+                                    artistId
+                                )
+                            )
+                        },
                         extraMenu = {
                             SavedTrackDropDownMenu(
                                 track = track,

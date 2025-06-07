@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,6 +69,7 @@ import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.QueueBottomSheet
 import com.musicapp.ui.composables.TopBarWithBackButtonAndMoreVert
 import com.musicapp.ui.models.TrackModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.util.Locale
 
@@ -79,6 +81,7 @@ fun TrackDetailsScreen(
 ) {
     val viewModel: BasePlaybackViewModel = koinViewModel()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     val currentTrack: TrackModel? = playbackUiState.currentQueueItem?.track
 
@@ -112,7 +115,7 @@ fun TrackDetailsScreen(
         bottomBar = {
             TrackDetailsPlayerControls(
                 playbackUiState = playbackUiState,
-                onTogglePlayPause = { viewModel.togglePlayback(currentTrack) },
+                onTogglePlayPause = { scope.launch { viewModel.togglePlayback(currentTrack) } },
                 onPreviousClick = viewModel::playPreviousTrack,
                 onNextClick = viewModel::playNextTrack,
                 onShuffleClick = viewModel::toggleShuffleMode,
@@ -137,6 +140,7 @@ fun TrackDetailsScreen(
     if (showQueueBottomSheet) {
         QueueBottomSheet(
             playbackUiState = playbackUiState,
+            onClearQueueClicked = viewModel::clearPlaybackQueue,
             onDismissRequest = { showQueueBottomSheet = false },
         )
     }

@@ -1,5 +1,6 @@
 package com.musicapp.ui.composables
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +44,7 @@ import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.PlaybackUiState
 import com.musicapp.playback.QueueItem
 import com.musicapp.ui.models.TrackModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -163,11 +166,13 @@ fun EditPlaylistNameModal(
 @Composable
 fun QueueBottomSheet(
     playbackUiState: PlaybackUiState,
+    onClearQueueClicked: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+    val scope = rememberCoroutineScope()
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -181,13 +186,24 @@ fun QueueBottomSheet(
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .fillMaxHeight(0.8f)
         ) {
-            // Title
-            Text(
-                text = stringResource(R.string.queue_title),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Absolute.SpaceBetween
+            ) {
+                // Title
+                Text(
+                    text = stringResource(R.string.queue_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                // clear queue button
+                TextButton(onClick = { onClearQueueClicked() }) {
+                    Text(stringResource(R.string.clear_queue))
+                }
+            }
 
             // Playing: track name
             Row(
@@ -225,24 +241,30 @@ fun QueueBottomSheet(
                             queueId = queueItem.id,
                             playbackUiState = playbackUiState,
                             onTrackClick = { clickedTrack ->
-                                trackClick(
-                                    queueItem,
-                                    playbackUiState,
-                                    viewModel,
-                                    clickedTrack,
-                                    index
-                                )
+                                scope.launch {
+                                    trackClick(
+                                        queueItem,
+                                        playbackUiState,
+                                        viewModel,
+                                        clickedTrack,
+                                        index
+                                    )
+                                }
                             },
                             onArtistClick = { },
                             extraMenu = {
                                 if (queueItem.id == playbackUiState.currentQueueItemId) {
-                                    IconButton(onClick = { trackClick(
-                                        queueItem,
-                                        playbackUiState,
-                                        viewModel,
-                                        queueItem.track,
-                                        index
-                                    ) }) {
+                                    IconButton(onClick = {
+                                        scope.launch {
+                                            trackClick(
+                                                queueItem,
+                                                playbackUiState,
+                                                viewModel,
+                                                queueItem.track,
+                                                index
+                                            )
+                                        }
+                                    }) {
                                         Icon(
                                             painter = painterResource(
                                                 if (playbackUiState.isPlaying) R.drawable.ic_pause else R.drawable.ic_play
@@ -278,7 +300,7 @@ fun QueueBottomSheet(
 }
 
 @androidx.annotation.OptIn(UnstableApi::class)
-private fun trackClick(
+private suspend fun trackClick(
     queueItem: QueueItem,
     playbackUiState: PlaybackUiState,
     viewModel: BasePlaybackViewModel,

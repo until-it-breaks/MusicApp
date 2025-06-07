@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,6 +38,7 @@ import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.MainTopBar
 import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.TrackCard
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @UnstableApi
@@ -48,6 +50,7 @@ fun SearchScreen(
     val viewModel: SearchViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
 
     Scaffold(
@@ -124,7 +127,7 @@ fun SearchScreen(
                                 track = track,
                                 showPicture = true,
                                 playbackUiState = playbackUiState,
-                                onTrackClick = viewModel::togglePlayback,
+                                onTrackClick = { scope.launch { viewModel.togglePlayback(track) } },
                                 onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                                 extraMenu = {
                                     PublicTrackDropDownMenu(

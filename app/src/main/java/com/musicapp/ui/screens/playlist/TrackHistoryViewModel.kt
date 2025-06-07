@@ -7,7 +7,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.TrackHistoryModel
-import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
 import com.musicapp.playback.BasePlaybackViewModel
 import kotlinx.coroutines.Dispatchers
@@ -85,16 +84,6 @@ class TrackHistoryViewModel(
                 Log.e(TAG, e.localizedMessage, e)
             }
         }
-    }
-
-    fun addToQueue(track: TrackModel) {
-        viewModelScope.launch {
-            // TODO Enqueue given track
-        }
-    }
-
-    fun playTrack(track: TrackModel) {
-        mediaPlayerManager.togglePlayback(track)
     }
 
     fun logout() {

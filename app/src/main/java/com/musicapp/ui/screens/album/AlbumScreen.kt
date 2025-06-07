@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +49,7 @@ import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.composables.TrackCard
 import com.musicapp.ui.theme.AppPadding
 import com.musicapp.util.convertDurationInSecondsToString
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 
@@ -58,18 +60,26 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
     val viewModel = koinViewModel<AlbumViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(albumId) {
         viewModel.loadAlbum(albumId)
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.album_details)) },
+        topBar = {
+            TopBarWithBackButton(
+                navController,
+                title = stringResource(R.string.album_details)
+            )
+        },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.padding(contentPadding).padding(AppPadding.ScaffoldContent)
+            modifier = Modifier
+                .padding(contentPadding)
+                .padding(AppPadding.ScaffoldContent)
         ) {
             item {
                 if (uiState.showAlbumDetailsLoading) {
@@ -128,7 +138,11 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                                     Text(
                                         text = contributor.name,
                                         textDecoration = TextDecoration.Underline,
-                                        modifier = Modifier.clickable { navController.navigate(MusicAppRoute.Artist(contributor.id)) }
+                                        modifier = Modifier.clickable {
+                                            navController.navigate(
+                                                MusicAppRoute.Artist(contributor.id)
+                                            )
+                                        }
                                     )
                                     if (index < album.contributors.lastIndex) {
                                         Text(" · ")
@@ -147,7 +161,11 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 uiState.tracksErrorStringId?.let {
                     ErrorSection(
                         title = stringResource(R.string.failed_to_load_tracks),
-                        message = stringResource(it) + if (uiState.failedTracksCount > 0) " (${uiState.failedTracksCount} ${stringResource(R.string.tracks)})" else "",
+                        message = stringResource(it) + if (uiState.failedTracksCount > 0) " (${uiState.failedTracksCount} ${
+                            stringResource(
+                                R.string.tracks
+                            )
+                        })" else "",
                         onRetry = viewModel::loadTracks
                     )
                 }
@@ -156,8 +174,21 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 TrackCard(
                     track = track,
                     playbackUiState = playbackUiState,
-                    onTrackClick = { viewModel.setPlaybackQueue(uiState.tracks, index) },
-                    onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
+                    onTrackClick = {
+                        scope.launch {
+                            viewModel.setPlaybackQueue(
+                                uiState.tracks,
+                                index
+                            )
+                        }
+                    },
+                    onArtistClick = { artistId ->
+                        navController.navigate(
+                            MusicAppRoute.Artist(
+                                artistId
+                            )
+                        )
+                    },
                     extraMenu = {
                         PublicTrackDropDownMenu(
                             trackModel = track,

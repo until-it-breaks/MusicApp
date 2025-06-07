@@ -17,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -33,6 +34,7 @@ import com.musicapp.ui.SearchNavGraph
 import com.musicapp.ui.composables.MainNavBar
 import com.musicapp.ui.composables.MusicBar
 import com.musicapp.ui.composables.QueueBottomSheet
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 enum class MainCategory(
@@ -69,6 +71,7 @@ fun MainScreen(navController: NavController) {
     // view model for the music player
     val viewModel: BasePlaybackViewModel = koinViewModel()
     val playbackUiState by viewModel.playbackUiState.collectAsState()
+    val scope = rememberCoroutineScope()
     var showQueueBottomSheet by remember { mutableStateOf(false) }
 
 
@@ -86,7 +89,9 @@ fun MainScreen(navController: NavController) {
 
             MusicBar(
                 playbackState = playbackUiState,
-                onTogglePlayback = viewModel::togglePlayback,
+                onTogglePlayback = { scope.launch {
+                    viewModel.togglePlayback(playbackUiState.currentQueueItem!!.track)
+                } },
                 onStopClick = viewModel::stopMusic,
                 onQueueClick = { showQueueBottomSheet = true },
                 onAddToQueue = viewModel::addTrackToQueue,
@@ -133,6 +138,7 @@ fun MainScreen(navController: NavController) {
             if (showQueueBottomSheet) {
                 QueueBottomSheet(
                     playbackUiState = playbackUiState,
+                    onClearQueueClicked = viewModel::clearPlaybackQueue,
                     onDismissRequest = { showQueueBottomSheet = false },
                 )
             }

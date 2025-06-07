@@ -141,7 +141,7 @@ fun ProfileScreen(navController: NavController) {
                     .clickable { } //TODO show full picture?
             )
             TextButton(onClick = { viewModel.showProfilePictureOptions() }) {
-                Text("Edit photo")
+                Text(stringResource(R.string.edit_photo))
             }
             // Username
             Column(
