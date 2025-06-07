@@ -69,6 +69,7 @@ import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.QueueBottomSheet
 import com.musicapp.ui.composables.TopBarWithBackButtonAndMoreVert
 import com.musicapp.ui.models.TrackModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.util.Locale
@@ -84,12 +85,19 @@ fun TrackDetailsScreen(
     val scope = rememberCoroutineScope()
 
     val currentTrack: TrackModel? = playbackUiState.currentQueueItem?.track
+    val TIMEOUT_MILLIS = 2000L
 
     var showQueueBottomSheet by remember { mutableStateOf(false) }
 
-    // maybe not needed since the track is already loaded in the viewModel
+
+
     LaunchedEffect(currentTrack) {
-        //viewModel.loadCurrentTrack()
+        if (currentTrack == null){
+            delay(TIMEOUT_MILLIS)
+            if (currentTrack == null) {
+                navController.popBackStack()
+            }
+        }
     }
 
     if (currentTrack == null) {
