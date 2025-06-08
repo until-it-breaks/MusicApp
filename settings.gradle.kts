@@ -11,6 +11,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -20,8 +21,8 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("com.autonomousapps.build-health") version "2.17.0"
-    id("com.android.application") version "8.10.0" apply false
+    id("com.autonomousapps.build-health") version "2.18.0"
+    id("com.android.application") version "8.10.1" apply false
 }
 
 rootProject.name = "MusicApp"

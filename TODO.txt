@@ -1,9 +1,0 @@
-log in (jiekai)
-home (jiekai)
-search, song, player (franco)
-library (jiekai)
-setting
-profilo (franco)
-
-
-signup -> consider making an email verification based one (currently any mail is considered ok)

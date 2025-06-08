@@ -55,25 +55,38 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Navigation
     implementation(libs.androidx.navigation.compose)
+
+    // Icons
     implementation(libs.androidx.material.icons.extended)
+
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.com.google.firebase.firebase.analytics)
     implementation(libs.firebase.auth)
+
     implementation(libs.koin.androidx.compose)
+
+    // Http Client
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
+
+    // Loadable images
     implementation(libs.coil.kt.coil.compose)
-    implementation(libs.coil.network.okhttp) // Needed to display async images with url from the network
+    implementation(libs.coil.network.okhttp)
+
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
+
     // Datastore preferences
     implementation(libs.androidx.datastore.preferences)
 
