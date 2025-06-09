@@ -3,13 +3,13 @@ package com.musicapp.ui.screens.addtoplaylist
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.LikedTracksRepository
 import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.UserPlaylistModel
 import com.musicapp.ui.models.toModel
+import com.musicapp.ui.screens.AuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,15 +33,13 @@ data class AddToPlaylistUiState(
 class AddToPlaylistViewModel(
     private val likedTracksRepository: LikedTracksRepository,
     private val userPlaylistRepository: UserPlaylistRepository,
-    private val auth: FirebaseAuth
+    private val authManager: AuthManager
 ): ViewModel() {
-    private val _userId = MutableStateFlow<String?>(auth.currentUser?.uid)
-
     private val _uiState = MutableStateFlow(AddToPlaylistUiState())
     val uiState: StateFlow<AddToPlaylistUiState> = _uiState.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val playlists: StateFlow<List<UserPlaylistModel>> = _userId
+    val playlists: StateFlow<List<UserPlaylistModel>> = authManager.userId
         .filterNotNull()
         .flatMapLatest { userId ->
             userPlaylistRepository.getPlaylistsWithTracksFlow(userId).map { it.map { it.toModel() } }
@@ -53,7 +51,7 @@ class AddToPlaylistViewModel(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val likedPlaylist: StateFlow<LikedTracksPlaylistModel?> = _userId
+    val likedPlaylist: StateFlow<LikedTracksPlaylistModel?> = authManager.userId
         .filterNotNull()
         .flatMapLatest { userId ->
             likedTracksRepository.getPlaylistWithTracks(userId).map { it.toModel() }
@@ -64,9 +62,14 @@ class AddToPlaylistViewModel(
             initialValue = null
         )
 
+    override fun onCleared() {
+        super.onCleared()
+        authManager.cleanup()
+    }
+
     fun addToLiked(track: TrackModel) {
         viewModelScope.launch {
-            val userId = auth.currentUser?.uid
+            val userId = authManager.userId.value
             if (userId == null) {
                 _uiState.update { it.copy(showAuthError = true) }
             } else {
@@ -83,7 +86,7 @@ class AddToPlaylistViewModel(
 
     fun addToPlaylists(track: TrackModel, playlistIds: Set<String> ) {
         viewModelScope.launch {
-            val userId = auth.currentUser?.uid
+            val userId = authManager.userId.value
             if (userId == null) {
                 _uiState.update { it.copy(showAuthError = true) }
             } else {

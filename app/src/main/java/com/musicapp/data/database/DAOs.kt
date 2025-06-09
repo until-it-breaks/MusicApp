@@ -1,7 +1,6 @@
 package com.musicapp.data.database
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
@@ -45,8 +44,8 @@ interface UserDAO {
     @Query("UPDATE user SET profilePictureUri = :profilePictureUri WHERE userId = :userId")
     suspend fun updateProfilePicture(profilePictureUri: String, userId: String)
 
-    @Delete
-    suspend fun deleteUser(user: User)
+    @Query("DELETE FROM user WHERE userId = :userId")
+    suspend fun deleteUser(userId: String)
 }
 
 @Dao

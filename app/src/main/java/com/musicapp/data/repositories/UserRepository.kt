@@ -85,11 +85,11 @@ class UserRepository(
         usersDAO.updateUsername(newUsername, userId)
     }
 
-    suspend fun deleteUser(user: User) {
-        removeProfilePicture(user.userId)
-        usersDAO.deleteUser(user)
-        likedDAO.clearLikedTracks(user.userId)
-        historyDAO.clearTrackHistory(user.userId)
+    suspend fun deleteUser(userId: String) {
+        removeProfilePicture(userId)
+        usersDAO.deleteUser(userId)
+        likedDAO.clearLikedTracks(userId)
+        historyDAO.clearTrackHistory(userId)
     }
 
     /**

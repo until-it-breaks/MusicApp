@@ -3,10 +3,10 @@ package com.musicapp.ui.screens.library
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.ui.models.UserPlaylistModel
 import com.musicapp.ui.models.toModel
+import com.musicapp.ui.screens.AuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,14 +28,15 @@ data class LibraryUiState(
     val showAuthError: Boolean = false
 )
 
-class LibraryViewModel(private val userPlaylistRepository: UserPlaylistRepository, private val auth: FirebaseAuth): ViewModel() {
-    private val _userId = MutableStateFlow<String?>(auth.currentUser?.uid)
-
+class LibraryViewModel(
+    private val userPlaylistRepository: UserPlaylistRepository,
+    private val authManager: AuthManager
+): ViewModel() {
     private val _uiState = MutableStateFlow(LibraryUiState())
     val uiState: StateFlow<LibraryUiState> = _uiState.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val playlists: StateFlow<List<UserPlaylistModel>> = _userId
+    val playlists: StateFlow<List<UserPlaylistModel>> = authManager.userId
         .filterNotNull()
         .flatMapLatest { userId ->
             userPlaylistRepository.getPlaylists(userId).map { it.map { it.toModel() } }
@@ -46,8 +47,13 @@ class LibraryViewModel(private val userPlaylistRepository: UserPlaylistRepositor
             initialValue = emptyList()
         )
 
+    override fun onCleared() {
+        super.onCleared()
+        authManager.cleanup()
+    }
+
     fun createPlaylist(name: String) {
-        val userId = auth.currentUser?.uid
+        val userId = authManager.userId.value
         if (userId == null) {
             _uiState.update { it.copy(showAuthError = true) }
             return
@@ -70,6 +76,6 @@ class LibraryViewModel(private val userPlaylistRepository: UserPlaylistRepositor
     }
 
     fun logout() {
-        auth.signOut()
+        authManager.logout()
     }
 }

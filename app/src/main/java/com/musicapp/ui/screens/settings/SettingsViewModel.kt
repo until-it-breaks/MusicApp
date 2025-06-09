@@ -3,15 +3,14 @@ package com.musicapp.ui.screens.settings
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.models.Theme
 import com.musicapp.data.repositories.SettingsRepository
 import com.musicapp.data.repositories.UserRepository
 import com.musicapp.ui.models.UserModel
 import com.musicapp.ui.models.toModel
+import com.musicapp.ui.screens.AuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -24,14 +23,13 @@ import kotlinx.coroutines.withContext
 private const val TAG = "SettingsViewmodel"
 
 class SettingsViewModel(
-    auth: FirebaseAuth,
     private val userRepository: UserRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val authManager: AuthManager
 ): ViewModel() {
-    private val _userId = MutableStateFlow<String?>(auth.currentUser?.uid)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val user: StateFlow<UserModel?> = _userId
+    val user: StateFlow<UserModel?> = authManager.userId
         .filterNotNull()
         .flatMapLatest { userId ->
             userRepository.getUser(userId).map { it.toModel() }
@@ -53,6 +51,11 @@ class SettingsViewModel(
          started = SharingStarted.WhileSubscribed(),
          initialValue = Theme.Default
     )
+
+    override fun onCleared() {
+        super.onCleared()
+        authManager.cleanup()
+    }
 
     fun setAllowExplicit(enabled: Boolean) {
         viewModelScope.launch {

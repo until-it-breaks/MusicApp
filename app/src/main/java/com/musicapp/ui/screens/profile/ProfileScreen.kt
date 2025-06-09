@@ -47,7 +47,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
@@ -146,7 +145,7 @@ fun ProfileScreen(navController: NavController) {
                 .verticalScroll(rememberScrollState())
         ) {
             LoadableImage(
-                imageUri = user.value?.profilePictureUri?.toUri(),
+                imageUri = user.value?.profilePictureUri,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
