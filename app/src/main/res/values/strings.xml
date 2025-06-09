@@ -16,13 +16,22 @@
 
     <string name="app_name" translatable="false">MusicApp</string>
 
+    <string name="are_you_sure_you_want_to_logout">Are you sure you want to logout?</string>
+
     <string name="artist_details">Artist details</string>
 
     <string name="cancel">Cancel</string>
 
     <string name="change">Change</string>
     <string name="change_password">Change Password</string>
+    <string name="change_username">Change username</string>
 
+    <string name="channel_description" translatable="false">Notifications for ongoing music playback controls</string>
+    <string name="channel_name" translatable="false">Music Playback</string>
+
+    <string name="choose_from_gallery">Select a picture</string>
+
+    <string name="clear_queue">Clear queue</string>
     <string name="clear_tracks">Clear tracks</string>
 
     <string name="confirm">Confirm</string>
@@ -30,6 +39,7 @@
     <string name="confirm_clear_history_message">Are you sure you want to clear the track history?</string>
     <string name="confirm_clear_liked_tracks">Clear liked tracks</string>
     <string name="confirm_clear_liked_tracks_description">Are you sure you want to clear the liked tracks?</string>
+    <string name="confirm_delete_account">Delete account</string>
     <string name="confirm_delete_playlist">Delete playlist</string>
     <string name="confirm_delete_playlist_message">Are you sure you want to delete the playlist?</string>
 
@@ -41,6 +51,7 @@
     <string name="create_account">Create account</string>
 
     <string name="delete">Delete</string>
+    <string name="delete_account_warning">This action is irreversible, are you sure you want to continue?</string>
     <string name="delete_playlist">Delete playlist</string>
     <string name="delete_profile">Delete account</string>
 
@@ -49,10 +60,14 @@
     <string name="discover_new_music">Discover new music</string>
     <string name="discover_new_things">Discover something new</string>
 
+    <string name="edit_photo">Edit profile picture</string>
     <string name="edit_playlist_name">Edit name</string>
 
     <string name="email">Email</string>
     <string name="email_already_in_use">Email is already in use</string>
+
+    <string name="empty_queue_message">The queue is empty</string>
+    <string name="empty_search_message">No results.</string>
 
     <string name="error_search">An error has occurred, please try again</string>
 
@@ -84,27 +99,39 @@
 
     <string name="login">Log in</string>
 
+    <string name="logout">Logout</string>
+
     <string name="network_error">Network error. Please check your connection.</string>
 
     <string name="new_playlist">New Playlist</string>
     <string name="new_playlist_name">New playlist name</string>
+    <string name="new_username">New username</string>
 
     <string name="no_playlists_found">No playlists were found</string>
     <string name="no_user_found">No user corresponding to the given mail was found</string>
-
-    <string name="track_load_error">Some tracks failed to load</string>
+    <string name="no_username">No username found</string>
 
     <string name="password">Password</string>
     <string name="password_recovery">Password Recovery</string>
     <string name="password_reset_email_sent">Password reset email sent successfully</string>
     <string name="password_reset_instructions">Enter your email address below and we\'ll send you the instructions to reset your password.</string>
 
+    <string name="playing_now">Playing: </string>
+
     <string name="playlist_details">Playlist details</string>
     <string name="playlist_name">Playlist name</string>
 
     <string name="profile">Profile</string>
 
+    <string name="queue_title">Queue</string>
+
+    <string name="remove_current_photo">Remove current profile picture</string>
+    <string name="remove_from_queue">Remove from queue</string>
     <string name="remove_track">Remove track</string>
+
+    <string name="retry">Retry</string>
+
+    <string name="save">Save</string>
 
     <string name="search">Search</string>
     <string name="search_description">Find new tracks</string>
@@ -121,6 +148,8 @@
     <string name="sign_up">Sign Up</string>
     <string name="sign_up_now">Don\'t have an account? Sign up now!</string>
 
+    <string name="take_photo_now">Take a picture</string>
+
     <string name="theme">Theme</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_default">Default</string>
@@ -132,11 +161,13 @@
     <string name="top_playlists">Top Playlists</string>
 
     <string name="track_history">Track History</string>
+    <string name="track_load_error">Some tracks failed to load</string>
 
     <string name="tracks">track(s)</string>
 
     <string name="unexpected_error">An unexpected error occurred</string>
 
+    <string name="unknown_email">Unknown email</string>
     <string name="unknown_playlist">Unknown playlist</string>
     <string name="unknown_user">Unknown user</string>
 
@@ -149,26 +180,4 @@
     <string name="what_to_play">What do you want to play?</string>
 
     <string name="your_playlists">Your playlists</string>
-    <string name="channel_name" translatable="false">Music Playback</string>
-    <string name="channel_description" translatable="false">Notifications for ongoing music playback controls</string>
-    <string name="queue_title">Queue</string>
-    <string name="playing_now">Playing: </string>
-    <string name="empty_queue_message">The queue is empty</string>
-    <string name="remove_from_queue">Remove from queue</string>
-    <string name="no_username">No username found</string>
-    <string name="change_username">Change username</string>
-    <string name="new_username">New username</string>
-    <string name="save">Save</string>
-    <string name="take_photo_now">Take a picture</string>
-    <string name="choose_from_gallery">Select a picture</string>
-    <string name="remove_current_photo">Remove current profile picture</string>
-    <string name="edit_photo">Edit profile picture</string>
-    <string name="confirm_delete_account">Delete account</string>
-    <string name="delete_account_warning">This action is irreversible, are you sure you want to continue?</string>
-    <string name="empty_search_message">No results.</string>
-    <string name="clear_queue">Clear queue</string>
-    <string name="retry">Retry</string>
-    <string name="logout">Logout</string>
-    <string name="unknown_email">Unknown email</string>
-    <string name="are_you_sure_you_want_to_logout">Are you sure you want to logout?</string>
 </resources>

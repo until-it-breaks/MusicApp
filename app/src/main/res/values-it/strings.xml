@@ -14,13 +14,19 @@
     <string name="allow_explicit">Contenuti espliciti</string>
     <string name="allow_explicit_description">Consenti contenuti espliciti.</string>
 
+    <string name="are_you_sure_you_want_to_logout">Sei sicuro di voler effettuare il logout?</string>
+
     <string name="artist_details">Dettagli artista</string>
 
     <string name="cancel">Annulla</string>
 
     <string name="change">Modifica</string>
     <string name="change_password">Cambia Password</string>
+    <string name="change_username">Cambia username</string>
 
+    <string name="choose_from_gallery">Scegli una foto</string>
+
+    <string name="clear_queue">Svuota la coda</string>
     <string name="clear_tracks">Svuota tracce</string>
 
     <string name="confirm">Conferma</string>
@@ -28,6 +34,7 @@
     <string name="confirm_clear_history_message">Sei sicuro di voler eliminare la cronologia?</string>
     <string name="confirm_clear_liked_tracks">Elimina le tracce preferite</string>
     <string name="confirm_clear_liked_tracks_description">Sei sicuro di voler eliminare le tracce preferite?</string>
+    <string name="confirm_delete_account">Elimina account</string>
     <string name="confirm_delete_playlist">Elimina la playlist</string>
     <string name="confirm_delete_playlist_message">Sei sicuro di voler eliminare la playlist?</string>
 
@@ -39,6 +46,7 @@
     <string name="create_account">Crea account</string>
 
     <string name="delete">Elimina</string>
+    <string name="delete_account_warning">Questa azione è irreversibile, sei sicuro di voler continuare?</string>
     <string name="delete_playlist">Elimina playlist</string>
     <string name="delete_profile">Elimina account</string>
 
@@ -47,12 +55,17 @@
     <string name="discover_new_music">Scopri nuovi brani</string>
     <string name="discover_new_things">Scopri qualcosa di nuovo</string>
 
+    <string name="edit_photo">Modifica foto profilo</string>
     <string name="edit_playlist_name">Modifica nome</string>
 
     <string name="email">Email</string>
     <string name="email_already_in_use">L\'email è già in uso</string>
 
+    <string name="empty_queue_message">La coda è vuota</string>
+    <string name="empty_search_message">Nessun risultato.</string>
+
     <string name="error_search">SI è verificato un errore, per favore riprova più tardi</string>
+
     <string name="failed_to_authenticate_login_again">Autenticazione fallita. Effettua nuovamente il login.</string>
     <string name="failed_to_load_album">Impossibile caricare l\'album</string>
     <string name="failed_to_load_albums">Impossibile caricare gli album</string>
@@ -81,27 +94,39 @@
 
     <string name="login">Log in</string>
 
+    <string name="logout">Logout</string>
+
     <string name="network_error">Errore di rete. Verifica la connessione.</string>
 
     <string name="new_playlist">Nuova playlist</string>
     <string name="new_playlist_name">Nuovo nome playlist</string>
+    <string name="new_username">Nuovo username</string>
 
     <string name="no_playlists_found">Non è stata trovata alcuna playlist</string>
     <string name="no_user_found">Non è stata trovato un utente corrispondente alla email</string>
-
-    <string name="track_load_error">Alcune tracce non sono state caricate</string>
+    <string name="no_username">Nessun username trovato</string>
 
     <string name="password">Password</string>
     <string name="password_recovery">Ripristino password</string>
     <string name="password_reset_email_sent">L\'email per il reset della password è stata inviata con successo</string>
     <string name="password_reset_instructions">Indicaci l\'email alla quale invieremo le istruzioni per il ripristino della password.</string>
 
+    <string name="playing_now">"In riproduzione: "</string>
+
     <string name="playlist_details">Dettagli playlist</string>
     <string name="playlist_name">Nome playlist</string>
 
     <string name="profile">Profilo</string>
 
+    <string name="queue_title">Coda</string>
+
+    <string name="remove_current_photo">Rimuovi la foto profilo corrente</string>
+    <string name="remove_from_queue">Rimuovi dalla Coda</string>
     <string name="remove_track">Rimuovi traccia</string>
+
+    <string name="retry">Riprova</string>
+
+    <string name="save">Salva</string>
 
     <string name="search">Ricerca</string>
     <string name="search_description">Scopri nuovi brani</string>
@@ -118,6 +143,8 @@
     <string name="sign_up">Iscriviti</string>
     <string name="sign_up_now">Non hai un account? Iscriviti ora!</string>
 
+    <string name="take_photo_now">Scatta una foto</string>
+
     <string name="theme">Tema</string>
     <string name="theme_dark">Scuro</string>
     <string name="theme_default">Default</string>
@@ -129,11 +156,13 @@
     <string name="top_playlists">Le migliori playlist</string>
 
     <string name="track_history">Cronologia tracce</string>
+    <string name="track_load_error">Alcune tracce non sono state caricate</string>
 
     <string name="tracks">traccia/e</string>
 
     <string name="unexpected_error">Errore imprevisto</string>
 
+    <string name="unknown_email">Email sconosciuta</string>
     <string name="unknown_playlist">Playlist sconosciuta</string>
     <string name="unknown_user">Utente sconosciuto</string>
 
@@ -146,20 +175,4 @@
     <string name="what_to_play">Cosa vuoi ascoltare?</string>
 
     <string name="your_playlists">Le tue playlist</string>
-    <string name="queue_title">Coda</string>
-    <string name="playing_now">"In riproduzione: "</string>
-    <string name="empty_queue_message">La coda è vuota</string>
-    <string name="remove_from_queue">Rimuovi dalla Coda</string>
-    <string name="no_username">Nessun username trovato</string>
-    <string name="change_username">Cambia username</string>
-    <string name="new_username">Nuovo username</string>
-    <string name="save">Salva</string>
-    <string name="take_photo_now">Scatta una foto</string>
-    <string name="choose_from_gallery">Scegli una foto</string>
-    <string name="remove_current_photo">Rimuovi la foto profilo corrente</string>
-    <string name="edit_photo">Modifica foto profilo</string>
-    <string name="confirm_delete_account">Elimina account</string>
-    <string name="delete_account_warning">Questa azione è irreversibile, sei sicuro di voler continuare?</string>
-    <string name="empty_search_message">Nessun risultato.</string>
-    <string name="clear_queue">Svuota la coda</string>
 </resources>

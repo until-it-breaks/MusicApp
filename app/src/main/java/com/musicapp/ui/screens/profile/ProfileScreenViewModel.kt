@@ -4,9 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Environment
 import android.util.Log
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.musicapp.data.database.User
@@ -26,10 +24,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 private const val TAG = "ProfileScreenViewModel"
 
@@ -38,13 +32,14 @@ data class ProfileUiState(
     val showProfilePictureOptions: Boolean = false,
     val showConfirmDelete: Boolean = false,
     val showConfirmLogout: Boolean = false,
-    val newUsernameInput: String = ""
+    val newUsernameInput: String = "",
+    val navigateToLogin: Boolean = false
 ) {
     val canChangeName = newUsernameInput.isNotBlank()
 }
 
 sealed class ProfileUiEvent {
-    data class LaunchCamera(val uri: Uri) : ProfileUiEvent()
+    object LaunchCamera : ProfileUiEvent()
     object RequestCameraPermission : ProfileUiEvent()
 }
 
@@ -132,6 +127,8 @@ class ProfileScreenViewModel(
                 }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
+            } finally {
+                dismissUsernameDialog()
             }
         }
     }
@@ -174,17 +171,10 @@ class ProfileScreenViewModel(
         }
 
         if (appContext.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            val tempUri = createTempImageUri()
-            if (tempUri != null) {
-                viewModelScope.launch {
-                    _events.send(ProfileUiEvent.LaunchCamera(tempUri))
-                }
-            } else {
-                Log.e(TAG, "Failed to create temporary URI for camera.")
-                dismissProfilePictureOptions()
+            viewModelScope.launch {
+                _events.send(ProfileUiEvent.LaunchCamera)
             }
         } else {
-            // no permissions, request
             viewModelScope.launch {
                 _events.send(ProfileUiEvent.RequestCameraPermission)
             }
@@ -193,14 +183,8 @@ class ProfileScreenViewModel(
 
     fun onCameraPermissionResult(isGranted: Boolean) {
         if (isGranted) {
-            val tempUri = createTempImageUri()
-            if (tempUri != null) {
-                viewModelScope.launch {
-                    _events.send(ProfileUiEvent.LaunchCamera(tempUri))
-                }
-            } else {
-                Log.e(TAG, "Failed to create temporary URI after permission granted.")
-                dismissProfilePictureOptions()
+            viewModelScope.launch {
+                _events.send(ProfileUiEvent.LaunchCamera)
             }
         } else {
             Log.d(TAG, "Camera permission denied.")
@@ -210,32 +194,12 @@ class ProfileScreenViewModel(
 
     fun deleteAccount() {
         authManager.deleteAccount()
-        //userRepository.deleteUser(uiState.value.currentUser!!)
+        // userRepository.deleteUser(uiState.value.currentUser)
+        _uiState.update { it.copy(navigateToLogin = true, showConfirmDelete = false) }
     }
 
     fun logout() {
         authManager.logout()
-    }
-
-    private fun createTempImageUri(): Uri? {
-        try {
-            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            val imageFileName = "JPEG_${timestamp}_.jpg"
-
-            val storageDir = appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            if (storageDir == null) {
-                Log.e(TAG, "External storage directory not available.")
-                return null
-            }
-            val photoFile = File(storageDir, imageFileName)
-            return FileProvider.getUriForFile(
-                appContext,
-                "${appContext.packageName}.fileprovider",
-                photoFile
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, e.localizedMessage, e)
-            return null
-        }
+        _uiState.update { it.copy(navigateToLogin = true, showConfirmLogout = false) }
     }
 }

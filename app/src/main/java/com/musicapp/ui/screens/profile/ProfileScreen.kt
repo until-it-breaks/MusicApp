@@ -8,10 +8,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,11 +22,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -37,17 +35,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -57,8 +52,11 @@ import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.LoadableImage
+import com.musicapp.ui.composables.ProfileDropdownMenu
 import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.theme.AppPadding
+import com.musicapp.util.rememberCameraLauncher
+import com.musicapp.util.saveImageToStorage
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "ProfileScreen"
@@ -71,27 +69,22 @@ fun ProfileScreen(navController: NavController) {
 
     val context = LocalContext.current
 
-    var cameraOutputUri: Uri? by remember { mutableStateOf(null) }
+    val dropdownExpanded = remember { mutableStateOf(false) }
 
-    val takePictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = { success ->
-            if (success) {
-                cameraOutputUri?.let { uri ->
-                    viewModel.updateProfilePicture(uri)
-                }
-            } else {
-                Log.e(TAG, "Photo capture cancelled or failed.")
-            }
+    val cameraLauncher = rememberCameraLauncher { capturedTempUri ->
+        // Save to MediaStore manually
+        try {
             viewModel.dismissProfilePictureOptions()
+            val savedUri = saveImageToStorage(capturedTempUri, context.contentResolver)
+            viewModel.updateProfilePicture(savedUri)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save camera image: ${e.localizedMessage}", e)
         }
-    )
+    }
 
     val requestCameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted: Boolean ->
-            viewModel.onCameraPermissionResult(isGranted)
-        }
+        onResult = viewModel::onCameraPermissionResult
     )
 
     val pickImageLauncher = rememberLauncherForActivityResult(
@@ -108,7 +101,6 @@ fun ProfileScreen(navController: NavController) {
                 }
                 viewModel.updateProfilePicture(uri)
             }
-            viewModel.dismissProfilePictureOptions()
         }
     )
 
@@ -116,10 +108,8 @@ fun ProfileScreen(navController: NavController) {
         viewModel.events.collect { event ->
             when (event) {
                 is ProfileUiEvent.LaunchCamera -> {
-                    cameraOutputUri = event.uri
-                    takePictureLauncher.launch(event.uri)
+                    cameraLauncher.captureImage()
                 }
-
                 is ProfileUiEvent.RequestCameraPermission -> {
                     requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                 }
@@ -128,58 +118,22 @@ fun ProfileScreen(navController: NavController) {
     }
 
     Scaffold(
-        topBar = { TopBarWithBackButton(navController, title = stringResource(R.string.profile)) },
-        bottomBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .height(IntrinsicSize.Min),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    onClick = { navController.navigate(MusicAppRoute.PasswordRecovery) }
-                ) {
-                    Text(
-                        text = stringResource(R.string.change_password),
-                        textAlign = TextAlign.Center
-                    )
+        topBar = { TopBarWithBackButton(
+            navController = navController,
+            title = stringResource(R.string.profile),
+            content = {
+                IconButton(onClick = { dropdownExpanded.value = true }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = null)
                 }
-                Button(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    onClick = { viewModel.showConfirmDelete() },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError
-                    )
-                ) {
-                    Text(
-                        text = stringResource(R.string.delete_profile),
-                        textAlign = TextAlign.Center
-                    )
-                }
-                Button(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    onClick = { viewModel.showConfirmLogout() },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError
-                    )
-                ) {
-                    Text(
-                        text = stringResource(R.string.logout),
-                        textAlign = TextAlign.Center
-                    )
-                }
+                ProfileDropdownMenu(
+                    expanded = dropdownExpanded.value,
+                    onDismiss = { dropdownExpanded.value = false },
+                    onChangePassword = { navController.navigate(MusicAppRoute.PasswordRecovery) },
+                    onDeleteProfile = { viewModel.showConfirmDelete() },
+                    onLogout = { viewModel.showConfirmLogout() }
+                )
             }
-        }
+        ) },
     ) { contentPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -272,10 +226,7 @@ fun ProfileScreen(navController: NavController) {
                 confirmButton = {
                     TextButton(
                         enabled = uiState.value.canChangeName,
-                        onClick = {
-                            viewModel.updateUsername()
-                            viewModel.dismissUsernameDialog()
-                        }
+                        onClick = { viewModel.updateUsername() }
                     ) {
                         Text(stringResource(R.string.save))
                     }
@@ -309,9 +260,12 @@ fun ProfileScreen(navController: NavController) {
                         TextButton(onClick = { viewModel.onTakePhotoClicked() }) {
                             Text(text = stringResource(R.string.take_photo_now))
                         }
-                        TextButton(onClick = {
-                            pickImageLauncher.launch("image/*")
-                        }) {
+                        TextButton(
+                            onClick = {
+                                viewModel.dismissProfilePictureOptions()
+                                pickImageLauncher.launch("image/*")
+                            }
+                        ) {
                             Text(text = stringResource(R.string.choose_from_gallery))
                         }
                         if (user.value?.profilePictureUri != null) {
@@ -359,13 +313,7 @@ fun ProfileScreen(navController: NavController) {
                 title = { Text(text = stringResource(R.string.logout)) },
                 text = { Text(text = stringResource(R.string.are_you_sure_you_want_to_logout)) },
                 confirmButton = {
-                    TextButton(onClick = {
-                        viewModel.dismissConfirmLogout()
-                        viewModel.logout()
-                        navController.navigate(MusicAppRoute.Login) {
-                            popUpTo(navController.graph.id) { inclusive = true }
-                        }
-                    }) {
+                    TextButton(onClick = { viewModel.logout() }) {
                         Text(stringResource(R.string.confirm))
                     }
                 },
@@ -375,6 +323,16 @@ fun ProfileScreen(navController: NavController) {
                     }
                 }
             )
+        }
+
+        LaunchedEffect(uiState.value.navigateToLogin) {
+            if (uiState.value.navigateToLogin) {
+                navController.navigate(MusicAppRoute.Login) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
+            }
         }
     }
 }

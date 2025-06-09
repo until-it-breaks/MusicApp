@@ -357,3 +357,39 @@ fun TrackHistoryDropDownMenu(modifier: Modifier = Modifier, onClearTracks: () ->
         )
     }
 }
+
+@Composable
+fun ProfileDropdownMenu(
+    expanded: Boolean,
+    onDismiss: () -> Unit,
+    onChangePassword: () -> Unit,
+    onDeleteProfile: () -> Unit,
+    onLogout: () -> Unit
+) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss
+    ) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.change_password)) },
+            onClick = {
+                onChangePassword()
+                onDismiss()
+            }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.delete_profile)) },
+            onClick = {
+                onDeleteProfile()
+                onDismiss()
+            }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.logout)) },
+            onClick = {
+                onLogout()
+                onDismiss()
+            }
+        )
+    }
+}
