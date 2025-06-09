@@ -31,8 +31,6 @@ import com.musicapp.ui.models.TrackModel
 fun MusicBar(
     playbackState: PlaybackUiState,
     onTogglePlayback: (TrackModel) -> Unit,
-    onAddToQueue: (TrackModel) -> Unit,
-    onLikeClick: (TrackModel) -> Unit,
     onStopClick: () -> Unit,
     onQueueClick: () -> Unit,
     onBarClick: () -> Unit,
@@ -93,19 +91,6 @@ fun MusicBar(
             // Right
             Row(verticalAlignment = Alignment.CenterVertically) {
                 playbackState.currentQueueItem.track.let { track ->
-                    // plus
-                    PublicTrackDropDownMenu(
-                        trackModel = playbackState.currentQueueItem.track,
-                        onAddToQueue = onAddToQueue,
-                        onLiked = onLikeClick,
-                        customIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_add),
-                                contentDescription = "Add",
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    )
 
                     // play/pause
                     if (playbackState.isLoading) {

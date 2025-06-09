@@ -96,8 +96,6 @@ fun MainScreen(navController: NavController) {
                 },
                 onStopClick = viewModel::stopMusic,
                 onQueueClick = { showQueueBottomSheet = true },
-                onAddToQueue = viewModel::addTrackToQueue,
-                onLikeClick = { /*TODO*/ },
                 onBarClick = {
                     navController.navigate(MusicAppRoute.TrackDetails)
                 },

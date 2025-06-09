@@ -1,22 +1,25 @@
 package com.musicapp.ui.screens.search
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.util.UnstableApi
 import com.musicapp.data.remote.deezer.DeezerDataSource
-import com.musicapp.data.remote.deezer.DeezerSearchResponse
+import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.data.repositories.SettingsRepository
+import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
-import com.musicapp.playback.PlaybackUiState
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
+import com.musicapp.ui.screens.AuthManager
+import com.musicapp.util.getErrorMessageResId
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import android.util.Log
-import androidx.media3.common.util.UnstableApi
-import com.musicapp.playback.BasePlaybackViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.withContext
 
 private const val TAG = "SearchViewModel"
 
@@ -33,134 +36,135 @@ data class SearchUiState(
     val searchResults: SearchResultsUiState = SearchResultsUiState(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
-    val error: Boolean = false,
-    val paginationError: Boolean = false,
-    val playbackState: PlaybackUiState = PlaybackUiState()
+    val searchErrorStringId: Int? = null,
+    val paginationErrorStringId: Int? = null
 )
 
 @UnstableApi
 class SearchViewModel(
     private val deezerDataSource: DeezerDataSource,
+    private val likedTracksRepository: LikedTracksRepository,
+    private val settingsRepository: SettingsRepository,
+    private val authManager: AuthManager,
     mediaPlayerManager: MediaPlayerManager
 ) : BasePlaybackViewModel(mediaPlayerManager) {
 
-    private val _searchText = MutableStateFlow("")
-    private val _lastSearchText = MutableStateFlow("")
-    private val _searchResultsState = MutableStateFlow(SearchResultsUiState())
-    private val _isLoading = MutableStateFlow(false)
-    private val _isLoadingMore = MutableStateFlow(false)
-    private val _error = MutableStateFlow(false)
-    private val _paginationError = MutableStateFlow(false)
-
-    val uiState: StateFlow<SearchUiState> = combine(
-        // Provide the flows as a List explicitly because for some reason it can't infer the types
-        listOf(
-            _searchText,
-            _lastSearchText,
-            _searchResultsState,
-            _isLoading,
-            _isLoadingMore,
-            _error,
-            _paginationError,
-            mediaPlayerManager.playbackState
-        )
-    ) { values ->
-        val searchText = values[0] as String
-        val lastSearchText = values[1] as String
-        val searchResults = values[2] as SearchResultsUiState
-        val isLoading = values[3] as Boolean
-        val isLoadingMore = values[4] as Boolean
-        val error = values[5] as Boolean
-        val paginationError = values[6] as Boolean
-        val playbackState = values[7] as PlaybackUiState
-
-        SearchUiState(
-            searchText = searchText,
-            lastSearchText = lastSearchText,
-            searchResults = searchResults,
-            isLoading = isLoading,
-            isLoadingMore = isLoadingMore,
-            error = error,
-            paginationError = paginationError,
-            playbackState = playbackState
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = SearchUiState()
-    )
+    private val _uiState = MutableStateFlow(SearchUiState())
+    val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     fun onSearchTextChange(newText: String) {
-        _searchText.value = newText
+        _uiState.update { it.copy(searchText = newText) }
     }
 
     fun performSearch() {
-        val currentSearchText = _searchText.value
-        _lastSearchText.value = currentSearchText
+        val currentSearchText = _uiState.value.searchText
+
+        _uiState.update {
+            it.copy(
+                lastSearchText = currentSearchText,
+                searchErrorStringId = null,
+                paginationErrorStringId = null
+            )
+        }
 
         if (currentSearchText.isBlank()) {
-            _searchResultsState.value = SearchResultsUiState()
-            _error.value = false
-            _paginationError.value = false
+            _uiState.update {
+                it.copy(
+                    searchResults = SearchResultsUiState(),
+                    searchErrorStringId = null,
+                    paginationErrorStringId = null
+                )
+            }
             return
         }
 
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = false
-            _paginationError.value = false
+            _uiState.update { it.copy(isLoading = true) }
+            val allowExplicit = settingsRepository.allowExplicit.first()
 
             try {
-                val results: DeezerSearchResponse =
+                val results = withContext(Dispatchers.IO) {
                     deezerDataSource.getSearchTracks(currentSearchText)
-                val trackModels = results.data.map { it.toModel() }
+                }
 
-                _searchResultsState.value = SearchResultsUiState(
-                    tracks = trackModels,
-                    totalResults = results.total,
-                    hasNext = results.next != null,
-                    next = results.next
-                )
-                _isLoading.value = false
+                val trackModels = results.data
+                    .filter { allowExplicit || it.explicitLyrics != true }
+                    .map { it.toModel() }
+
+                _uiState.update {
+                    it.copy(
+                        searchResults = SearchResultsUiState(
+                            tracks = trackModels,
+                            totalResults = results.total,
+                            hasNext = results.next != null,
+                            next = results.next
+                        ),
+                        isLoading = false
+                    )
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Error performing search for '$currentSearchText': ${e.message}", e)
-                _isLoading.value = false
-                _error.value = true
+                _uiState.update {
+                    it.copy(searchErrorStringId = getErrorMessageResId(e))
+                }
+            } finally {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
             }
         }
     }
 
     fun loadMoreTracks() {
-        if (_isLoadingMore.value || !_searchResultsState.value.hasNext || _searchResultsState.value.next == null) {
+        val state = _uiState.value
+        if (state.isLoadingMore || !state.searchResults.hasNext || state.searchResults.next == null) {
             return
         }
 
-        val nextUrl = _searchResultsState.value.next!!
+        val nextUrl = state.searchResults.next
 
         viewModelScope.launch {
-            _isLoadingMore.value = true
-            _paginationError.value = false
+            _uiState.update { it.copy(isLoadingMore = true, paginationErrorStringId = null) }
+
+            val allowExplicit = settingsRepository.allowExplicit.first()
 
             try {
-                val results: DeezerSearchResponse = deezerDataSource.getTracksByUrl(nextUrl)
-                val newTrackModels = results.data.map { it.toModel() }
+                val results = withContext(Dispatchers.IO) {
+                    deezerDataSource.getTracksByUrl(nextUrl)
+                }
+                val newTrackModels = results.data
+                    .filter { allowExplicit || it.explicitLyrics != true }
+                    .map { it.toModel() }
 
-                _searchResultsState.update { current ->
-                    current.copy(
-                        tracks = current.tracks + newTrackModels,
-                        hasNext = results.next != null,
-                        next = results.next
+                _uiState.update {
+                    it.copy(
+                        searchResults = it.searchResults.copy(
+                            tracks = it.searchResults.tracks + newTrackModels,
+                            hasNext = results.next != null,
+                            next = results.next
+                        )
                     )
                 }
-                _isLoadingMore.value = false
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading next page from $nextUrl: ${e.message}", e)
-                _isLoadingMore.value = false
-                _paginationError.value = true
+                _uiState.update { it.copy(paginationErrorStringId = getErrorMessageResId(e)) }
+            } finally {
+                _uiState.update { it.copy(isLoadingMore = false) }
             }
         }
     }
 
-    fun addToLiked(track: TrackModel) { /*TODO*/}
+    fun addToLiked(track: TrackModel) {
+        viewModelScope.launch {
+            authManager.userId.value?.let {
+                try {
+                    withContext(Dispatchers.IO) {
+                        likedTracksRepository.addTrackToLikedTracks(it, track)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, e.localizedMessage, e)
+                }
+            }
+        }
+    }
 }
-

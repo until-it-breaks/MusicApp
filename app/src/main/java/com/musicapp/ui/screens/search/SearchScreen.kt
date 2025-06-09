@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,10 +18,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,9 +28,11 @@ import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
+import com.musicapp.ui.composables.CenteredCircularProgressIndicator
 import com.musicapp.ui.composables.MainTopBar
 import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.TrackCard
+import com.musicapp.ui.theme.AppPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -44,18 +43,23 @@ fun SearchScreen(
     subNavController: NavController,
 ) {
     val viewModel: SearchViewModel = koinViewModel()
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
     Scaffold(
-        topBar = { MainTopBar(mainNavController, "Search") },
+        topBar = {
+            MainTopBar(
+                navController = mainNavController,
+                title = stringResource(R.string.search)
+            )
+        },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
     ) { contentPadding ->
         Column(
             modifier = Modifier
                 .padding(contentPadding)
-                .padding(horizontal = 12.dp)
+                .padding(AppPadding.ScaffoldContent)
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -68,54 +72,49 @@ fun SearchScreen(
                 trailingIcon = {
                     IconButton(onClick = viewModel::performSearch) {
                         Icon(
-                            Icons.Outlined.Search,
-                            stringResource(R.string.search_description)
+                            imageVector = Icons.Outlined.Search,
+                            contentDescription = null
                         )
                     }
                 }
             )
 
+            val searchErrorId = uiState.searchErrorStringId
+
             when {
                 uiState.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(16.dp)
-                    )
+                    CenteredCircularProgressIndicator()
                 }
-
-                uiState.error -> {
-
-                    val lastSearch = uiState.lastSearchText
+                searchErrorId != null -> {
                     Text(
-                        text = "${stringResource(R.string.search_results)} '${lastSearch}'",
+                        text = "${stringResource(R.string.search_results)} '${uiState.lastSearchText}'",
                         style = MaterialTheme.typography.titleLarge
                     )
-
-                    Text(
-                        text = stringResource(R.string.empty_search_message),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    if (searchErrorId != R.string.unexpected_error) {
+                        Text(
+                            text = stringResource(searchErrorId),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    } else {
+                        Text(text = stringResource(R.string.empty_search_message))
+                    }
                 }
-
                 uiState.searchResults.tracks.isNotEmpty() -> {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         item {
-                            val lastSearch = uiState.lastSearchText
                             Text(
-                                text = "${stringResource(R.string.search_results)} '${lastSearch}'",
+                                text = "${stringResource(R.string.search_results)} '${uiState.lastSearchText}'",
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                         }
                         itemsIndexed(uiState.searchResults.tracks) { index, track ->
-
                             if ((index >= uiState.searchResults.tracks.size - 1) && uiState.searchResults.hasNext) {
                                 viewModel.loadMoreTracks()
                             }
-
                             TrackCard(
                                 track = track,
                                 showPicture = true,
@@ -130,6 +129,11 @@ fun SearchScreen(
                                     )
                                 }
                             )
+                        }
+                        if (uiState.isLoadingMore) {
+                            item {
+                                CenteredCircularProgressIndicator()
+                            }
                         }
                     }
                 }

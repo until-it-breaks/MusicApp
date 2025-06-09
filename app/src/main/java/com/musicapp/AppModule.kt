@@ -150,7 +150,7 @@ val appModule = module {
 
     viewModel { LikedTracksViewModel(get(), get(), get()) }
 
-    viewModel { SearchViewModel(get(), get()) }
+    viewModel { SearchViewModel(get(), get(), get(), get(), get()) }
     
     viewModel { TrackHistoryViewModel(get(), get(), get()) }
 
