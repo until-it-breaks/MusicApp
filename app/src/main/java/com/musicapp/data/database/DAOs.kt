@@ -172,7 +172,7 @@ interface TrackHistoryDAO {
     @Query("""
     SELECT Track.* FROM Track
     INNER JOIN TrackHistoryTrackCrossRef ON Track.trackId = TrackHistoryTrackCrossRef.trackId
-    WHERE TrackHistoryTrackCrossRef.ownerId = :userId ORDER BY TrackHistoryTrackCrossRef.timeOfAddition
+    WHERE TrackHistoryTrackCrossRef.ownerId = :userId ORDER BY TrackHistoryTrackCrossRef.timeOfAddition DESC
     """)
     fun getTracksOfPlaylist(userId: String): Flow<List<Track>>
 

@@ -11,6 +11,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.ui.models.TrackModel
+import com.musicapp.ui.screens.AuthManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val TAG = "MediaPlaybackManager"
 
@@ -53,7 +55,7 @@ enum class RepeatMode {
 @UnstableApi
 class MediaPlayerManager(
     private val appContext: Context,
-    private val auth: FirebaseAuth,
+    private val authManager: AuthManager,
     private val trackHistoryRepository: TrackHistoryRepository
 ) : Player.Listener {
 
@@ -134,6 +136,16 @@ class MediaPlayerManager(
         val newQueueItemId = mediaItem?.mediaId?.toLongOrNull()
         val newQueueItem = currentState.playbackQueue.find { it.id == newQueueItemId }
         val newIndex = currentState.playbackQueue.indexOf(newQueueItem)
+
+        authManager.userId.value?.let {
+            scope.launch {
+                withContext(Dispatchers.IO) {
+                    if (newQueueItem != null) {
+                        trackHistoryRepository.addTrackToTrackHistory(it, newQueueItem.track)
+                    }
+                }
+            }
+        }
 
         if (currentState.repeatMode == RepeatMode.ONCE && previousQueueItemId != newQueueItemId) {
             playPrevious()
