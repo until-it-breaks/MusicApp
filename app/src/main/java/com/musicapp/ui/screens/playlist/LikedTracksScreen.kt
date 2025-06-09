@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -77,12 +77,12 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                         }
                     }
                 }
-                items(playlist.value?.tracks.orEmpty()) { track ->
+                itemsIndexed(playlist.value?.tracks.orEmpty()) { index, track ->
                     TrackCard(
                         track = track,
                         showPicture = true,
                         playbackUiState = playbackUiState,
-                        onTrackClick = { scope.launch { viewModel.togglePlayback(track) } },
+                        onTrackClick = { scope.launch { viewModel.setPlaybackQueue(playlist.value?.tracks.orEmpty(), index) } },
                         onArtistClick = { artistId ->
                             subNavController.navigate(
                                 MusicAppRoute.Artist(
