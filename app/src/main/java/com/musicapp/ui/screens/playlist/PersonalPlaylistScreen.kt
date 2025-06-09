@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
@@ -101,12 +101,12 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     }
                 }
             }
-            items(playlist.value?.tracks.orEmpty()) { track ->
+            itemsIndexed(playlist.value?.tracks.orEmpty()) { index, track ->
                 TrackCard(
                     track = track,
                     showPicture = true,
                     playbackUiState = playbackUiState,
-                    onTrackClick = {scope.launch { viewModel.togglePlayback(track) } },
+                    onTrackClick = {scope.launch { viewModel.setPlaybackQueue(playlist.value?.tracks.orEmpty(), index) } },
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
                         SavedTrackDropDownMenu(

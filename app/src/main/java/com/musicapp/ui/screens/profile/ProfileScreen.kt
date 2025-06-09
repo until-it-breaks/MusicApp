@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -151,6 +152,8 @@ fun ProfileScreen(navController: NavController) {
                 modifier = Modifier
                     .size(128.dp)
                     .clip(CircleShape)
+                    .padding(0.dp)
+                    .clickable { viewModel.showProfilePictureOptions() } //TODO show full picture?
             )
             TextButton(onClick = { viewModel.showProfilePictureOptions() }) {
                 Text(stringResource(R.string.edit_photo))
