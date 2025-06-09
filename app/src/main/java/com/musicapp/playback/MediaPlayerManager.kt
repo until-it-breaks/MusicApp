@@ -424,8 +424,10 @@ class MediaPlayerManager(
             _nextQueueId = 0
             setPlaybackQueue(listOf(currentTrack), 0)
             seekTo(currentPositionMs)
-            _playbackState.update {
-                it.copy(isPlaying = isPlaying,)
+            if (isPlaying){
+                resume()
+            } else {
+                pause()
             }
             Log.d(TAG, "Playback queue cleared.")
         }
