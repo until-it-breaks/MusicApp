@@ -67,11 +67,7 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                         val timeInMillis = playlist.value?.lastEditTime
                         timeInMillis?.let {
                             Text(
-                                text = "${stringResource(R.string.last_edited)}: ${
-                                    convertMillisToDateWithHourAndMinutes(
-                                        it
-                                    )
-                                }",
+                                text = "${stringResource(R.string.last_edited)}: ${convertMillisToDateWithHourAndMinutes(it)}",
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
                         }
@@ -83,13 +79,7 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                         showPicture = true,
                         playbackUiState = playbackUiState,
                         onTrackClick = { scope.launch { viewModel.togglePlayback(track) } },
-                        onArtistClick = { artistId ->
-                            subNavController.navigate(
-                                MusicAppRoute.Artist(
-                                    artistId
-                                )
-                            )
-                        },
+                        onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                         extraMenu = {
                             SavedTrackDropDownMenu(
                                 track = track,

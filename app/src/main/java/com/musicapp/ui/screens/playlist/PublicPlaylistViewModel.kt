@@ -3,7 +3,6 @@ package com.musicapp.ui.screens.playlist
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
-import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.R
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.remote.deezer.DeezerTrackDetailed
@@ -14,6 +13,7 @@ import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.PublicPlaylistModel
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
+import com.musicapp.ui.screens.AuthManager
 import com.musicapp.util.getErrorMessageResId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,13 +39,18 @@ data class PublicPlaylistState(
 @UnstableApi
 class PublicPlaylistViewModel(
     private val deezerDataSource: DeezerDataSource,
-    private val auth: FirebaseAuth,
+    private val authManager: AuthManager,
     private val likedTracksRepository: LikedTracksRepository,
     private val settingsRepository: SettingsRepository,
     mediaPlayerManager: MediaPlayerManager
 ) : BasePlaybackViewModel(mediaPlayerManager) {
     private val _uiState = MutableStateFlow(PublicPlaylistState())
     val uiState: StateFlow<PublicPlaylistState> = _uiState.asStateFlow()
+
+    override fun onCleared() {
+        super.onCleared()
+        authManager.cleanup()
+    }
 
     fun loadPlaylist(id: Long) {
         if (_uiState.value.playlistDetails?.id == id) return
@@ -110,7 +115,7 @@ class PublicPlaylistViewModel(
 
     fun addToLiked(track: TrackModel) {
         viewModelScope.launch {
-            auth.currentUser?.uid?.let {
+            authManager.userId.value?.let {
                 try {
                     withContext(Dispatchers.IO) {
                         likedTracksRepository.addTrackToLikedTracks(it, track)

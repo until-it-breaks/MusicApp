@@ -106,7 +106,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     track = track,
                     showPicture = true,
                     playbackUiState = playbackUiState,
-                    onTrackClick = {scope.launch { viewModel.setPlaybackQueue(playlist.value?.tracks.orEmpty(), index) } },
+                    onTrackClick = { scope.launch { viewModel.setPlaybackQueue(playlist.value?.tracks.orEmpty(), index) } },
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
                         SavedTrackDropDownMenu(

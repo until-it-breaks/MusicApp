@@ -67,11 +67,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                         val timeInMillis = playlist.value?.lastEditTime
                         timeInMillis?.let {
                             Text(
-                                text = "${stringResource(R.string.last_edited)}: ${
-                                    convertMillisToDateWithHourAndMinutes(
-                                        it
-                                    )
-                                }",
+                                text = "${stringResource(R.string.last_edited)}: ${convertMillisToDateWithHourAndMinutes(it)}",
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
                         }
@@ -83,13 +79,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                         showPicture = true,
                         playbackUiState = playbackUiState,
                         onTrackClick = { scope.launch { viewModel.setPlaybackQueue(playlist.value?.tracks.orEmpty(), index) } },
-                        onArtistClick = { artistId ->
-                            subNavController.navigate(
-                                MusicAppRoute.Artist(
-                                    artistId
-                                )
-                            )
-                        },
+                        onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                         extraMenu = {
                             SavedTrackDropDownMenu(
                                 track = track,

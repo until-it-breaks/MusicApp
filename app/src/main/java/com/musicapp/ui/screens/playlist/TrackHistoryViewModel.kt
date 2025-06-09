@@ -3,12 +3,12 @@ package com.musicapp.ui.screens.playlist
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
-import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.TrackHistoryRepository
+import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.TrackHistoryModel
 import com.musicapp.ui.models.toModel
-import com.musicapp.playback.BasePlaybackViewModel
+import com.musicapp.ui.screens.AuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,16 +29,15 @@ data class TrackHistoryState(val showAuthError: Boolean = false)
 
 @UnstableApi
 class TrackHistoryViewModel(
-    private val auth: FirebaseAuth,
+    private val authManager: AuthManager,
     private val trackHistoryRepository: TrackHistoryRepository,
     mediaPlayerManager: MediaPlayerManager
 ): BasePlaybackViewModel(mediaPlayerManager) {
-    private val _userId = MutableStateFlow(auth.currentUser?.uid)
     private val _uiState = MutableStateFlow(TrackHistoryState())
     val uiState: StateFlow<TrackHistoryState> = _uiState.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val playlist: StateFlow<TrackHistoryModel?> = _userId
+    val playlist: StateFlow<TrackHistoryModel?> = authManager.userId
         .filterNotNull()
         .flatMapLatest { userId ->
             trackHistoryRepository.getTrackHistoryWithTracksAndArtists(userId).map { it.toModel() }
@@ -49,13 +48,16 @@ class TrackHistoryViewModel(
             initialValue = null
         )
 
+    override fun onCleared() {
+        super.onCleared()
+        authManager.cleanup()
+    }
+
     fun clearTrackHistory() {
-        val userId = auth.currentUser?.uid
+        val userId = authManager.userId.value
         if (userId == null) {
             _uiState.update { it.copy(showAuthError = true) }
             return
-        } else {
-            _userId.value = userId
         }
         viewModelScope.launch {
             try {
@@ -69,12 +71,11 @@ class TrackHistoryViewModel(
     }
 
     fun removeTrackFromTrackHistory(trackId: Long) {
-        val userId = auth.currentUser?.uid
+        val userId = authManager.userId.value
         if (userId == null) {
             _uiState.update { it.copy(showAuthError = true) }
             return
         }
-        _userId.value = userId
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
@@ -87,6 +88,6 @@ class TrackHistoryViewModel(
     }
 
     fun logout() {
-        auth.signOut()
+        authManager.logout()
     }
 }

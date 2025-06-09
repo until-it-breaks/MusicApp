@@ -3,12 +3,12 @@ package com.musicapp.ui.screens.playlist
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
-import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.repositories.LikedTracksRepository
+import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.ui.models.LikedTracksPlaylistModel
 import com.musicapp.ui.models.toModel
-import com.musicapp.playback.BasePlaybackViewModel
+import com.musicapp.ui.screens.AuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,16 +29,15 @@ data class LikedTracksState(val showAuthError: Boolean = false)
 
 @UnstableApi
 class LikedTracksViewModel(
-    private val auth: FirebaseAuth,
     private val likedTracksRepository: LikedTracksRepository,
+    private val authManager: AuthManager,
     mediaPlayerManager: MediaPlayerManager
 ): BasePlaybackViewModel(mediaPlayerManager) {
-    private val _userId = MutableStateFlow(auth.currentUser?.uid)
     private val _uiState = MutableStateFlow(LikedTracksState())
     val uiState: StateFlow<LikedTracksState> = _uiState.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val playlist: StateFlow<LikedTracksPlaylistModel?> = _userId
+    val playlist: StateFlow<LikedTracksPlaylistModel?> = authManager.userId
         .filterNotNull()
         .flatMapLatest { userId ->
             likedTracksRepository.getPlaylistWithTracksAndArtists(userId).map { it.toModel() }
@@ -49,13 +48,16 @@ class LikedTracksViewModel(
             initialValue = null
         )
 
+    override fun onCleared() {
+        super.onCleared()
+        authManager.cleanup()
+    }
+
     fun clearLikedTracks() {
-        val userId = auth.currentUser?.uid
+        val userId = authManager.userId.value
         if (userId == null) {
             _uiState.update { it.copy(showAuthError = true) }
             return
-        } else {
-            _userId.value = userId
         }
         viewModelScope.launch {
             try {
@@ -69,12 +71,10 @@ class LikedTracksViewModel(
     }
 
     fun removeTrackFromLikedTracks(trackId: Long) {
-        val userId = auth.currentUser?.uid
+        val userId = authManager.userId.value
         if (userId == null) {
             _uiState.update { it.copy(showAuthError = true) }
             return
-        } else {
-            _userId.value = userId
         }
         viewModelScope.launch {
             try {
@@ -88,6 +88,6 @@ class LikedTracksViewModel(
     }
 
     fun logout() {
-        auth.signOut()
+        authManager.logout()
     }
 }

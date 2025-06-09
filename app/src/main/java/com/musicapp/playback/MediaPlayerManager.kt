@@ -193,9 +193,6 @@ class MediaPlayerManager(
      * Plays a new track, clearing the queue and setting this as the first.
      */
     suspend fun playTrack(track: TrackModel) {
-        auth.currentUser?.uid?.let {
-            trackHistoryRepository.addTrackToTrackHistory(it, track)
-        }
         setPlaybackQueue(listOf(track), 0) // Sets a new queue with just this track and plays it
     }
 
