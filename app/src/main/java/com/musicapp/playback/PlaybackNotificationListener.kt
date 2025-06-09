@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerNotificationManager
 
+private const val TAG = "PlaybackNotificationListener"
+
 @UnstableApi
 class PlaybackNotificationListener(
     private val service: MediaPlaybackService,
@@ -15,16 +17,15 @@ class PlaybackNotificationListener(
     override fun onNotificationPosted(notificationId: Int, notification: Notification, ongoing: Boolean) {
         if (ongoing) {
             service.startForeground(notificationId, notification)
-            Log.d("PlaybackNotificationListener", "Notification posted. Service is now foreground.")
+            Log.d(TAG, "Notification posted. Service is now foreground.")
         } else {
             service.stopForeground(Service.STOP_FOREGROUND_DETACH)
-            Log.d("PlaybackNotificationListener", "Notification not ongoing. Service detached from foreground.")
-            //service.stopForeground(true) deprecated, maybe needed for older versions
+            Log.d(TAG, "Notification not ongoing. Service detached from foreground.")
         }
     }
 
     override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
-        Log.d("PlaybackNotificationListener", "Notification cancelled. Dismissed by user: $dismissedByUser")
+        Log.d(TAG, "Notification cancelled. Dismissed by user: $dismissedByUser")
         if (dismissedByUser) {
             mediaPlayerManager.stop()
         }

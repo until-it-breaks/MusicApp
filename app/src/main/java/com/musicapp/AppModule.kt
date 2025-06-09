@@ -119,7 +119,7 @@ val appModule = module {
     single { DeezerDataSource(get()) }
 
     // Media player
-    single { MediaPlayerManager(get()) }
+    single { MediaPlayerManager(get(), get(), get()) }
 
     // ViewModels
     viewModel { SignUpViewModel(get(), get()) }

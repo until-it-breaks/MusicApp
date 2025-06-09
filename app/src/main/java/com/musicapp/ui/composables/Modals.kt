@@ -228,7 +228,6 @@ fun QueueBottomSheet(
                 )
             }
 
-
             // List of tracks in the queue
             if (playbackUiState.playbackQueue.isNotEmpty()) {
                 val viewModel: BasePlaybackViewModel = koinViewModel()
@@ -242,7 +241,7 @@ fun QueueBottomSheet(
                             playbackUiState = playbackUiState,
                             onTrackClick = { clickedTrack ->
                                 scope.launch {
-                                    trackClick(
+                                    onTrackClick(
                                         queueItem,
                                         playbackUiState,
                                         viewModel,
@@ -256,7 +255,7 @@ fun QueueBottomSheet(
                                 if (queueItem.id == playbackUiState.currentQueueItemId) {
                                     IconButton(onClick = {
                                         scope.launch {
-                                            trackClick(
+                                            onTrackClick(
                                                 queueItem,
                                                 playbackUiState,
                                                 viewModel,
@@ -300,7 +299,7 @@ fun QueueBottomSheet(
 }
 
 @androidx.annotation.OptIn(UnstableApi::class)
-private suspend fun trackClick(
+private suspend fun onTrackClick(
     queueItem: QueueItem,
     playbackUiState: PlaybackUiState,
     viewModel: BasePlaybackViewModel,

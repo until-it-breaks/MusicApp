@@ -44,7 +44,7 @@ fun MusicBar(
 
     if (isVisible) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .height(64.dp)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
@@ -142,7 +142,6 @@ fun MusicBar(
                     }
                 }
             }
-
         }
     }
 }

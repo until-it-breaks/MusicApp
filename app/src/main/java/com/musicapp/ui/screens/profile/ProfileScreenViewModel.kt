@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
-import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
@@ -44,6 +43,8 @@ sealed class ProfileUiEvent {
     object RequestCameraPermission : ProfileUiEvent()
 }
 
+private const val TAG = "ProfileScreenViewModel"
+
 class ProfileScreenViewModel(
     private val auth: FirebaseAuth,
     private val userRepository: UserRepository,
@@ -54,7 +55,7 @@ class ProfileScreenViewModel(
         userRepository.getUser(userId)
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
+                started = SharingStarted.WhileSubscribed(),
                 initialValue = null
             )
     } ?: run {
@@ -72,7 +73,7 @@ class ProfileScreenViewModel(
         user?.profilePictureUri?.toUri()
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(),
         initialValue = null
     )
 
@@ -80,7 +81,7 @@ class ProfileScreenViewModel(
         user?.profilePictureUri.isNullOrBlank()
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(),
         initialValue = true
     )
 
@@ -171,14 +172,11 @@ class ProfileScreenViewModel(
             dismissProfilePictureOptions()
             return
         }
-
         viewModelScope.launch {
             try {
                 userRepository.updateProfilePicture(uri, userId)
             } catch (e: Exception) {
-                Log.e("ProfileScreenViewModel", "Error updating profile picture", e)
-                Toast.makeText(appContext, "Error updating profile picture", Toast.LENGTH_SHORT)
-                    .show()
+                Log.e(TAG, e.localizedMessage, e)
             }
         }
     }
@@ -189,15 +187,12 @@ class ProfileScreenViewModel(
             dismissProfilePictureOptions()
             return
         }
-
         viewModelScope.launch {
             try {
                 userRepository.removeProfilePicture(userId)
                 dismissProfilePictureOptions()
             } catch (e: Exception) {
-                Log.e("ProfileScreenViewModel", "Error removing profile picture", e)
-                Toast.makeText(appContext, "Error removing profile picture", Toast.LENGTH_SHORT)
-                    .show()
+                Log.e(TAG, e.localizedMessage, e)
                 dismissProfilePictureOptions()
             }
         }
@@ -211,14 +206,13 @@ class ProfileScreenViewModel(
         }
 
         if (appContext.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            // have permissions
             val tempUri = createTempImageUri()
             if (tempUri != null) {
                 viewModelScope.launch {
                     _events.send(ProfileUiEvent.LaunchCamera(tempUri))
                 }
             } else {
-                Log.e("ProfileScreenViewModel", "Failed to create temporary URI for camera.")
+                Log.e(TAG, "Failed to create temporary URI for camera.")
                 dismissProfilePictureOptions()
             }
         } else {
@@ -237,59 +231,43 @@ class ProfileScreenViewModel(
                     _events.send(ProfileUiEvent.LaunchCamera(tempUri))
                 }
             } else {
-                Log.e(
-                    "ProfileScreenViewModel",
-                    "Failed to create temporary URI after permission granted."
-                )
+                Log.e(TAG, "Failed to create temporary URI after permission granted.")
                 dismissProfilePictureOptions()
             }
         } else {
-            Log.d("ProfileScreenViewModel", "Camera permission denied.")
+            Log.d(TAG, "Camera permission denied.")
             dismissProfilePictureOptions()
-            Toast.makeText(appContext, "Camera permission denied", Toast.LENGTH_SHORT).show()
         }
     }
 
     fun deleteAccount() {
-        val user = auth.currentUser
-        if (user == null) {
-            return
-        }
         auth.currentUser?.delete()
         //userRepository.deleteUser(uiState.value.currentUser!!)
     }
 
     fun logout() {
-        val user = auth.currentUser
-        if (user == null) {
-            return
-        }
         auth.signOut()
     }
 
     private fun createTempImageUri(): Uri? {
-        return try {
+        try {
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
             val imageFileName = "JPEG_${timestamp}_.jpg"
 
             val storageDir = appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             if (storageDir == null) {
-                Log.e("ProfileScreenViewModel", "External storage directory not available.")
+                Log.e(TAG, "External storage directory not available.")
                 return null
             }
             val photoFile = File(storageDir, imageFileName)
-            FileProvider.getUriForFile(
+            return FileProvider.getUriForFile(
                 appContext,
                 "${appContext.packageName}.fileprovider",
                 photoFile
             )
         } catch (e: Exception) {
-            Log.e(
-                "ProfileScreenViewModel",
-                "Error creating temporary image file URI: ${e.message}",
-                e
-            )
-            null
+            Log.e(TAG, e.localizedMessage, e)
+            return null
         }
     }
 }

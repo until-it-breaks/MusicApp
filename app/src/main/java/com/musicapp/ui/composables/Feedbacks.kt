@@ -71,7 +71,7 @@ fun ErrorSection(
             textAlign = TextAlign.Center
         )
         TextButton(onClick = onRetry) {
-            Text("Retry")
+            Text(stringResource(R.string.retry))
         }
     }
 }

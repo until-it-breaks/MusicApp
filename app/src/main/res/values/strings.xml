@@ -158,13 +158,15 @@
     <string name="no_username">No username found</string>
     <string name="change_username">Change username</string>
     <string name="new_username">New username</string>
-    <string name="save">save</string>
-    <string name="take_photo_now">Take a photo</string>
-    <string name="choose_from_gallery">Choose a photo</string>
-    <string name="remove_current_photo">Remove current Photo</string>
-    <string name="edit_photo">Edit profile photo</string>
-    <string name="confirm_delete_account">Delete Account</string>
-    <string name="delete_account_warning">This action is unreversible, are you sure to continue?</string>
+    <string name="save">Save</string>
+    <string name="take_photo_now">Take a picture</string>
+    <string name="choose_from_gallery">Select a picture</string>
+    <string name="remove_current_photo">Remove current profile picture</string>
+    <string name="edit_photo">Edit profile picture</string>
+    <string name="confirm_delete_account">Delete account</string>
+    <string name="delete_account_warning">This action is irreversible, are you sure you want to continue?</string>
     <string name="empty_search_message">No results.</string>
-    <string name="clear_queue">clear queue</string>
+    <string name="clear_queue">Clear queue</string>
+    <string name="retry">Retry</string>
+    <string name="logout">Logout</string>
 </resources>

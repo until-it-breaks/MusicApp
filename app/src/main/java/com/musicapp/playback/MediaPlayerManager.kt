@@ -8,6 +8,8 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import com.google.firebase.auth.FirebaseAuth
+import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.ui.models.TrackModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +22,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+private const val TAG = "MediaPlaybackManager"
+
 data class PlaybackUiState(
     val currentQueueItemId: Long? = null,
     val currentQueueItem: QueueItem? = null,
@@ -29,7 +33,7 @@ data class PlaybackUiState(
     val playbackQueue: List<QueueItem> = emptyList(),
     val currentQueueIndex: Int = -1,
     val currentPositionMs: Long = 0L,
-    val trackDurationMs: Long = 30000L, // Default preview duration, can be updated
+    val trackDurationMs: Long = 30000L,
     val isShuffleModeEnabled: Boolean = false,
     val repeatMode: RepeatMode = RepeatMode.OFF
 )
@@ -48,7 +52,9 @@ enum class RepeatMode {
 
 @UnstableApi
 class MediaPlayerManager(
-    private val appContext: Context
+    private val appContext: Context,
+    private val auth: FirebaseAuth,
+    private val trackHistoryRepository: TrackHistoryRepository
 ) : Player.Listener {
 
     private var exoPlayer: ExoPlayer? = null
@@ -70,7 +76,7 @@ class MediaPlayerManager(
         _isExoPlayerReady.value = (player != null)
 
         this.exoPlayer = player
-        Log.d("MediaPlayerManager", "ExoPlayer instance set by service.")
+        Log.d(TAG, "ExoPlayer instance set by service.")
 
         this.exoPlayer?.addListener(this)
 
@@ -80,8 +86,7 @@ class MediaPlayerManager(
                 val newLoading = exoPlayer?.playbackState == Player.STATE_BUFFERING
                 val currentMediaItem = exoPlayer?.currentMediaItem
                 val currentQueueItemId = currentMediaItem?.mediaId?.toLongOrNull()
-                val currentQueueItem =
-                    currentState.playbackQueue.find { it.id == currentQueueItemId }
+                val currentQueueItem = currentState.playbackQueue.find { it.id == currentQueueItemId }
                 val newIndex = currentState.playbackQueue.indexOf(currentQueueItem)
 
                 currentState.copy(
@@ -103,18 +108,18 @@ class MediaPlayerManager(
     }
 
     override fun onPlaybackStateChanged(playbackState: Int) {
-        Log.d("MediaPlayerManager", "Manager: ExoPlayer playback state changed: $playbackState")
+        Log.d(TAG, "Manager: ExoPlayer playback state changed: $playbackState")
         _playbackState.update { currentState ->
             val newIsLoading = playbackState == Player.STATE_BUFFERING
             currentState.copy(isLoading = newIsLoading)
         }
         if (playbackState == Player.STATE_ENDED) {
-            Log.d("MediaPlayerManager", "ExoPlayer: Queue ended naturally.")
+            Log.d(TAG, "ExoPlayer: Queue ended naturally.")
         }
     }
 
     override fun onIsPlayingChanged(isPlaying: Boolean) {
-        Log.d("MediaPlayerManager", "Manager: ExoPlayer isPlaying changed: $isPlaying")
+        Log.d(TAG, "Manager: ExoPlayer isPlaying changed: $isPlaying")
         _playbackState.update { it.copy(isPlaying = isPlaying) }
         if (isPlaying) {
             startPositionUpdates()
@@ -136,10 +141,7 @@ class MediaPlayerManager(
             return
         }
 
-        Log.d(
-            "MediaPlayerManager",
-            "Manager: Media item transition to ${newQueueItem?.track?.title}, new index: $newIndex"
-        )
+        Log.d(TAG, "Manager: Media item transition to ${newQueueItem?.track?.title}, new index: $newIndex")
         val startPosition = if (currentState.currentQueueItemId == newQueueItem?.id) {
             currentState.currentPositionMs
         } else 0L
@@ -160,27 +162,21 @@ class MediaPlayerManager(
         newPosition: Player.PositionInfo,
         reason: Int
     ) {
-        Log.d(
-            "MediaPlayerManager",
-            "Manager: onPositionDiscontinuity: Old ${oldPosition.positionMs}, New ${newPosition.positionMs}, Reason: $reason"
-        )
+        Log.d(TAG, "Manager: onPositionDiscontinuity: Old ${oldPosition.positionMs}, New ${newPosition.positionMs}, Reason: $reason")
         _playbackState.update { it.copy(currentPositionMs = newPosition.positionMs) }
     }
 
     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
         _playbackState.update { it.copy(isShuffleModeEnabled = shuffleModeEnabled) }
-        Log.d("MediaPlayerManager", "Manager: ExoPlayer shuffle mode changed: $shuffleModeEnabled")
+        Log.d(TAG, "Manager: ExoPlayer shuffle mode changed: $shuffleModeEnabled")
     }
 
     override fun onRepeatModeChanged(@Player.RepeatMode repeatMode: Int) {
-        Log.d(
-            "MediaPlayerManager",
-            "Manager: ExoPlayer repeat mode changed to $repeatMode"
-        )
+        Log.d(TAG, "Manager: ExoPlayer repeat mode changed to $repeatMode")
     }
 
     override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
-        Log.e("MediaPlayerManager", "Manager: ExoPlayer error: ${error.message}", error)
+        Log.e(TAG, "Manager: ExoPlayer error: ${error.message}", error)
         _playbackState.update {
             it.copy(
                 isPlaying = false,
@@ -197,6 +193,9 @@ class MediaPlayerManager(
      * Plays a new track, clearing the queue and setting this as the first.
      */
     suspend fun playTrack(track: TrackModel) {
+        auth.currentUser?.uid?.let {
+            trackHistoryRepository.addTrackToTrackHistory(it, track)
+        }
         setPlaybackQueue(listOf(track), 0) // Sets a new queue with just this track and plays it
     }
 
@@ -231,7 +230,7 @@ class MediaPlayerManager(
                 exoPlayer?.seekToNextMediaItem()
                 _playbackState.update { it.copy(isLoading = true, playbackError = null) }
             } else {
-                Log.d("MediaPlayerManager", "No next track available.")
+                Log.d(TAG, "No next track available.")
                 // stop when reach the end of queue
                 seekTo(0L)
                 pause()
@@ -245,12 +244,11 @@ class MediaPlayerManager(
     fun playPrevious() {
         scope.launch {
             val hasPrevious = exoPlayer?.hasPreviousMediaItem() == true
-
             if (hasPrevious) {
                 exoPlayer?.seekToPreviousMediaItem()
                 _playbackState.update { it.copy(isLoading = true, playbackError = null) }
             } else {
-                Log.d("MediaPlayerManager", "No previous track available.")
+                Log.d(TAG, "No previous track available.")
                 // restart if reach the start of queue
                 seekTo(0L)
             }
@@ -275,7 +273,7 @@ class MediaPlayerManager(
 
         val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
         appContext.stopService(serviceIntent)
-        Log.d("MediaPlayerManager", "Stopped playback and MediaPlaybackService.")
+        Log.d(TAG, "Stopped playback and MediaPlaybackService.")
     }
 
     /**
@@ -299,7 +297,6 @@ class MediaPlayerManager(
             )
         }
         setPlaybackQueueInternal(newQueueItems, startIndex)
-
     }
 
     /**
@@ -311,7 +308,7 @@ class MediaPlayerManager(
         val currentState = _playbackState.value
         val newShuffleMode = !currentState.isShuffleModeEnabled
         exoPlayer?.shuffleModeEnabled = newShuffleMode
-        Log.d("MediaPlayerManager", "Shuffle mode toggled to: $newShuffleMode")
+        Log.d(TAG, "Shuffle mode toggled to: $newShuffleMode")
     }
 
     private suspend fun setPlaybackQueueInternal(
@@ -319,14 +316,9 @@ class MediaPlayerManager(
         startIndex: Int,
         currentTime: Long = 0L
     ) {
-
-        Log.d(
-            "MediaPlayerManager",
-            "Internal: Setting playback queue. Size: ${newQueue.size}, Start Index: $startIndex, Shuffle: ${_playbackState.value.isShuffleModeEnabled}"
-        )
+        Log.d(TAG, "Internal: Setting playback queue. Size: ${newQueue.size}, Start Index: $startIndex, Shuffle: ${_playbackState.value.isShuffleModeEnabled}")
 
         stopPositionUpdates()
-
 
         val mediaItems = newQueue.map { queueItem ->
             MediaItem.Builder()
@@ -345,11 +337,10 @@ class MediaPlayerManager(
         if (exoPlayer == null) {
             val serviceIntent = Intent(appContext, MediaPlaybackService::class.java)
             appContext.startService(serviceIntent)
-            Log.d("MediaPlayerManager", "Started MediaPlaybackService for new queue.")
+            Log.d(TAG, "Started MediaPlaybackService for new queue.")
         } else {
-            Log.d("MediaPlayerManager", "Updated MediaPlaybackService for new queue.")
+            Log.d(TAG, "Updated MediaPlaybackService for new queue.")
         }
-
 
         // race condition, wait for service to bind
         _isExoPlayerReady.first { it }
@@ -359,10 +350,7 @@ class MediaPlayerManager(
             prepare()
             play()
         } ?: run {
-            Log.e(
-                "MediaPlayerManager",
-                "ExoPlayer not available when trying to set queue. Service might not be ready."
-            )
+            Log.e(TAG, "ExoPlayer not available when trying to set queue. Service might not be ready.")
         }
     }
 
@@ -377,7 +365,7 @@ class MediaPlayerManager(
             val newQueueItem = QueueItem(id = _nextQueueId++, track = track)
 
             if (currentQueue.isEmpty()) {
-                Log.d("MediaPlayerManager", "Queue was empty. Playing new track: ${track.title}")
+                Log.d(TAG, "Queue was empty. Playing new track: ${track.title}")
                 playTrack(track)
             } else {
                 currentQueue.add(newQueueItem)
@@ -396,10 +384,7 @@ class MediaPlayerManager(
                     .build()
 
                 exoPlayer?.addMediaItem(mediaItemToAdd)
-                Log.d(
-                    "MediaPlayerManager",
-                    "Added track '${track.title}' to end of queue. New queue size: ${currentQueue.size}"
-                )
+                Log.d(TAG, "Added track '${track.title}' to end of queue. New queue size: ${currentQueue.size}")
             }
         }
     }
@@ -412,10 +397,7 @@ class MediaPlayerManager(
             _playbackState.update { it.copy(playbackQueue = currentQueue) }
 
             exoPlayer?.removeMediaItem(index)
-            Log.d(
-                "MediaPlayerManager",
-                "Removed track '${queueItem.track.title}' from queue. New queue size: ${currentQueue.size}"
-            )
+            Log.d(TAG, "Removed track '${queueItem.track.title}' from queue. New queue size: ${currentQueue.size}")
         }
     }
 
@@ -435,18 +417,16 @@ class MediaPlayerManager(
             setPlaybackQueue(listOf(currentTrack), 0)
             seekTo(currentPositionMs)
             _playbackState.update {
-                it.copy(
-                    isPlaying = isPlaying,
-                )
+                it.copy(isPlaying = isPlaying,)
             }
-            Log.d("MediaPlayerManager", "Playback queue cleared.")
+            Log.d(TAG, "Playback queue cleared.")
         }
     }
 
     fun seekTo(positionMs: Long) {
         exoPlayer?.seekTo(positionMs)
         _playbackState.update { it.copy(currentPositionMs = positionMs) }
-        Log.d("MediaPlayerManager", "CurrentPositionMs set to $positionMs")
+        Log.d(TAG, "CurrentPositionMs set to $positionMs")
     }
 
     private fun startPositionUpdates() {
@@ -454,9 +434,7 @@ class MediaPlayerManager(
         positionUpdateJob = scope.launch {
             while (_playbackState.value.isPlaying) {
                 exoPlayer?.let { player ->
-                    _playbackState.update {
-                        it.copy(currentPositionMs = player.currentPosition.toLong())
-                    }
+                    _playbackState.update { it.copy(currentPositionMs = player.currentPosition.toLong()) }
                 }
                 delay(1000L)
             }
@@ -484,12 +462,12 @@ class MediaPlayerManager(
             RepeatMode.ONE -> Player.REPEAT_MODE_ONE
         }
 
-        Log.d("MediaPlayerManager", "Repeat mode changed to: $nextRepeatMode")
+        Log.d(TAG, "Repeat mode changed to: $nextRepeatMode")
         _playbackState.update { it.copy(repeatMode = nextRepeatMode) }
     }
 
     fun release() {
-        Log.d("MediaPlayerManager", "Releasing ExoPlayer resources and resetting state.")
+        Log.d(TAG, "Releasing ExoPlayer resources and resetting state.")
         stopPositionUpdates()
         exoPlayer?.release()
         exoPlayer = null

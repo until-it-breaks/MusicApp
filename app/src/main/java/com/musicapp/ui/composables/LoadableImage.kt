@@ -34,7 +34,7 @@ fun LoadableImage(
                 .data(imageUri)
                 .crossfade(true)
                 .listener(onError = { request, result ->
-                    Log.e(TAG, "Coil failed to load image: ${request.data}. Error: ${result.throwable.message}", result.throwable)
+                    Log.e(TAG, "Failed to load image: ${request.data}. Error: ${result.throwable.message}", result.throwable)
                 })
                 .build(),
             contentDescription = contentDescription,

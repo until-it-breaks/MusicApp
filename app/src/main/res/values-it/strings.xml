@@ -153,12 +153,13 @@
     <string name="no_username">Nessun username trovato</string>
     <string name="change_username">Cambia username</string>
     <string name="new_username">Nuovo username</string>
-    <string name="save">salva</string>
+    <string name="save">Salva</string>
     <string name="take_photo_now">Scatta una foto</string>
     <string name="choose_from_gallery">Scegli una foto</string>
-    <string name="remove_current_photo">Rimuovi la foto corrente</string>
-    <string name="edit_photo">modifica foto profilo</string>
-    <string name="confirm_delete_account">Elimina Account</string>
-    <string name="delete_account_warning">Questa azione è irreversibile, sei sicuro di continuare?</string>
+    <string name="remove_current_photo">Rimuovi la foto profilo corrente</string>
+    <string name="edit_photo">Modifica foto profilo</string>
+    <string name="confirm_delete_account">Elimina account</string>
+    <string name="delete_account_warning">Questa azione è irreversibile, sei sicuro di voler continuare?</string>
     <string name="empty_search_message">Nessun risultato.</string>
+    <string name="clear_queue">Svuota la coda</string>
 </resources>

@@ -2,17 +2,13 @@ package com.musicapp.ui.screens.search
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,7 +48,6 @@ fun SearchScreen(
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
-
     Scaffold(
         topBar = { MainTopBar(mainNavController, "Search") },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets)
@@ -64,7 +59,6 @@ fun SearchScreen(
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Search TextField
             OutlinedTextField(
                 value = uiState.searchText,
                 onValueChange = viewModel::onSearchTextChange,
@@ -104,7 +98,6 @@ fun SearchScreen(
                     )
                 }
 
-
                 uiState.searchResults.tracks.isNotEmpty() -> {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -132,7 +125,7 @@ fun SearchScreen(
                                 extraMenu = {
                                     PublicTrackDropDownMenu(
                                         trackModel = track,
-                                        onLiked = viewModel::addToLiked, // TODO
+                                        onLiked = viewModel::addToLiked,
                                         onAddToQueue = viewModel::addTrackToQueue
                                     )
                                 }
@@ -147,30 +140,6 @@ fun SearchScreen(
                     )
                 }
             }
-        }
-    }
-}
-
-/*
-* Just an example. Modify as needed.
-* */
-@Composable
-fun GenreItem(title: String, onClick: () -> Unit) {
-    Card(
-        onClick = onClick
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Image,
-                contentDescription = "Genre picture",
-                modifier = Modifier.size(72.dp)
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium
-            )
         }
     }
 }

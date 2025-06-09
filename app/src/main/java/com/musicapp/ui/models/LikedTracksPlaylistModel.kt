@@ -25,7 +25,6 @@ fun LikedPlaylistWithTracks.toModel(): LikedTracksPlaylistModel {
     )
 }
 
-
 fun LikedPlaylistWithTracksAndArtists.toModel(): LikedTracksPlaylistModel {
     return LikedTracksPlaylistModel(
         ownerId = playlist.ownerId,

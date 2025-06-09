@@ -68,12 +68,10 @@ fun MainScreen(navController: NavController) {
     val searchNavController = rememberNavController()
     val libraryNavController = rememberNavController()
 
-    // view model for the music player
     val viewModel: BasePlaybackViewModel = koinViewModel()
     val playbackUiState by viewModel.playbackUiState.collectAsState()
     val scope = rememberCoroutineScope()
     var showQueueBottomSheet by remember { mutableStateOf(false) }
-
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -89,18 +87,21 @@ fun MainScreen(navController: NavController) {
 
             MusicBar(
                 playbackState = playbackUiState,
-                onTogglePlayback = { scope.launch {
-                    viewModel.togglePlayback(playbackUiState.currentQueueItem!!.track)
-                } },
+                onTogglePlayback = {
+                    playbackUiState.currentQueueItem?.let {
+                        scope.launch {
+                            viewModel.togglePlayback(it.track)
+                        }
+                    }
+                },
                 onStopClick = viewModel::stopMusic,
                 onQueueClick = { showQueueBottomSheet = true },
                 onAddToQueue = viewModel::addTrackToQueue,
-                onLikeClick = {/*TODO*/ },
+                onLikeClick = { /*TODO*/ },
                 onBarClick = {
                     navController.navigate(MusicAppRoute.TrackDetails)
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
 
             MainNavBar(

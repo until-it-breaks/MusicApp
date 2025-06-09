@@ -161,11 +161,7 @@ fun AlbumScreen(navController: NavController, albumId: Long) {
                 uiState.tracksErrorStringId?.let {
                     ErrorSection(
                         title = stringResource(R.string.failed_to_load_tracks),
-                        message = stringResource(it) + if (uiState.failedTracksCount > 0) " (${uiState.failedTracksCount} ${
-                            stringResource(
-                                R.string.tracks
-                            )
-                        })" else "",
+                        message = stringResource(it) + if (uiState.failedTracksCount > 0) " (${uiState.failedTracksCount} ${stringResource(R.string.tracks)})" else "",
                         onRetry = viewModel::loadTracks
                     )
                 }

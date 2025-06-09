@@ -19,6 +19,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.graphics.createBitmap
 
+private const val TAG = "PlaybackDescriptionAdapter"
+
 @UnstableApi
 class PlaybackDescriptionAdapter(
     private val context: Context,
@@ -43,7 +45,6 @@ class PlaybackDescriptionAdapter(
         return notificationActivityPendingIntent
     }
 
-
     override fun getCurrentLargeIcon(
         player: Player,
         callback: PlayerNotificationManager.BitmapCallback
@@ -65,17 +66,11 @@ class PlaybackDescriptionAdapter(
                     if (loadedBitmap != null) {
                         callback.onBitmap(loadedBitmap)
                     } else {
-                        Log.e(
-                            "PlaybackDescAdapter",
-                            "Loaded drawable was null or couldn't be converted to bitmap."
-                        )
+                        Log.e(TAG, "Loaded drawable was null or couldn't be converted to bitmap.")
                         callback.onBitmap(defaultBitmap)
                     }
                 } catch (e: Exception) {
-                    Log.e(
-                        "PlaybackDescAdapter",
-                        "Error loading album art for notification: ${e.message}"
-                    )
+                    Log.e(TAG, "Error loading album art for notification: ${e.message}")
                     callback.onBitmap(defaultBitmap)
                 }
             }
@@ -87,8 +82,7 @@ class PlaybackDescriptionAdapter(
         val drawable = ContextCompat.getDrawable(
             context,
             R.drawable.ic_music_note
-        ) // Icon TODO change to app icon?
-            ?: ContextCompat.getDrawable(context, android.R.drawable.sym_def_app_icon)
+        ) ?: ContextCompat.getDrawable(context, android.R.drawable.sym_def_app_icon)
 
         val bitmap = if (drawable is BitmapDrawable) {
             drawable.bitmap
@@ -103,5 +97,4 @@ class PlaybackDescriptionAdapter(
         }
         return bitmap ?: createBitmap(NOTIFICATION_ICON_SIZE_PX, NOTIFICATION_ICON_SIZE_PX)
     }
-
 }

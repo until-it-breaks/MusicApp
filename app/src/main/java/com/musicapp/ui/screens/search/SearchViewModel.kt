@@ -1,28 +1,24 @@
 package com.musicapp.ui.screens.search
 
 import androidx.lifecycle.viewModelScope
-
 import com.musicapp.data.remote.deezer.DeezerDataSource
-
 import com.musicapp.data.remote.deezer.DeezerSearchResponse
 import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.playback.PlaybackUiState
-
 import com.musicapp.ui.models.TrackModel
 import com.musicapp.ui.models.toModel
-
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
-
 import kotlinx.coroutines.launch
-
 import android.util.Log
 import androidx.media3.common.util.UnstableApi
 import com.musicapp.playback.BasePlaybackViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+
+private const val TAG = "SearchViewModel"
 
 data class SearchResultsUiState(
     val tracks: List<TrackModel> = emptyList(),
@@ -90,10 +86,9 @@ class SearchViewModel(
         )
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
+        started = SharingStarted.WhileSubscribed(),
         initialValue = SearchUiState()
     )
-
 
     fun onSearchTextChange(newText: String) {
         _searchText.value = newText
@@ -128,11 +123,7 @@ class SearchViewModel(
                 )
                 _isLoading.value = false
             } catch (e: Exception) {
-                Log.e(
-                    "SearchViewModel",
-                    "Error performing initial search for '$currentSearchText': ${e.message}",
-                    e
-                )
+                Log.e(TAG, "Error performing search for '$currentSearchText': ${e.message}", e)
                 _isLoading.value = false
                 _error.value = true
             }
@@ -156,14 +147,14 @@ class SearchViewModel(
 
                 _searchResultsState.update { current ->
                     current.copy(
-                        tracks = current.tracks + newTrackModels, // Append new tracks
+                        tracks = current.tracks + newTrackModels,
                         hasNext = results.next != null,
-                        next = results.next // Update with the URL for the subsequent page
+                        next = results.next
                     )
                 }
                 _isLoadingMore.value = false
             } catch (e: Exception) {
-                Log.e("SearchViewModel", "Error loading next page from $nextUrl: ${e.message}", e)
+                Log.e(TAG, "Error loading next page from $nextUrl: ${e.message}", e)
                 _isLoadingMore.value = false
                 _paginationError.value = true
             }
@@ -171,6 +162,5 @@ class SearchViewModel(
     }
 
     fun addToLiked(track: TrackModel) { /*TODO*/}
-
 }
 

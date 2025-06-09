@@ -24,6 +24,8 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import kotlin.math.abs
 
+private const val TAG = "MediaPlaybackService"
+
 @UnstableApi
 class MediaPlaybackService : MediaSessionService() {
 
@@ -42,7 +44,7 @@ class MediaPlaybackService : MediaSessionService() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("MediaPlaybackService", "Service onCreate")
+        Log.d(TAG, "Service onCreate")
 
         createNotificationChannel()
 
@@ -60,28 +62,19 @@ class MediaPlaybackService : MediaSessionService() {
             .apply {
                 addListener(object : Player.Listener {
                     override fun onIsPlayingChanged(isPlaying: Boolean) {
-                        Log.d("MediaPlaybackService", "ExoPlayer isPlaying changed: $isPlaying")
+                        Log.d(TAG, "ExoPlayer isPlaying changed: $isPlaying")
                     }
 
                     override fun onPlaybackStateChanged(playbackState: Int) {
-                        Log.d(
-                            "MediaPlaybackService",
-                            "ExoPlayer playback state changed: $playbackState"
-                        )
+                        Log.d(TAG, "ExoPlayer playback state changed: $playbackState")
                         if (playbackState == Player.STATE_ENDED) {
-                            Log.d(
-                                "MediaPlaybackService",
-                                "ExoPlayer: Track ended naturally. Triggering next."
-                            )
+                            Log.d(TAG, "ExoPlayer: Track ended naturally. Triggering next.")
                             mediaPlayerManager.playNext()
                         }
                     }
 
                     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                        Log.d(
-                            "MediaPlaybackService",
-                            "ExoPlayer: Media item transition to ${mediaItem?.mediaMetadata?.title}"
-                        )
+                        Log.d(TAG, "ExoPlayer: Media item transition to ${mediaItem?.mediaMetadata?.title}")
                     }
                 })
             }
@@ -93,9 +86,9 @@ class MediaPlaybackService : MediaSessionService() {
             mediaSession = MediaSession.Builder(this, player)
                 .setSessionActivity(getMediaSessionActivityPendingIntent())
                 .build()
-            Log.d("MediaPlaybackService", "MediaSession created and linked to ExoPlayer")
+            Log.d(TAG, "MediaSession created and linked to ExoPlayer")
         } ?: run {
-            Log.e("MediaPlaybackService", "Failed to initialize MediaSession: ExoPlayer is null")
+            Log.e(TAG, "Failed to initialize MediaSession: ExoPlayer is null")
         }
     }
 
@@ -112,10 +105,10 @@ class MediaPlaybackService : MediaSessionService() {
                     .setSmallIconResourceId(R.drawable.ic_music_note)
                     .setMediaDescriptionAdapter(
                         PlaybackDescriptionAdapter(
-                            this,
-                            mediaPlayerManager,
-                            serviceScope,
-                            getMediaSessionActivityPendingIntent()
+                            context = this,
+                            mediaPlayerManager = mediaPlayerManager,
+                            serviceScope = serviceScope,
+                            notificationActivityPendingIntent = getMediaSessionActivityPendingIntent()
                         )
                     )
                     .setNotificationListener(PlaybackNotificationListener(this, mediaPlayerManager))
@@ -128,23 +121,17 @@ class MediaPlaybackService : MediaSessionService() {
                         setUseNextAction(true)
                         setUsePreviousAction(true)
                     }
-                Log.d("MediaPlaybackService", "PlayerNotificationManager initialized")
+                Log.d(TAG, "PlayerNotificationManager initialized")
             }
         } ?: run {
-            Log.e(
-                "MediaPlaybackService",
-                "Failed to initialize PlayerNotificationManager: ExoPlayer or MediaSession is null"
-            )
+            Log.e(TAG, "Failed to initialize PlayerNotificationManager: ExoPlayer or MediaSession is null")
         }
     }
 
     private fun observePlaybackState() {
         serviceScope.launch {
             mediaPlayerManager.playbackState.collectLatest { uiState ->
-                Log.d(
-                    "MediaPlaybackService",
-                    "MediaPlayerManager PlaybackUiState updated: $uiState"
-                )
+                Log.d(TAG, "MediaPlayerManager PlaybackUiState updated: $uiState")
 
                 val currentQueueItem = uiState.currentQueueItem
                 val exoPlayerCurrentMediaItem = exoPlayer?.currentMediaItem
@@ -153,10 +140,7 @@ class MediaPlaybackService : MediaSessionService() {
                     val mediaItem = createMediaItem(currentQueueItem)
 
                     if (shouldUpdateMediaItem(exoPlayerCurrentMediaItem, mediaItem)) {
-                        Log.d(
-                            "MediaPlaybackService",
-                            "Setting new MediaItem for ExoPlayer: ${currentQueueItem.track.title}"
-                        )
+                        Log.d(TAG, "Setting new MediaItem for ExoPlayer: ${currentQueueItem.track.title}")
                         exoPlayer?.setMediaItem(mediaItem)
                         exoPlayer?.prepare()
                         if (uiState.isPlaying) {
@@ -167,7 +151,6 @@ class MediaPlaybackService : MediaSessionService() {
                     } else {
                         syncPlaybackState(uiState)
                     }
-
                     syncSeekPosition(uiState.currentPositionMs)
                 } else {
                     handleNoCurrentTrack()
@@ -185,10 +168,10 @@ class MediaPlaybackService : MediaSessionService() {
     private fun syncPlaybackState(uiState: PlaybackUiState) {
         if (uiState.isPlaying && exoPlayer?.isPlaying == false) {
             exoPlayer?.play()
-            Log.d("MediaPlaybackService", "ExoPlayer play triggered by MediaPlayerManager")
+            Log.d(TAG, "ExoPlayer play triggered by MediaPlayerManager")
         } else if (!uiState.isPlaying && exoPlayer?.isPlaying == true) {
             exoPlayer?.pause()
-            Log.d("MediaPlaybackService", "ExoPlayer pause triggered by MediaPlayerManager")
+            Log.d(TAG, "ExoPlayer pause triggered by MediaPlayerManager")
         }
     }
 
@@ -200,10 +183,7 @@ class MediaPlaybackService : MediaSessionService() {
 
     private fun handleNoCurrentTrack() {
         if (exoPlayer?.isPlaying == true || exoPlayer?.isLoading == true) {
-            Log.d(
-                "MediaPlaybackService",
-                "Stopping ExoPlayer due to null currentTrack in MediaPlayerManager"
-            )
+            Log.d(TAG, "Stopping ExoPlayer due to null currentTrack in MediaPlayerManager")
             exoPlayer?.stop()
             exoPlayer?.clearMediaItems()
         }
@@ -211,13 +191,13 @@ class MediaPlaybackService : MediaSessionService() {
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
-        Log.d("MediaPlaybackService", "onGetSession called.")
+        Log.d(TAG, "onGetSession called.")
         return mediaSession
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("MediaPlaybackService", "MediaPlaybackService destroyed.")
+        Log.d(TAG, "MediaPlaybackService destroyed.")
         cleanupResources()
         mediaPlayerManager.release()
     }
@@ -239,9 +219,7 @@ class MediaPlaybackService : MediaSessionService() {
         ).apply {
             description = getString(R.string.channel_description)
         }
-        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
-            channel
-        )
+        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(channel)
     }
 
     private fun createMediaItem(queueItem: QueueItem): MediaItem {

@@ -198,8 +198,8 @@ fun TrackCard(
             }
             if (showPicture) {
                 LoadableImage(
-                    track.mediumPictureUri,
-                    "Track picture",
+                    imageUri = track.mediumPictureUri,
+                    contentDescription = null,
                     modifier = Modifier
                         .size(48.dp)
                         .clip(RoundedCornerShape(4.dp)),
@@ -289,7 +289,7 @@ fun PlaylistCardToAddTo(
             if (showCheck || !enabled) {
                 Icon(
                     imageVector = Icons.Outlined.Check,
-                    contentDescription = "Forward",
+                    contentDescription = null,
                     modifier = Modifier.padding(8.dp)
                 )
             }
@@ -298,16 +298,18 @@ fun PlaylistCardToAddTo(
 }
 
 @Composable
-fun TrackCardToAdd(
-    track: TrackModel
-) {
+fun TrackCardToAdd(track: TrackModel) {
     Card {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.padding(8.dp)
         ) {
-            LoadableImage(track.mediumPictureUri, "Track picture", modifier = Modifier.size(48.dp))
+            LoadableImage(
+                imageUri = track.mediumPictureUri,
+                contentDescription = null,
+                modifier = Modifier.size(48.dp)
+            )
             Column(
                 modifier = Modifier.weight(1f)
             ) {
