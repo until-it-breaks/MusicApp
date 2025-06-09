@@ -7,137 +7,117 @@ import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.musicapp.data.database.User
 import com.musicapp.data.repositories.UserRepository
+import com.musicapp.ui.screens.AuthManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+private const val TAG = "ProfileScreenViewModel"
+
 data class ProfileUiState(
-    val currentUser: User? = null,
     val showChangeUsernameDialog: Boolean = false,
     val showProfilePictureOptions: Boolean = false,
     val showConfirmDelete: Boolean = false,
-    val newUsernameInput: String = "",
-    val currentProfilePictureUri: Uri? = null,
-    val isDefaultProfilePicture: Boolean = true
-)
+    val showConfirmLogout: Boolean = false,
+    val newUsernameInput: String = ""
+) {
+    val canChangeName = newUsernameInput.isNotBlank()
+}
 
 sealed class ProfileUiEvent {
     data class LaunchCamera(val uri: Uri) : ProfileUiEvent()
     object RequestCameraPermission : ProfileUiEvent()
 }
 
-private const val TAG = "ProfileScreenViewModel"
-
 class ProfileScreenViewModel(
-    private val auth: FirebaseAuth,
+    private val authManager: AuthManager,
     private val userRepository: UserRepository,
     private val appContext: Context
 ) : ViewModel() {
 
-    private val _currentUser: StateFlow<User?> = auth.currentUser?.uid?.let { userId ->
-        userRepository.getUser(userId)
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = null
-            )
-    } ?: run {
-        MutableStateFlow(null)
-    }
-    private val _showChangeUsernameDialog = MutableStateFlow(false)
-    private val _showProfilePictureOptions = MutableStateFlow(false)
-    private val _showConfirmDelete = MutableStateFlow(false)
-    private val _newUsernameInput = MutableStateFlow("")
+    private val _userId = authManager.userId
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val currentUser: StateFlow<User?> = _userId
+        .filterNotNull()
+        .flatMapLatest {
+            userRepository.getUser(it)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = null
+        )
+
+    private val _uiState = MutableStateFlow(ProfileUiState())
+    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
     private val _events = Channel<ProfileUiEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
-    private val _derivedProfilePictureUri: StateFlow<Uri?> = _currentUser.map { user ->
-        user?.profilePictureUri?.toUri()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = null
-    )
-
-    private val _derivedIsDefaultProfilePicture: StateFlow<Boolean> = _currentUser.map { user ->
-        user?.profilePictureUri.isNullOrBlank()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = true
-    )
-
-    val uiState: StateFlow<ProfileUiState> = combine(
-        listOf(
-            _currentUser,
-            _showChangeUsernameDialog,
-            _newUsernameInput,
-            _showProfilePictureOptions,
-            _showConfirmDelete,
-            _derivedProfilePictureUri,
-            _derivedIsDefaultProfilePicture
-        )
-    ) { values ->
-
-        val user = values[0] as User?
-        val showUsernameDialog = values[1] as Boolean
-        val newUsername = values[2] as String
-        val showPhotoOptions = values[3] as Boolean
-        val showConfirmDelete = values[4] as Boolean
-        val profileUri = values[5] as Uri?
-        val isDefault = values[6] as Boolean
-
-        ProfileUiState(
-            currentUser = user,
-            showChangeUsernameDialog = showUsernameDialog,
-            newUsernameInput = newUsername,
-            showProfilePictureOptions = showPhotoOptions,
-            showConfirmDelete = showConfirmDelete,
-            currentProfilePictureUri = profileUri,
-            isDefaultProfilePicture = isDefault
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = ProfileUiState()
-    )
-
+    override fun onCleared() {
+        super.onCleared()
+        authManager.cleanup()
+    }
 
     fun onNewUsernameChanged(username: String) {
-        _newUsernameInput.update { username }
+        _uiState.update { it.copy(newUsernameInput = username) }
     }
 
     fun showUsernameDialog() {
-        _showChangeUsernameDialog.value = true
-        _newUsernameInput.value = uiState.value.currentUser?.username ?: ""
+        _uiState.update { it.copy(showChangeUsernameDialog = true, newUsernameInput = currentUser.value?.username ?: "Unknown") }
     }
 
     fun dismissUsernameDialog() {
-        _showChangeUsernameDialog.value = false
-        _newUsernameInput.value = ""
+        _uiState.update { it.copy(showChangeUsernameDialog = false) }
+    }
+
+    fun showProfilePictureOptions() {
+        _uiState.update { it.copy(showProfilePictureOptions = true) }
+    }
+
+    fun dismissProfilePictureOptions() {
+        _uiState.update { it.copy(showProfilePictureOptions = false) }
+    }
+
+    fun showConfirmDelete() {
+        _uiState.update { it.copy(showConfirmDelete = true) }
+    }
+
+    fun dismissConfirmDelete() {
+        _uiState.update { it.copy(showConfirmDelete = false) }
+    }
+
+    fun showConfirmLogout() {
+        _uiState.update { it.copy(showConfirmLogout = true) }
+    }
+
+    fun dismissConfirmLogout() {
+        _uiState.update { it.copy(showConfirmLogout = false) }
     }
 
     fun updateUsername() {
-        val userId = auth.currentUser?.uid
-        val currentUsername = uiState.value.currentUser?.username
+        val userId = _userId.value
+        val currentUsername = currentUser.value?.username
         val newName = uiState.value.newUsernameInput.trim()
 
         if (userId == null || newName.isBlank() || newName == currentUsername) {
@@ -146,35 +126,26 @@ class ProfileScreenViewModel(
         }
 
         viewModelScope.launch {
-            userRepository.updateUsername(newName, userId)
+            try {
+                withContext(Dispatchers.IO) {
+                    userRepository.updateUsername(newName, userId)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, e.localizedMessage, e)
+            }
         }
     }
 
-    fun showProfilePictureOptions() {
-        _showProfilePictureOptions.value = true
-    }
-
-    fun dismissProfilePictureOptions() {
-        _showProfilePictureOptions.value = false
-    }
-
-    fun showConfirmDelete() {
-        _showConfirmDelete.value = true
-    }
-
-    fun dismissConfirmDelete() {
-        _showConfirmDelete.value = false
-    }
-
     fun updateProfilePicture(uri: Uri) {
-        val userId = auth.currentUser?.uid
+        val userId = _userId.value
         if (userId == null) {
-            dismissProfilePictureOptions()
             return
         }
         viewModelScope.launch {
             try {
-                userRepository.updateProfilePicture(uri, userId)
+                withContext(Dispatchers.IO) {
+                    userRepository.updateProfilePicture(uri, userId)
+                }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
             }
@@ -182,7 +153,7 @@ class ProfileScreenViewModel(
     }
 
     fun removeProfilePicture() {
-        val userId = auth.currentUser?.uid
+        val userId = _userId.value
         if (userId == null) {
             dismissProfilePictureOptions()
             return
@@ -190,17 +161,14 @@ class ProfileScreenViewModel(
         viewModelScope.launch {
             try {
                 userRepository.removeProfilePicture(userId)
-                dismissProfilePictureOptions()
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
-                dismissProfilePictureOptions()
             }
         }
     }
 
     fun onTakePhotoClicked() {
-        val userId = auth.currentUser?.uid
-        if (userId == null) {
+        if (_userId.value == null) {
             dismissProfilePictureOptions()
             return
         }
@@ -241,12 +209,12 @@ class ProfileScreenViewModel(
     }
 
     fun deleteAccount() {
-        auth.currentUser?.delete()
+        authManager.deleteAccount()
         //userRepository.deleteUser(uiState.value.currentUser!!)
     }
 
     fun logout() {
-        auth.signOut()
+        authManager.logout()
     }
 
     private fun createTempImageUri(): Uri? {

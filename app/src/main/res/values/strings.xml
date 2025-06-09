@@ -169,4 +169,6 @@
     <string name="clear_queue">Clear queue</string>
     <string name="retry">Retry</string>
     <string name="logout">Logout</string>
+    <string name="unknown_email">Unknown email</string>
+    <string name="are_you_sure_you_want_to_logout">Are you sure you want to logout?</string>
 </resources>

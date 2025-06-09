@@ -6,7 +6,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -39,7 +37,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +51,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
 import com.musicapp.ui.MusicAppRoute
@@ -62,13 +61,16 @@ import com.musicapp.ui.composables.TopBarWithBackButton
 import com.musicapp.ui.theme.AppPadding
 import org.koin.androidx.compose.koinViewModel
 
+private const val TAG = "ProfileScreen"
+
 @Composable
 fun ProfileScreen(navController: NavController) {
     val viewModel: ProfileScreenViewModel = koinViewModel()
-    val uiState = viewModel.uiState.collectAsState().value
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val user = viewModel.currentUser.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
 
-    val username = uiState.currentUser?.username ?: stringResource(R.string.unknown_user)
     var cameraOutputUri: Uri? by remember { mutableStateOf(null) }
 
     val takePictureLauncher = rememberLauncherForActivityResult(
@@ -79,7 +81,7 @@ fun ProfileScreen(navController: NavController) {
                     viewModel.updateProfilePicture(uri)
                 }
             } else {
-                Log.e("ProfileScreen", "Photo capture cancelled or failed.")
+                Log.e(TAG, "Photo capture cancelled or failed.")
             }
             viewModel.dismissProfilePictureOptions()
         }
@@ -102,11 +104,7 @@ fun ProfileScreen(navController: NavController) {
                         Intent.FLAG_GRANT_READ_URI_PERMISSION
                     )
                 } catch (e: SecurityException) {
-                    Log.e(
-                        "ProfileScreen",
-                        "Failed to take persistable URI permission for gallery image",
-                        e
-                    )
+                    Log.e(TAG, "Failed to take persistable URI permission for gallery image", e)
                 }
                 viewModel.updateProfilePicture(uri)
             }
@@ -169,12 +167,7 @@ fun ProfileScreen(navController: NavController) {
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    onClick = {
-                        viewModel.logout()
-                        navController.navigate(MusicAppRoute.Login) {
-                            popUpTo(navController.graph.id) { inclusive = true }
-                        }
-                    },
+                    onClick = { viewModel.showConfirmLogout() },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onError
@@ -198,7 +191,7 @@ fun ProfileScreen(navController: NavController) {
                 .verticalScroll(rememberScrollState())
         ) {
             LoadableImage(
-                imageUri = uiState.currentProfilePictureUri,
+                imageUri = user.value?.profilePictureUri?.toUri(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -226,7 +219,7 @@ fun ProfileScreen(navController: NavController) {
                             .padding(12.dp)
                     ) {
                         Text(
-                            text = username,
+                            text = user.value?.username ?: stringResource(R.string.unknown_user),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodyMedium,
@@ -238,17 +231,38 @@ fun ProfileScreen(navController: NavController) {
                         )
                     }
                 }
+                Text(
+                    text = stringResource(R.string.email),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(start = 12.dp)
+                )
+                Card {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                    ) {
+                        Text(
+                            text = user.value?.email ?: stringResource(R.string.unknown_email),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(48.dp))
         }
 
-        if (uiState.showChangeUsernameDialog) {
+        if (uiState.value.showChangeUsernameDialog) {
             AlertDialog(
                 onDismissRequest = { viewModel.dismissUsernameDialog() },
                 title = { Text(text = stringResource(R.string.change_username)) },
                 text = {
                     OutlinedTextField(
-                        value = uiState.newUsernameInput,
+                        value = uiState.value.newUsernameInput,
                         onValueChange = { viewModel.onNewUsernameChanged(it) },
                         label = { Text(stringResource(R.string.new_username)) },
                         singleLine = true,
@@ -256,10 +270,13 @@ fun ProfileScreen(navController: NavController) {
                     )
                 },
                 confirmButton = {
-                    TextButton(onClick = {
-                        viewModel.updateUsername()
-                        viewModel.dismissUsernameDialog()
-                    }) {
+                    TextButton(
+                        enabled = uiState.value.canChangeName,
+                        onClick = {
+                            viewModel.updateUsername()
+                            viewModel.dismissUsernameDialog()
+                        }
+                    ) {
                         Text(stringResource(R.string.save))
                     }
                 },
@@ -271,7 +288,7 @@ fun ProfileScreen(navController: NavController) {
             )
         }
 
-        if (uiState.showProfilePictureOptions) {
+        if (uiState.value.showProfilePictureOptions) {
             Dialog(onDismissRequest = { viewModel.dismissProfilePictureOptions() }) {
                 Surface(
                     shape = RoundedCornerShape(16.dp),
@@ -289,18 +306,15 @@ fun ProfileScreen(navController: NavController) {
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
-
                         TextButton(onClick = { viewModel.onTakePhotoClicked() }) {
                             Text(text = stringResource(R.string.take_photo_now))
                         }
-
                         TextButton(onClick = {
                             pickImageLauncher.launch("image/*")
                         }) {
                             Text(text = stringResource(R.string.choose_from_gallery))
                         }
-
-                        if (!uiState.isDefaultProfilePicture) {
+                        if (user.value?.profilePictureUri != null) {
                             TextButton(onClick = {
                                 viewModel.removeProfilePicture()
                                 viewModel.dismissProfilePictureOptions()
@@ -313,7 +327,7 @@ fun ProfileScreen(navController: NavController) {
             }
         }
 
-        if (uiState.showConfirmDelete) {
+        if (uiState.value.showConfirmDelete) {
             AlertDialog(
                 onDismissRequest = { viewModel.dismissConfirmDelete() },
                 title = { Text(text = stringResource(R.string.confirm_delete_account)) },
@@ -333,6 +347,30 @@ fun ProfileScreen(navController: NavController) {
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.dismissConfirmDelete() }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
+
+        if (uiState.value.showConfirmLogout) {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissConfirmLogout() },
+                title = { Text(text = stringResource(R.string.logout)) },
+                text = { Text(text = stringResource(R.string.are_you_sure_you_want_to_logout)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.dismissConfirmLogout()
+                        viewModel.logout()
+                        navController.navigate(MusicAppRoute.Login) {
+                            popUpTo(navController.graph.id) { inclusive = true }
+                        }
+                    }) {
+                        Text(stringResource(R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.dismissConfirmLogout() }) {
                         Text(stringResource(R.string.cancel))
                     }
                 }
