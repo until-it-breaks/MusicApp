@@ -153,7 +153,7 @@ fun ProfileScreen(navController: NavController) {
                     .size(128.dp)
                     .clip(CircleShape)
                     .padding(0.dp)
-                    .clickable { viewModel.showProfilePictureOptions() } //TODO show full picture?
+                    .clickable { viewModel.showProfilePictureOptions() }
             )
             TextButton(onClick = { viewModel.showProfilePictureOptions() }) {
                 Text(stringResource(R.string.edit_photo))

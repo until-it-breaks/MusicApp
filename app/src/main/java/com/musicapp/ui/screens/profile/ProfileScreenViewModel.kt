@@ -150,9 +150,9 @@ class ProfileScreenViewModel(
     }
 
     fun removeProfilePicture() {
+        dismissProfilePictureOptions()
         val userId = _userId.value
         if (userId == null) {
-            dismissProfilePictureOptions()
             return
         }
         viewModelScope.launch {
@@ -165,11 +165,10 @@ class ProfileScreenViewModel(
     }
 
     fun onTakePhotoClicked() {
+        dismissProfilePictureOptions()
         if (_userId.value == null) {
-            dismissProfilePictureOptions()
             return
         }
-
         if (appContext.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             viewModelScope.launch {
                 _events.send(ProfileUiEvent.LaunchCamera)
@@ -188,7 +187,6 @@ class ProfileScreenViewModel(
             }
         } else {
             Log.d(TAG, "Camera permission denied.")
-            dismissProfilePictureOptions()
         }
     }
 
