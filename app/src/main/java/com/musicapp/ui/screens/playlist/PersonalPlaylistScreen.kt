@@ -46,7 +46,7 @@ import org.koin.androidx.compose.koinViewModel
 fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
     val viewModel = koinViewModel<PersonalPlaylistViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val playlist = viewModel.playlist.collectAsStateWithLifecycle()
+    val playlist by viewModel.playlist.collectAsStateWithLifecycle()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
@@ -64,9 +64,9 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
         topBar = {
             TopBarWithBackButton(
                 navController = navController,
-                title = playlist.value?.name ?: stringResource(R.string.unknown_playlist),
+                title = playlist?.name ?: stringResource(R.string.unknown_playlist),
                 content = {
-                    playlist.value?.let {
+                    playlist?.let {
                         UserPlaylistDropDownMenu(
                             onDeletePlaylist = { viewModel.deletePlaylist() },
                             onEditPlaylistName = { viewModel.startEditingName(it.name) }
@@ -89,11 +89,11 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     LoadableImage(
-                        imageUri = playlist.value?.playlistPictureUri,
+                        imageUri = playlist?.playlistPictureUri,
                         contentDescription = null,
                         modifier = Modifier.size(250.dp)
                     )
-                    val timeInMillis = playlist.value?.lastEditTime
+                    val timeInMillis = playlist?.lastEditTime
                     timeInMillis?.let {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text("${stringResource(R.string.last_edited)}: ${convertMillisToDateWithHourAndMinutes(it)}")
@@ -101,12 +101,12 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
                     }
                 }
             }
-            itemsIndexed(playlist.value?.tracks.orEmpty()) { index, track ->
+            itemsIndexed(playlist?.tracks.orEmpty()) { index, track ->
                 TrackCard(
                     track = track,
                     showPicture = true,
                     playbackUiState = playbackUiState,
-                    onTrackClick = { scope.launch { viewModel.setPlaybackQueue(playlist.value?.tracks.orEmpty(), index) } },
+                    onTrackClick = { scope.launch { viewModel.setPlaybackQueue(playlist?.tracks.orEmpty(), index) } },
                     onArtistClick = { artistId -> navController.navigate(MusicAppRoute.Artist(artistId)) },
                     extraMenu = {
                         SavedTrackDropDownMenu(
@@ -120,7 +120,7 @@ fun PersonalPlaylistScreen(navController: NavController, playlistId: String) {
         }
     }
 
-    if (uiState.isEditingName && playlist.value != null) {
+    if (uiState.isEditingName && playlist != null) {
         val sheetState = rememberModalBottomSheetState()
         EditPlaylistNameModal(
             sheetState = sheetState,

@@ -8,24 +8,43 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrackDAO {
+
+    /**
+     * Returns a flow of a track.
+     */
     @Query("SELECT * FROM track WHERE track.trackId = :trackId")
     fun getTrackFlow(trackId: Long): Flow<Track>
 
+    /**
+     * Returns a flow of a artists that contributed to a track.
+     */
     @Query("""
     SELECT Artist.* FROM Artist, TrackArtistCrossRef WHERE Artist.artistId = TrackArtistCrossRef.artistId
     AND TrackArtistCrossRef.trackId = :trackId ORDER BY TrackArtistCrossRef.`order`
     """)
     fun getTrackArtistsFlow(trackId: Long): Flow<List<Artist>>
 
+    /**
+     * Upserts a track.
+     */
     @Upsert
     suspend fun upsertTrack(track: Track)
 
+    /**
+     * Upserts an artist.
+     */
     @Upsert
     suspend fun upsertArtist(artist: Artist)
 
+    /**
+     * Adds a cross ref between artist and track.
+     */
     @Upsert
     suspend fun addArtistToTrack(crossRef: TrackArtistCrossRef)
 
+    /**
+     * Deletes a track given its id.
+     */
     @Query("DELETE FROM track WHERE trackId = :trackId")
     suspend fun deleteTrack(trackId: Long)
 }
@@ -63,6 +82,9 @@ interface UserPlaylistDAO {
     @Query("SELECT * FROM playlist WHERE ownerId = :ownerId")
     fun getPlaylists(ownerId: String): Flow<List<Playlist>>
 
+    /**
+     * Returns a flow of tracks of a given playlist ordered from the least recent to the most.
+     */
     @Query("""
     SELECT Track.* FROM Track
     INNER JOIN PlaylistTrackCrossRef ON Track.trackId = PlaylistTrackCrossRef.trackId
@@ -70,6 +92,9 @@ interface UserPlaylistDAO {
     """)
     fun getTracksOfPlaylist(playlistId: String): Flow<List<Track>>
 
+    /**
+     * Returns a specific track cross ref in a given playlist.
+     */
     @Query("SELECT * FROM playlisttrackcrossref WHERE playlistId = :playlistId AND trackId = :trackId")
     suspend fun getTrackFromPlaylist(playlistId: String, trackId: Long): PlaylistTrackCrossRef?
 
@@ -91,9 +116,15 @@ interface UserPlaylistDAO {
     @Query("UPDATE playlist SET name = :name WHERE playlistId = :playlistId")
     suspend fun editName(playlistId: String, name: String)
 
+    /**
+     * Updates the picture of a playlist of a given user.
+     */
     @Query("UPDATE playlist SET pictureUri = :pictureUri WHERE playlistId = :playlistId")
     suspend fun updatePlaylistPicture(playlistId: String, pictureUri: String)
 
+    /**
+     * Updates the last edit time of a playlist of a given user.
+     */
     @Query("UPDATE playlist SET lastEditTime = :lastEditTime WHERE playlistId = :playlistId")
     suspend fun updateEditTime(playlistId: String, lastEditTime: Long = System.currentTimeMillis())
 
@@ -125,9 +156,15 @@ interface LikedPlaylistDAO {
     @Query("SELECT * FROM likedplaylist WHERE ownerId = :userId")
     fun getLikedPlaylist(userId: String): Flow<LikedPlaylist>
 
+    /**
+     * Returns a specific track cross ref in a given liked tracks playlist.
+     */
     @Query("SELECT * FROM likedplaylisttrackcrossref WHERE ownerId = :userId AND trackId = :trackId")
     suspend fun getTrackFromLikedTracks(userId: String, trackId: Long): LikedPlaylistTrackCrossRef?
 
+    /**
+     * Returns a flow of tracks of a given liked tracks ordered from the least recent to the most.
+     */
     @Query("""
     SELECT Track.* FROM Track
     INNER JOIN LikedPlaylistTrackCrossRef ON Track.trackId = LikedPlaylistTrackCrossRef.trackId
@@ -147,6 +184,9 @@ interface LikedPlaylistDAO {
     @Upsert
     suspend fun addTrackToLikedTracks(crossRef: LikedPlaylistTrackCrossRef)
 
+    /**
+     * Updates the last edit time of the liked tracks of a given user.
+     */
     @Query("UPDATE likedplaylist SET lastEditTime = :lastEditTime WHERE ownerId = :playlistId")
     suspend fun updateEditTime(playlistId: String, lastEditTime: Long = System.currentTimeMillis())
 
@@ -166,9 +206,15 @@ interface LikedPlaylistDAO {
 @Dao
 interface TrackHistoryDAO {
 
+    /**
+     * Returns a flow of a track history of a given user.
+     */
     @Query("SELECT * FROM trackhistory WHERE ownerId = :userId")
     fun getTrackHistory(userId: String): Flow<TrackHistory>
 
+    /**
+     * Returns a flow of tracks of a given track history ordered from the most recent to the least.
+     */
     @Query("""
     SELECT Track.* FROM Track
     INNER JOIN TrackHistoryTrackCrossRef ON Track.trackId = TrackHistoryTrackCrossRef.trackId
@@ -188,6 +234,9 @@ interface TrackHistoryDAO {
     @Upsert
     suspend fun addTrackToTrackHistory(crossRef: TrackHistoryTrackCrossRef)
 
+    /**
+     * Updates the last edit time of the track history of a given user.
+     */
     @Query("UPDATE trackhistory SET lastEditTime = :lastEditTime WHERE ownerId = :playlistId")
     suspend fun updateEditTime(playlistId: String, lastEditTime: Long = System.currentTimeMillis())
 

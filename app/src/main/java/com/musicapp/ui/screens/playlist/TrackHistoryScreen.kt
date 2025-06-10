@@ -38,7 +38,7 @@ import org.koin.androidx.compose.koinViewModel
 fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavController) {
     val viewModel = koinViewModel<TrackHistoryViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val playlist = viewModel.playlist.collectAsStateWithLifecycle()
+    val playlist by viewModel.playlist.collectAsStateWithLifecycle()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
@@ -64,7 +64,7 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        val timeInMillis = playlist.value?.lastEditTime
+                        val timeInMillis = playlist?.lastEditTime
                         timeInMillis?.let {
                             Text(
                                 text = "${stringResource(R.string.last_edited)}: ${convertMillisToDateWithHourAndMinutes(it)}",
@@ -73,7 +73,7 @@ fun TrackHistoryScreen(mainNavController: NavController, subNavController: NavCo
                         }
                     }
                 }
-                items(playlist.value?.tracks.orEmpty()) { track ->
+                items(playlist?.tracks.orEmpty()) { track ->
                     TrackCard(
                         track = track,
                         showPicture = true,

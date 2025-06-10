@@ -40,8 +40,8 @@ fun AddTrackToPlaylistModal(
 ) {
     val viewModel = koinViewModel<AddToPlaylistViewModel>()
 
-    val playlists = viewModel.playlists.collectAsStateWithLifecycle()
-    val likedPlaylist = viewModel.likedPlaylist.collectAsStateWithLifecycle()
+    val playlists by viewModel.playlists.collectAsStateWithLifecycle()
+    val likedPlaylist by viewModel.likedPlaylist.collectAsStateWithLifecycle()
 
     val clickedPlaylists = remember { mutableStateOf(setOf<String>()) }
     var addToLiked by remember { mutableStateOf(false) }
@@ -94,11 +94,11 @@ fun AddTrackToPlaylistModal(
                                 title = stringResource(R.string.liked_tracks),
                                 playlistType = PlaylistType.LIKED,
                                 onClick = { addToLiked = !addToLiked },
-                                enabled = likedPlaylist.value?.tracks?.none { it.id == track.id } == true,
+                                enabled = likedPlaylist?.tracks?.none { it.id == track.id } == true,
                                 showCheck = addToLiked
                             )
                         }
-                        items(playlists.value) { playlist ->
+                        items(playlists) { playlist ->
                             PlaylistCardToAddTo(
                                 title = playlist.name,
                                 imageUri = playlist.playlistPictureUri,

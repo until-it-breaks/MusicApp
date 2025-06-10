@@ -38,7 +38,7 @@ import org.koin.androidx.compose.koinViewModel
 fun LikedTracksScreen(mainNavController: NavController, subNavController: NavController) {
     val viewModel = koinViewModel<LikedTracksViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val playlist = viewModel.playlist.collectAsStateWithLifecycle()
+    val playlist by viewModel.playlist.collectAsStateWithLifecycle()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
@@ -64,7 +64,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        val timeInMillis = playlist.value?.lastEditTime
+                        val timeInMillis = playlist?.lastEditTime
                         timeInMillis?.let {
                             Text(
                                 text = "${stringResource(R.string.last_edited)}: ${convertMillisToDateWithHourAndMinutes(it)}",
@@ -73,12 +73,12 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                         }
                     }
                 }
-                itemsIndexed(playlist.value?.tracks.orEmpty()) { index, track ->
+                itemsIndexed(playlist?.tracks.orEmpty()) { index, track ->
                     TrackCard(
                         track = track,
                         showPicture = true,
                         playbackUiState = playbackUiState,
-                        onTrackClick = { scope.launch { viewModel.setPlaybackQueue(playlist.value?.tracks.orEmpty(), index) } },
+                        onTrackClick = { scope.launch { viewModel.setPlaybackQueue(playlist?.tracks.orEmpty(), index) } },
                         onArtistClick = { artistId -> subNavController.navigate(MusicAppRoute.Artist(artistId)) },
                         extraMenu = {
                             SavedTrackDropDownMenu(

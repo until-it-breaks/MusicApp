@@ -47,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.musicapp.R
@@ -63,9 +64,9 @@ private const val TAG = "ProfileScreen"
 
 @Composable
 fun ProfileScreen(navController: NavController) {
-    val viewModel: ProfileScreenViewModel = koinViewModel()
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    val user = viewModel.currentUser.collectAsStateWithLifecycle()
+    val viewModel = koinViewModel<ProfileScreenViewModel>()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val user by viewModel.currentUser.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
 
@@ -145,7 +146,7 @@ fun ProfileScreen(navController: NavController) {
                 .verticalScroll(rememberScrollState())
         ) {
             LoadableImage(
-                imageUri = user.value?.profilePictureUri,
+                imageUri = user?.profilePictureUri,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -175,7 +176,7 @@ fun ProfileScreen(navController: NavController) {
                             .padding(12.dp)
                     ) {
                         Text(
-                            text = user.value?.username ?: stringResource(R.string.unknown_user),
+                            text = user?.username ?: stringResource(R.string.unknown_user),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodyMedium,
@@ -200,7 +201,7 @@ fun ProfileScreen(navController: NavController) {
                             .padding(12.dp)
                     ) {
                         Text(
-                            text = user.value?.email ?: stringResource(R.string.unknown_email),
+                            text = user?.email ?: stringResource(R.string.unknown_email),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodyMedium,
@@ -212,13 +213,13 @@ fun ProfileScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(48.dp))
         }
 
-        if (uiState.value.showChangeUsernameDialog) {
+        if (uiState.showChangeUsernameDialog) {
             AlertDialog(
                 onDismissRequest = { viewModel.dismissUsernameDialog() },
                 title = { Text(text = stringResource(R.string.change_username)) },
                 text = {
                     OutlinedTextField(
-                        value = uiState.value.newUsernameInput,
+                        value = uiState.newUsernameInput,
                         onValueChange = { viewModel.onNewUsernameChanged(it) },
                         label = { Text(stringResource(R.string.new_username)) },
                         singleLine = true,
@@ -227,7 +228,7 @@ fun ProfileScreen(navController: NavController) {
                 },
                 confirmButton = {
                     TextButton(
-                        enabled = uiState.value.canChangeName,
+                        enabled = uiState.canChangeName,
                         onClick = { viewModel.updateUsername() }
                     ) {
                         Text(stringResource(R.string.save))
@@ -241,7 +242,7 @@ fun ProfileScreen(navController: NavController) {
             )
         }
 
-        if (uiState.value.showProfilePictureOptions) {
+        if (uiState.showProfilePictureOptions) {
             Dialog(onDismissRequest = { viewModel.dismissProfilePictureOptions() }) {
                 Surface(
                     shape = RoundedCornerShape(16.dp),
@@ -270,7 +271,7 @@ fun ProfileScreen(navController: NavController) {
                         ) {
                             Text(text = stringResource(R.string.choose_from_gallery))
                         }
-                        if (user.value?.profilePictureUri != null) {
+                        if (user?.profilePictureUri != null) {
                             TextButton(onClick = {
                                 viewModel.removeProfilePicture()
                                 viewModel.dismissProfilePictureOptions()
@@ -283,7 +284,7 @@ fun ProfileScreen(navController: NavController) {
             }
         }
 
-        if (uiState.value.showConfirmDelete) {
+        if (uiState.showConfirmDelete) {
             AlertDialog(
                 onDismissRequest = { viewModel.dismissConfirmDelete() },
                 title = { Text(text = stringResource(R.string.confirm_delete_account)) },
@@ -309,7 +310,7 @@ fun ProfileScreen(navController: NavController) {
             )
         }
 
-        if (uiState.value.showConfirmLogout) {
+        if (uiState.showConfirmLogout) {
             AlertDialog(
                 onDismissRequest = { viewModel.dismissConfirmLogout() },
                 title = { Text(text = stringResource(R.string.logout)) },
@@ -327,8 +328,8 @@ fun ProfileScreen(navController: NavController) {
             )
         }
 
-        LaunchedEffect(uiState.value.navigateToLogin) {
-            if (uiState.value.navigateToLogin) {
+        LaunchedEffect(uiState.navigateToLogin) {
+            if (uiState.navigateToLogin) {
                 navController.navigate(MusicAppRoute.Login) {
                     popUpTo(navController.graph.id) {
                         inclusive = true

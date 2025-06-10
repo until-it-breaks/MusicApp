@@ -44,7 +44,7 @@ import org.koin.androidx.compose.koinViewModel
 fun LibraryScreen(mainNavController: NavController, subNavController: NavController) {
     val viewModel = koinViewModel<LibraryViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val playlists = viewModel.playlists.collectAsStateWithLifecycle()
+    val playlists by viewModel.playlists.collectAsStateWithLifecycle()
 
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -97,7 +97,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
                             text = stringResource(R.string.your_playlists),
                             style = MaterialTheme.typography.headlineSmall,
                         )
-                        if (playlists.value.isEmpty()) {
+                        if (playlists.isEmpty()) {
                             Text(
                                 text = stringResource(R.string.no_playlists_found),
                                 style = MaterialTheme.typography.bodyMedium,
@@ -106,7 +106,7 @@ fun LibraryScreen(mainNavController: NavController, subNavController: NavControl
                         }
                     }
                 }
-                items(playlists.value) { playlist ->
+                items(playlists) { playlist ->
                     UserPlaylistCard(
                         title = playlist.name,
                         imageUri = playlist.playlistPictureUri,
