@@ -10,6 +10,10 @@ import com.musicapp.data.repositories.LikedTracksRepository
 import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -20,7 +24,14 @@ class TrackDetailsViewModel(
     mediaPlayerManager: MediaPlayerManager,
     private val authManager: AuthManager,
     private val likedTracksRepository: LikedTracksRepository
-): BasePlaybackViewModel(mediaPlayerManager) {
+) : BasePlaybackViewModel(mediaPlayerManager) {
+
+    private var _isCurrentTrackLiked = MutableStateFlow(false)
+    val isCurrentTrackLiked = _isCurrentTrackLiked.asStateFlow()
+
+    init {
+        observeCurrentTrackLikedStatus()
+    }
 
     override fun onCleared() {
         super.onCleared()
@@ -42,6 +53,36 @@ class TrackDetailsViewModel(
                     Log.e(TAG, e.localizedMessage, e)
                 }
             }
+        }
+    }
+
+
+    private fun observeCurrentTrackLikedStatus() {
+        viewModelScope.launch {
+            authManager.userId
+                .collect { userId ->
+                    if (userId == null) {
+                        _isCurrentTrackLiked.value = false
+                        return@collect
+                    }
+
+                    likedTracksRepository.getPlaylistWithTracks(userId)
+                        .map { likedPlaylist ->
+                            val currentTrackId = playbackUiState.value.currentQueueItem?.track?.id
+                            if (currentTrackId == null) {
+                                false
+                            } else {
+                                likedPlaylist.tracks.any { likedTrack ->
+                                    likedTrack.trackId == currentTrackId
+                                }
+                            }
+                        }
+                        .distinctUntilChanged() // Only emit if liked status actually changes
+                        .collect { isLiked ->
+                            _isCurrentTrackLiked.value = isLiked
+                            Log.d(TAG, "Current track liked status updated to: $isLiked")
+                        }
+                }
         }
     }
 }

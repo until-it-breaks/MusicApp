@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -81,6 +82,7 @@ fun TrackDetailsScreen(
     val scope = rememberCoroutineScope()
 
     val currentTrack: TrackModel? = playbackUiState.currentQueueItem?.track
+    val isCurrentTrackLiked by viewModel.isCurrentTrackLiked.collectAsState()
 
     var showQueueBottomSheet by remember { mutableStateOf(false) }
 
@@ -117,6 +119,7 @@ fun TrackDetailsScreen(
                 onRepeatModeClick = viewModel::toggleRepeatMode,
                 onQueueClick = { showQueueBottomSheet = true },
                 onLikeClick = { viewModel.toggleAddToLiked(currentTrack) },
+                isTrackLiked = isCurrentTrackLiked,
                 onAddToQueue = viewModel::addTrackToQueue,
                 onSeek = viewModel::seekTo,
                 currentPosition = playbackUiState.currentPositionMs,
@@ -158,7 +161,8 @@ fun TrackDetailsContent(
 
     LaunchedEffect(painter.state) {
         if (painter.state is AsyncImagePainter.State.Success) {
-            val bitmap = (painter.state as AsyncImagePainter.State.Success).result.drawable.toBitmap()
+            val bitmap =
+                (painter.state as AsyncImagePainter.State.Success).result.drawable.toBitmap()
             Palette.from(bitmap).generate { palette ->
                 palette?.let {
                     // try to get dominant color else use vibrant or muted
@@ -251,6 +255,7 @@ fun TrackDetailsPlayerControls(
     onRepeatModeClick: () -> Unit,
     onQueueClick: () -> Unit,
     onLikeClick: () -> Unit,
+    isTrackLiked: Boolean,
     onAddToQueue: (TrackModel) -> Unit,
     onSeek: (Long) -> Unit,
     currentPosition: Long,
@@ -294,8 +299,13 @@ fun TrackDetailsPlayerControls(
             }
             // like
             IconButton(onClick = onLikeClick) {
+                val heartIcon = if (isTrackLiked) {
+                    R.drawable.ic_heart_filled
+                } else {
+                    R.drawable.ic_heart
+                }
                 Icon(
-                    painter = painterResource(R.drawable.ic_heart),
+                    painter = painterResource(heartIcon),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface
                 )
