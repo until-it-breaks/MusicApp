@@ -142,9 +142,11 @@ class UserPlaylistRepository(
      * Removes a track from a playlist. Calls for a picture update too.
      */
     suspend fun removeTrackFromPlaylist(playlistId: String, trackId: Long) {
-        playlistDAO.deleteTrackFromPlaylist(playlistId, trackId)
-        updatePlaylistPicture(playlistId)
-        playlistDAO.updateEditTime(playlistId)
+        db.withTransaction {
+            playlistDAO.deleteTrackFromPlaylist(playlistId, trackId)
+            updatePlaylistPicture(playlistId)
+            playlistDAO.updateEditTime(playlistId)
+        }
     }
 
     /**

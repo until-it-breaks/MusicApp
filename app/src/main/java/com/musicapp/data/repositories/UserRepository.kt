@@ -1,9 +1,6 @@
 package com.musicapp.data.repositories
 
-import android.content.Context
 import android.net.Uri
-import android.util.Log
-import androidx.core.net.toUri
 import androidx.room.withTransaction
 import com.musicapp.data.database.LikedPlaylist
 import com.musicapp.data.database.LikedPlaylistDAO
@@ -13,83 +10,50 @@ import com.musicapp.data.database.TrackHistoryDAO
 import com.musicapp.data.database.User
 import com.musicapp.data.database.UserDAO
 import com.musicapp.ui.models.UserModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileOutputStream
 
 class UserRepository(
     private val usersDAO: UserDAO,
     private val likedDAO: LikedPlaylistDAO,
     private val historyDAO: TrackHistoryDAO,
-    private val db: MusicAppDatabase,
-    private val context: Context
+    private val db: MusicAppDatabase
 ) {
+    /**
+     * Returns a flow of user given his id.
+     */
     fun getUser(userId: String): Flow<User> = usersDAO.getUser(userId)
 
-    suspend fun saveProfilePictureToInternalStorage(uri: Uri, userId: String): Uri? {
-        return withContext(Dispatchers.IO) {
-            val timestamp = System.currentTimeMillis()
-            val fileName = "profile_picture_${userId}_${timestamp}.jpg"
-            val file = File(context.filesDir, fileName)
-
-            try {
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                    FileOutputStream(file).use { outputStream ->
-                        inputStream.copyTo(outputStream)
-                    }
-                }
-                Log.d("UserRepository", "Successfully saved profile picture to: ${file.absolutePath}")
-                return@withContext file.toUri()
-            } catch (e: Exception) {
-                Log.e("UserRepository", "Error saving profile picture to internal storage", e)
-                return@withContext null
-            }
-        }
-    }
-
+    /**
+     * Updates the profile picture of a given user to the supplied uri.
+     */
     suspend fun updateProfilePicture(uri: Uri, userId: String) {
-        // delete old picture if available
-        val oldUri = usersDAO.getUser(userId).first().profilePictureUri
-        if (oldUri != null && oldUri.isNotEmpty() && oldUri != Uri.EMPTY.toString()){
-            removeProfilePicture(userId)
-        }
-
-        // save picture to internal storage
-        val newInternalUri = saveProfilePictureToInternalStorage(uri, userId)
-        if (newInternalUri != null) {
-            usersDAO.updateProfilePicture(newInternalUri.toString(), userId)
-            Log.d("UserRepository", "Database updated with new profile picture URI: $newInternalUri")
-        } else {
-            usersDAO.updateProfilePicture(Uri.EMPTY.toString(), userId)
-            Log.e("UserRepository", "Failed to save profile picture to internal storage for $userId")
-        }
+        usersDAO.updateProfilePicture(uri.toString(), userId)
     }
 
+    /**
+     * Overrides the profile picture of a given user to null.
+     */
     suspend fun removeProfilePicture(userId: String) {
-        withContext(Dispatchers.IO) {
-            val fileName = usersDAO.getUser(userId).first().profilePictureUri!!
-            val file = File(context.filesDir, fileName)
-            if (file.exists()) {
-                file.delete()
-                Log.d("UserRepository", "Deleted profile picture file: ${file.absolutePath}")
-            }
-            usersDAO.updateProfilePicture(Uri.EMPTY.toString(), userId)
-            Log.d("UserRepository", "Profile picture URI set to EMPTY in DB for userId: $userId")
-        }
+        usersDAO.updateProfilePicture(null, userId)
     }
 
+    /**
+     * Updates the username of a given user.
+     */
     suspend fun updateUsername(newUsername: String, userId: String) {
         usersDAO.updateUsername(newUsername, userId)
     }
 
+    /**
+     * Deletes an user and his data given his id.
+     */
     suspend fun deleteUser(userId: String) {
-        removeProfilePicture(userId)
-        usersDAO.deleteUser(userId)
-        likedDAO.clearLikedTracks(userId)
-        historyDAO.clearTrackHistory(userId)
+        db.withTransaction {
+            removeProfilePicture(userId)
+            usersDAO.deleteUser(userId)
+            likedDAO.clearLikedTracks(userId)
+            historyDAO.clearTrackHistory(userId)
+        }
     }
 
     /**

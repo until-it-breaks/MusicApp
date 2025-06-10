@@ -1,6 +1,8 @@
 package com.musicapp.data.repositories
 
+import androidx.room.withTransaction
 import com.musicapp.data.database.Artist
+import com.musicapp.data.database.MusicAppDatabase
 import com.musicapp.data.database.Track
 import com.musicapp.data.database.TrackArtistCrossRef
 import com.musicapp.data.database.TrackDAO
@@ -15,6 +17,7 @@ data class TrackWithArtists(
 )
 
 class TracksRepository(
+    private val db: MusicAppDatabase,
     private val dao: TrackDAO,
 ) {
     /**
@@ -33,10 +36,12 @@ class TracksRepository(
      * Upserts a track and eventually upserts its artists too if present.
      */
     suspend fun upsertTrack(track: TrackModel) {
-        dao.upsertTrack(track.toDbEntity())
-        track.contributors.forEachIndexed { index, contributor ->
-            dao.upsertArtist(contributor.toDbEntity())
-            dao.addArtistToTrack(TrackArtistCrossRef(track.id, contributor.id, index))
+        db.withTransaction {
+            dao.upsertTrack(track.toDbEntity())
+            track.contributors.forEachIndexed { index, contributor ->
+                dao.upsertArtist(contributor.toDbEntity())
+                dao.addArtistToTrack(TrackArtistCrossRef(track.id, contributor.id, index))
+            }
         }
     }
 }

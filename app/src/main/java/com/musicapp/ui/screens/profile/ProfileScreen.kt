@@ -93,10 +93,7 @@ fun ProfileScreen(navController: NavController) {
         onResult = { uri: Uri? ->
             if (uri != null) {
                 try {
-                    context.contentResolver.takePersistableUriPermission(
-                        uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    )
+                    context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 } catch (e: SecurityException) {
                     Log.e(TAG, "Failed to take persistable URI permission for gallery image", e)
                 }
@@ -271,7 +268,7 @@ fun ProfileScreen(navController: NavController) {
                         ) {
                             Text(text = stringResource(R.string.choose_from_gallery))
                         }
-                        if (user?.profilePictureUri != null) {
+                        if (user?.profilePictureUri != Uri.EMPTY) {
                             TextButton(onClick = {
                                 viewModel.removeProfilePicture()
                                 viewModel.dismissProfilePictureOptions()

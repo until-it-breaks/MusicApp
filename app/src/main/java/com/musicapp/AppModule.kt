@@ -90,7 +90,10 @@ val appModule = module {
     }
 
     single {
-        TracksRepository(get<MusicAppDatabase>().trackDAO())
+        TracksRepository(
+            get(),
+            get<MusicAppDatabase>().trackDAO()
+        )
     }
 
     single {
@@ -98,8 +101,7 @@ val appModule = module {
             get<MusicAppDatabase>().userDAO(),
             get<MusicAppDatabase>().likedPlaylistDAO(),
             get<MusicAppDatabase>().trackHistoryDAO(),
-            get(),
-            get<Context>()
+            get()
         )
     }
 

@@ -24,5 +24,4 @@ data class DeezerTrackSummary(
     val artist: DeezerArtist,
     @SerialName("album")
     val album: DeezerTrackAlbum
-
 )

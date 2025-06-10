@@ -144,21 +144,26 @@ class ProfileScreenViewModel(
                 }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
+            } finally {
+                dismissProfilePictureOptions()
             }
         }
     }
 
     fun removeProfilePicture() {
-        dismissProfilePictureOptions()
         val userId = authManager.userId.value
         if (userId == null) {
             return
         }
         viewModelScope.launch {
             try {
-                userRepository.removeProfilePicture(userId)
+                withContext(Dispatchers.IO) {
+                    userRepository.removeProfilePicture(userId)
+                }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)
+            } finally {
+                dismissProfilePictureOptions()
             }
         }
     }
