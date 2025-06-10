@@ -1,4 +1,4 @@
-package com.musicapp.ui.screens
+package com.musicapp.auth
 
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow

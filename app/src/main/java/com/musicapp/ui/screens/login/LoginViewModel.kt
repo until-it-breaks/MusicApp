@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.musicapp.R
 import com.musicapp.data.repositories.UserRepository
-import com.musicapp.ui.models.UserModel
+import com.musicapp.data.models.UserModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

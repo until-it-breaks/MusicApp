@@ -6,7 +6,7 @@ import com.musicapp.data.database.Track
 import com.musicapp.data.database.TrackHistory
 import com.musicapp.data.database.TrackHistoryDAO
 import com.musicapp.data.database.TrackHistoryTrackCrossRef
-import com.musicapp.ui.models.TrackModel
+import com.musicapp.data.models.TrackModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

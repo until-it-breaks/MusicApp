@@ -1,4 +1,4 @@
-package com.musicapp.ui.models
+package com.musicapp.data.models
 
 import android.net.Uri
 import androidx.core.net.toUri

@@ -8,9 +8,9 @@ import com.musicapp.data.repositories.LikedTracksRepository
 import com.musicapp.data.repositories.SettingsRepository
 import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
-import com.musicapp.ui.models.TrackModel
-import com.musicapp.ui.models.toModel
-import com.musicapp.ui.screens.AuthManager
+import com.musicapp.data.models.TrackModel
+import com.musicapp.data.models.toModel
+import com.musicapp.auth.AuthManager
 import com.musicapp.util.getErrorMessageResId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

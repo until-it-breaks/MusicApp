@@ -6,9 +6,9 @@ import androidx.media3.common.util.UnstableApi
 import com.musicapp.data.repositories.TrackHistoryRepository
 import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
-import com.musicapp.ui.models.TrackHistoryModel
-import com.musicapp.ui.models.toModel
-import com.musicapp.ui.screens.AuthManager
+import com.musicapp.data.models.TrackHistoryModel
+import com.musicapp.data.models.toModel
+import com.musicapp.auth.AuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

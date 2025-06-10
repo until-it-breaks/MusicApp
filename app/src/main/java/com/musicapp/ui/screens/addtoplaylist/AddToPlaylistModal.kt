@@ -27,7 +27,7 @@ import com.musicapp.R
 import com.musicapp.ui.composables.PlaylistCardToAddTo
 import com.musicapp.ui.composables.PlaylistType
 import com.musicapp.ui.composables.TrackCardToAdd
-import com.musicapp.ui.models.TrackModel
+import com.musicapp.data.models.TrackModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

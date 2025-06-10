@@ -9,8 +9,8 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.musicapp.data.repositories.TrackHistoryRepository
-import com.musicapp.ui.models.TrackModel
-import com.musicapp.ui.screens.AuthManager
+import com.musicapp.data.models.TrackModel
+import com.musicapp.auth.AuthManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

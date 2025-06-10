@@ -29,7 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.media3.common.util.UnstableApi
 import com.musicapp.R
 import com.musicapp.playback.QueueItem
-import com.musicapp.ui.models.TrackModel
+import com.musicapp.data.models.TrackModel
 import com.musicapp.ui.screens.addtoplaylist.AddTrackToPlaylistModal
 
 /**

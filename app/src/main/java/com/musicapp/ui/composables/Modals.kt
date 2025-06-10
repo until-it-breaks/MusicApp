@@ -43,7 +43,7 @@ import com.musicapp.R
 import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.PlaybackUiState
 import com.musicapp.playback.QueueItem
-import com.musicapp.ui.models.TrackModel
+import com.musicapp.data.models.TrackModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 

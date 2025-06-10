@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
 import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.playback.MediaPlayerManager
-import com.musicapp.ui.models.UserPlaylistModel
-import com.musicapp.ui.models.toModel
+import com.musicapp.data.models.UserPlaylistModel
+import com.musicapp.data.models.toModel
 import com.musicapp.playback.BasePlaybackViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

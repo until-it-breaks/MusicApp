@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.musicapp.data.remote.deezer.DeezerDataSource
 import com.musicapp.data.repositories.SettingsRepository
-import com.musicapp.ui.models.AlbumModel
-import com.musicapp.ui.models.ArtistModel
-import com.musicapp.ui.models.toModel
+import com.musicapp.data.models.AlbumModel
+import com.musicapp.data.models.ArtistModel
+import com.musicapp.data.models.toModel
 import com.musicapp.util.getErrorMessageResId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

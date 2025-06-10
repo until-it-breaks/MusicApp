@@ -8,9 +8,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.musicapp.data.repositories.UserRepository
-import com.musicapp.ui.models.UserModel
-import com.musicapp.ui.models.toModel
-import com.musicapp.ui.screens.AuthManager
+import com.musicapp.data.models.UserModel
+import com.musicapp.data.models.toModel
+import com.musicapp.auth.AuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel

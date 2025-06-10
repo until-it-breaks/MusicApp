@@ -15,7 +15,7 @@ import com.musicapp.data.repositories.UserPlaylistRepository
 import com.musicapp.data.repositories.UserRepository
 import com.musicapp.playback.BasePlaybackViewModel
 import com.musicapp.playback.MediaPlayerManager
-import com.musicapp.ui.screens.AuthManager
+import com.musicapp.auth.AuthManager
 import com.musicapp.ui.screens.addtoplaylist.AddToPlaylistViewModel
 import com.musicapp.ui.screens.album.AlbumViewModel
 import com.musicapp.ui.screens.artist.ArtistViewModel

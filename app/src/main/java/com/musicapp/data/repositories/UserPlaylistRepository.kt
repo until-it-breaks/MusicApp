@@ -8,8 +8,8 @@ import com.musicapp.data.database.Playlist
 import com.musicapp.data.database.PlaylistTrackCrossRef
 import com.musicapp.data.database.Track
 import com.musicapp.data.database.UserPlaylistDAO
-import com.musicapp.ui.models.TrackModel
-import com.musicapp.ui.models.UserPlaylistModel
+import com.musicapp.data.models.TrackModel
+import com.musicapp.data.models.UserPlaylistModel
 import com.musicapp.util.combineBitmapsFromUris
 import com.musicapp.util.deleteImageFromInternalStorage
 import com.musicapp.util.saveBitmapToInternalStorage

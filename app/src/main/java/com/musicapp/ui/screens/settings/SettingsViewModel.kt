@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.musicapp.data.models.Theme
 import com.musicapp.data.repositories.SettingsRepository
 import com.musicapp.data.repositories.UserRepository
-import com.musicapp.ui.models.UserModel
-import com.musicapp.ui.models.toModel
-import com.musicapp.ui.screens.AuthManager
+import com.musicapp.data.models.UserModel
+import com.musicapp.data.models.toModel
+import com.musicapp.auth.AuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted

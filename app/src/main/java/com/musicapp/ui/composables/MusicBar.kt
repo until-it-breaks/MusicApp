@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.musicapp.R
 import com.musicapp.playback.PlaybackUiState
-import com.musicapp.ui.models.TrackModel
+import com.musicapp.data.models.TrackModel
 
 @Composable
 fun MusicBar(

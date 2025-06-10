@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.musicapp.R
 import com.musicapp.data.repositories.UserRepository
-import com.musicapp.ui.models.UserModel
+import com.musicapp.data.models.UserModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

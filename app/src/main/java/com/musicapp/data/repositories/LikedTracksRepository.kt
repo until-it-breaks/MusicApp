@@ -6,7 +6,7 @@ import com.musicapp.data.database.LikedPlaylistDAO
 import com.musicapp.data.database.LikedPlaylistTrackCrossRef
 import com.musicapp.data.database.MusicAppDatabase
 import com.musicapp.data.database.Track
-import com.musicapp.ui.models.TrackModel
+import com.musicapp.data.models.TrackModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

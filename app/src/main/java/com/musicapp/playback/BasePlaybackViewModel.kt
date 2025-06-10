@@ -2,7 +2,7 @@ package com.musicapp.playback
 
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.util.UnstableApi
-import com.musicapp.ui.models.TrackModel
+import com.musicapp.data.models.TrackModel
 import kotlinx.coroutines.flow.StateFlow
 
 /**

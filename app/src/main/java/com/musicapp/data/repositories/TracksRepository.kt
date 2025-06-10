@@ -6,8 +6,8 @@ import com.musicapp.data.database.MusicAppDatabase
 import com.musicapp.data.database.Track
 import com.musicapp.data.database.TrackArtistCrossRef
 import com.musicapp.data.database.TrackDAO
-import com.musicapp.ui.models.TrackModel
-import com.musicapp.ui.models.toDbEntity
+import com.musicapp.data.models.TrackModel
+import com.musicapp.data.models.toDbEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 

@@ -68,7 +68,7 @@ import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.QueueBottomSheet
 import com.musicapp.ui.composables.TopBarWithBackButton
-import com.musicapp.ui.models.TrackModel
+import com.musicapp.data.models.TrackModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel

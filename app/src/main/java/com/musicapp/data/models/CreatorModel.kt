@@ -1,4 +1,4 @@
-package com.musicapp.ui.models
+package com.musicapp.data.models
 
 import com.musicapp.data.remote.deezer.DeezerCreator
 

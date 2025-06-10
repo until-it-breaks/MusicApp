@@ -9,7 +9,7 @@ import com.musicapp.data.database.TrackHistory
 import com.musicapp.data.database.TrackHistoryDAO
 import com.musicapp.data.database.User
 import com.musicapp.data.database.UserDAO
-import com.musicapp.ui.models.UserModel
+import com.musicapp.data.models.UserModel
 import kotlinx.coroutines.flow.Flow
 
 class UserRepository(

@@ -33,7 +33,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.musicapp.playback.PlaybackUiState
-import com.musicapp.ui.models.TrackModel
+import com.musicapp.data.models.TrackModel
 import com.musicapp.ui.theme.playingColor
 
 enum class PlaylistType {
