@@ -2,7 +2,6 @@ package com.musicapp.ui.screens.trackdetails
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +47,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,15 +60,12 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.musicapp.R
-import com.musicapp.playback.BasePlaybackViewModel
+import com.musicapp.data.models.TrackModel
 import com.musicapp.playback.PlaybackUiState
 import com.musicapp.playback.RepeatMode
-import com.musicapp.ui.MusicAppRoute
 import com.musicapp.ui.composables.PublicTrackDropDownMenu
 import com.musicapp.ui.composables.QueueBottomSheet
 import com.musicapp.ui.composables.TopBarWithBackButton
-import com.musicapp.data.models.TrackModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.util.Locale
@@ -80,24 +76,21 @@ import java.util.Locale
 fun TrackDetailsScreen(
     navController: NavController,
 ) {
-    val viewModel: BasePlaybackViewModel = koinViewModel()
+    val viewModel = koinViewModel<TrackDetailsViewModel>()
     val playbackUiState by viewModel.playbackUiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
     val currentTrack: TrackModel? = playbackUiState.currentQueueItem?.track
-    val TIMEOUT_MILLIS = 2000L
 
     var showQueueBottomSheet by remember { mutableStateOf(false) }
 
-
-
-    LaunchedEffect(currentTrack) {
-        if (currentTrack == null){
-            delay(TIMEOUT_MILLIS)
-            if (currentTrack == null) {
-                navController.popBackStack()
+    LaunchedEffect(Unit) {
+        snapshotFlow { playbackUiState.currentQueueItem?.track }
+            .collect { track ->
+                if (track == null) {
+                    navController.popBackStack()
+                }
             }
-        }
     }
 
     if (currentTrack == null) {
@@ -111,7 +104,8 @@ fun TrackDetailsScreen(
         topBar = {
             TopBarWithBackButton(
                 navController = navController,
-                title = currentTrack.title)
+                title = currentTrack.title
+            )
         },
         bottomBar = {
             TrackDetailsPlayerControls(
@@ -122,7 +116,7 @@ fun TrackDetailsScreen(
                 onShuffleClick = viewModel::toggleShuffleMode,
                 onRepeatModeClick = viewModel::toggleRepeatMode,
                 onQueueClick = { showQueueBottomSheet = true },
-                onLikeClick = { /*TODO*/ },
+                onLikeClick = { viewModel.toggleAddToLiked(currentTrack) },
                 onAddToQueue = viewModel::addTrackToQueue,
                 onSeek = viewModel::seekTo,
                 currentPosition = playbackUiState.currentPositionMs,
@@ -132,7 +126,6 @@ fun TrackDetailsScreen(
     ) { paddingValues ->
         TrackDetailsContent(
             track = currentTrack,
-            navController = navController,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
@@ -150,7 +143,6 @@ fun TrackDetailsScreen(
 @Composable
 fun TrackDetailsContent(
     track: TrackModel,
-    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -166,8 +158,7 @@ fun TrackDetailsContent(
 
     LaunchedEffect(painter.state) {
         if (painter.state is AsyncImagePainter.State.Success) {
-            val bitmap =
-                (painter.state as AsyncImagePainter.State.Success).result.drawable.toBitmap()
+            val bitmap = (painter.state as AsyncImagePainter.State.Success).result.drawable.toBitmap()
             Palette.from(bitmap).generate { palette ->
                 palette?.let {
                     // try to get dominant color else use vibrant or muted
@@ -223,7 +214,6 @@ fun TrackDetailsContent(
                         )
                     }
                 }
-
                 Text(
                     text = track.title,
                     color = Color.White,
@@ -240,21 +230,14 @@ fun TrackDetailsContent(
                     text = contributor.name,
                     color = Color.White,
                     style = MaterialTheme.typography.bodyMedium,
-                    textDecoration = TextDecoration.Underline,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.clickable(onClick = {
-                        var artistId = contributor.id
-                        navController.navigate(MusicAppRoute.Artist(artistId))
-                    })
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
         }
     }
-
 }
-
 
 // bottom bar with controls buttons
 @OptIn(ExperimentalMaterial3Api::class)
@@ -312,8 +295,8 @@ fun TrackDetailsPlayerControls(
             // like
             IconButton(onClick = onLikeClick) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_heart), // TODO: show filled heart if liked
-                    contentDescription = "Like",
+                    painter = painterResource(R.drawable.ic_heart),
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -322,7 +305,7 @@ fun TrackDetailsPlayerControls(
             PublicTrackDropDownMenu(
                 trackModel = playbackUiState.currentQueueItem.track,
                 onAddToQueue = onAddToQueue,
-                onLiked = { } /*TODO*/,
+                onLiked = { onLikeClick() },
                 customIcon = {
                     Icon(
                         painter = painterResource(R.drawable.ic_add),

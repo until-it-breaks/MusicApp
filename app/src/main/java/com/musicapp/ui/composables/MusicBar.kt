@@ -53,8 +53,8 @@ fun MusicBar(
         ) {
 
             LoadableImage(
-                track?.mediumPictureUri,
-                "Track picture",
+                imageUri = track?.mediumPictureUri,
+                contentDescription = null,
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(4.dp)),

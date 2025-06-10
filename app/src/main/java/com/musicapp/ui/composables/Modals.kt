@@ -186,7 +186,6 @@ fun QueueBottomSheet(
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .fillMaxHeight(0.8f)
         ) {
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -219,7 +218,7 @@ fun QueueBottomSheet(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = playbackUiState.currentQueueItem?.track?.title ?: "",
+                    text = playbackUiState.currentQueueItem?.track?.title ?: stringResource(R.string.unknown_track),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -268,7 +267,7 @@ fun QueueBottomSheet(
                                             painter = painterResource(
                                                 if (playbackUiState.isPlaying) R.drawable.ic_pause else R.drawable.ic_play
                                             ),
-                                            contentDescription = "Play Track",
+                                            contentDescription = null,
                                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }

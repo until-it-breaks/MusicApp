@@ -12,8 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @param mediaPlayerManager The MediaPlayerManager instance, in this case injected via Koin.
  */
 @UnstableApi
-open class BasePlaybackViewModel
-    (
+open class BasePlaybackViewModel(
     protected val mediaPlayerManager: MediaPlayerManager
 ) : ViewModel() {
 
@@ -34,7 +33,6 @@ open class BasePlaybackViewModel
     fun clearPlaybackQueue() {
         mediaPlayerManager.clearQueue()
     }
-
 
     /**
      * Toggles playback for a given track.

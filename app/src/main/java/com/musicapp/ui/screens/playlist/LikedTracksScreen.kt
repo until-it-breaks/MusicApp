@@ -84,7 +84,7 @@ fun LikedTracksScreen(mainNavController: NavController, subNavController: NavCon
                             SavedTrackDropDownMenu(
                                 track = track,
                                 onAddToQueue = viewModel::addTrackToQueue,
-                                onRemoveTrack = { viewModel.removeTrackFromLikedTracks(track.id) }
+                                onRemoveTrack = { viewModel.removeTrackFromLikedTracks(track) }
                             )
                         }
                     )

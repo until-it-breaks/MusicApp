@@ -9,6 +9,7 @@ import com.musicapp.playback.MediaPlayerManager
 import com.musicapp.data.models.LikedTracksPlaylistModel
 import com.musicapp.data.models.toModel
 import com.musicapp.auth.AuthManager
+import com.musicapp.data.models.TrackModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,7 +71,7 @@ class LikedTracksViewModel(
         }
     }
 
-    fun removeTrackFromLikedTracks(trackId: Long) {
+    fun removeTrackFromLikedTracks(track: TrackModel) {
         val userId = authManager.userId.value
         if (userId == null) {
             _uiState.update { it.copy(showAuthError = true) }
@@ -79,7 +80,7 @@ class LikedTracksViewModel(
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    likedTracksRepository.removeTrackFromLikedTracks(userId, trackId)
+                    likedTracksRepository.removeTrackFromLikedTracks(userId, track)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, e.localizedMessage, e)

@@ -1,7 +1,6 @@
 package com.musicapp.ui.composables
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Icon
@@ -11,8 +10,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-
-private const val TAG = "LoadableImage"
 
 @Composable
 fun LoadableImage(
@@ -33,9 +30,6 @@ fun LoadableImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(imageUri)
                 .crossfade(true)
-                .listener(onError = { request, result ->
-                    Log.e(TAG, "Failed to load image: ${request.data}. Error: ${result.throwable.message}", result.throwable)
-                })
                 .build(),
             contentDescription = contentDescription,
             modifier = modifier,

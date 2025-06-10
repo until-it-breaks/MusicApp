@@ -93,9 +93,9 @@ class LikedTracksRepository(
     /**
      * Removes a track from a given user's liked tracks.
      */
-    suspend fun removeTrackFromLikedTracks(playlistId: String, trackId: Long) {
+    suspend fun removeTrackFromLikedTracks(playlistId: String, track: TrackModel) {
         db.withTransaction {
-            likedPlaylistDAO.deleteTrackFromLikedTracks(playlistId, trackId)
+            likedPlaylistDAO.deleteTrackFromLikedTracks(playlistId, track.id)
             likedPlaylistDAO.updateEditTime(playlistId)
         }
     }
