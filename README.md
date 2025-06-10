@@ -2,6 +2,8 @@
 
 A simple music player that fetches content from the Deezer public API.
 
+https://github.com/user-attachments/assets/ac56ce39-dfc1-43b8-806e-88f2ccbe55e3
+
 ## Features
 
 * Easy-to-use Music Player
