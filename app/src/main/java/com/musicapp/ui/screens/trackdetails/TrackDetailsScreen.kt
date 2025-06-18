@@ -82,7 +82,7 @@ fun TrackDetailsScreen(
     val scope = rememberCoroutineScope()
 
     val currentTrack: TrackModel? = playbackUiState.currentQueueItem?.track
-    val isCurrentTrackLiked by viewModel.isCurrentTrackLiked.collectAsState()
+    val isCurrentTrackLiked by viewModel.isCurrentTrackLiked.collectAsStateWithLifecycle()
 
     var showQueueBottomSheet by remember { mutableStateOf(false) }
 
